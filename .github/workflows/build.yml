@@ -1,0 +1,35 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: npm
+    - run: npm ci
+    - run: npm run test-all
+    - run: |
+        npm run -w viewer build
+        cp -r viewer/public/* viewer/dist/
+    - uses: actions/upload-pages-artifact@v1
+      with:
+        path: "viewer/dist"
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-22.04
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v1
