@@ -126,7 +126,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 				let val = renderAny(es[i + 1], { clickParent: line });
 				if (val) {
 					line.append(
-						renderAny(es[i], { unwrap: true, forceDefault: true }),
+						renderAny(es[i], { unwrap: true }),
 						": ",
 						val,
 					);
@@ -135,7 +135,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 			}
 		} else {
 			for (let i = 0; i < es.length; i++) {
-				element.append(renderAny(es[i], { unwrap: false, forceDefault: true }));
+				element.append(renderAny(es[i], { unwrap: false }));
 			}
 		}
 		element.dataset.start = "" + start;
@@ -329,7 +329,11 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 				}
 				return element;
 			}
-			entries.appendChild(createBlank(v[1].length, v[2], false));
+			let end = v[1].length;
+			if (v[0] === UIType.Object || v[0] === UIType.Map) {
+				end /= 2;
+			}
+			entries.appendChild(createBlank(end, v[2], false));
 		}
 
 		entries.classList.add("entries");
@@ -344,18 +348,10 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 		return e;
 	}
 
-	function renderAny(v: UIAny, a: { unwrap?: boolean; forceDefault: true; clickParent?: HTMLElement; }): HTMLElement;
 	function renderAny(
 		v: UIAny,
-		a?: { unwrap?: boolean; forceDefault?: boolean; clickParent?: HTMLElement; },
-	): HTMLElement | undefined;
-	function renderAny(
-		v: UIAny,
-		{ unwrap, forceDefault, clickParent }: { unwrap?: boolean; forceDefault?: boolean; clickParent?: HTMLElement; } = {
-			unwrap: false,
-			forceDefault: false,
-		},
-	): HTMLElement | undefined {
+		{ unwrap = false, clickParent }: { unwrap?: boolean; clickParent?: HTMLElement; } = {},
+	): HTMLElement {
 		if (typeof v === "string") {
 			const escapes: { [key: string]: string; } = {
 				"\0": "0",
@@ -444,7 +440,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 
 			if (unwrap && type === UIType.Array) {
 				if (v[1].length === 1) {
-					return renderAny(v[1][0], { unwrap: false, forceDefault: true });
+					return renderAny(v[1][0], { unwrap: false });
 				}
 			}
 
@@ -458,7 +454,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 		}
 
 		if (type === UIType.Typed) {
-			let e = renderAny(v[2], { unwrap, forceDefault, clickParent });
+			let e = renderAny(v[2], { unwrap, clickParent });
 			if (e) {
 				let type = v[1][0];
 				e.dataset.type = type;
@@ -497,13 +493,6 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 			return e;
 		}
 
-		if (type === UIType.DefaultValue) {
-			if (showDefault || forceDefault) {
-				return renderAny(v, { unwrap, forceDefault, clickParent });
-			}
-			return undefined;
-		}
-
 		return sp("unknown");
 	}
 
@@ -524,7 +513,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean,
 	}
 
 	{
-		let el = renderAny(data.value, { unwrap, forceDefault: true });
+		let el = renderAny(data.value, { unwrap });
 
 		for (; parent.lastChild; parent.removeChild(parent.lastChild));
 		parent.appendChild(el);

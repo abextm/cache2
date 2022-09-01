@@ -1,15 +1,15 @@
 import { NewType, Typed } from "cache2";
 import * as _ from "lodash";
+import { isEqual } from "lodash";
 
 // we use a bunch of tagged arrays as our intermediate format as they all get
 // posted via structured clone which seems to be faster with arrays since it doesn't
 // have to copy object keys
 
 export type UIPrimitive = string | number | boolean | undefined | bigint | null | Blob;
-export type UIAny = UIPrimitive | UITyped | UIList | UIPartialList | UIToStringed | UIError | UIDefaultValue;
+export type UIAny = UIPrimitive | UITyped | UIList | UIPartialList | UIToStringed | UIError;
 export type UITyped = [UIType.Typed, UITypeRef, UIPrimitive];
 export type UITypeRef = [string];
-export type UIDefaultValue = [UIType.DefaultValue, UIAny];
 
 export enum UIType {
 	Object = 1,
@@ -69,7 +69,7 @@ interface Entries {
 	isKV: boolean;
 }
 
-export function serialize(v: any): [UIData, Transferable[]] {
+export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[]] {
 	let seen: Map<any, [UIAny, number]> = new Map();
 	let types: Map<string, UITypeRef> = new Map();
 	let partials: { v: any; rType: Typed.Any | undefined; }[] = [];
@@ -88,15 +88,6 @@ export function serialize(v: any): [UIData, Transferable[]] {
 			v = [UIType.Typed, typ, v];
 		}
 
-		v = wrapDefault(v, rType && "default" in rType && rType.default === v0);
-
-		return v;
-	}
-
-	function wrapDefault(v: UIAny, isDefault: boolean | undefined): UIAny {
-		if (isDefault) {
-			v = [UIType.DefaultValue, v];
-		}
 		return v;
 	}
 
@@ -154,7 +145,7 @@ export function serialize(v: any): [UIData, Transferable[]] {
 				return existing;
 			}
 
-			let entries = this.toEntries(v);
+			let entries = this.toEntries(v, rType);
 			let isPartial = false;
 
 			if (ArrayBuffer.isView(entries.entries)) {
@@ -180,22 +171,16 @@ export function serialize(v: any): [UIData, Transferable[]] {
 				let perLimit = limit == -1 ? COLUMNS : limit / Math.min(entries.entries.length + 1, 6);
 				let size = 2;
 
-				let nonDefault = 0;
-				for (let { s, isDefault } of ctx.serEntries(entries, perLimit, uiEntries, rType)) {
-					if (isDefault) {
-						continue;
-					}
-
-					nonDefault++;
+				for (let s of ctx.serEntries(entries, perLimit, uiEntries, rType)) {
 					size += s;
 
 					if (limit == -1) {
-						if (nonDefault > ROOT_ROWS) {
+						if (uiEntries.length > ROOT_ROWS) {
 							isPartial = true;
 							break;
 						}
 					} else {
-						if (size > limit && nonDefault > 3) {
+						if (size > limit && uiEntries.length > 3) {
 							isPartial = true;
 							break;
 						}
@@ -210,8 +195,6 @@ export function serialize(v: any): [UIData, Transferable[]] {
 				existing[0].push(entries.entries.length, id);
 			}
 
-			existing[0] = wrapDefault(existing[0], rType && "default" in rType && _.isEqual(v, rType.default));
-
 			return existing;
 		}
 
@@ -222,7 +205,7 @@ export function serialize(v: any): [UIData, Transferable[]] {
 			rType: Typed.Any | undefined,
 			start = 0,
 			end?: number,
-		): Generator<{ s: number; isDefault: boolean; }, void, void> {
+		): Generator<number, void, void> {
 			end ??= entries.length;
 
 			let objType = rType?.type === "obj" ? rType : undefined;
@@ -233,21 +216,18 @@ export function serialize(v: any): [UIData, Transferable[]] {
 				let entry = entries[i];
 				if (isKV) {
 					let [kv, ks] = this.serAny(entry[0], perLimit, undefined);
-					let [vv, vs] = this.serAny(entry[1], perLimit, objType?.entries[entry[0]] || objType?.defaultEntry);
+					let [vv, vs] = this.serAny(entry[1], perLimit, objType?.entries[entry[0]] ?? objType?.defaultEntry);
 					uiEntries.push(kv, vv);
-					yield {
-						s: ks + vs,
-						isDefault: Array.isArray(vv) && vv[0] === UIType.DefaultValue,
-					};
+					yield ks + vs;
 				} else {
 					let [v, s] = this.serAny(entry, perLimit, listType?.entries || tupType?.entries?.[i]);
 					uiEntries.push(v);
-					yield { s, isDefault: false };
+					yield s;
 				}
 			}
 		}
 
-		toEntries(v: any): Entries {
+		toEntries(v: any, rType: Typed.Any): Entries {
 			if (Array.isArray(v)) {
 				return {
 					type: UIType.Array,
@@ -281,9 +261,16 @@ export function serialize(v: any): [UIData, Transferable[]] {
 					isKV: true,
 				};
 			} else {
+				let entries = Object.entries(v);
+				if (hideDefaults && rType && rType.type === "obj") {
+					entries = entries.filter(([k, v]) => {
+						let ty = rType.entries[k] ?? rType.defaultEntry;
+						return !(ty && "default" in ty && isEqual(ty.default, v));
+					});
+				}
 				return {
 					type: UIType.Object,
-					entries: Object.entries(v),
+					entries,
 					isKV: true,
 				};
 			}
@@ -302,7 +289,7 @@ export function serialize(v: any): [UIData, Transferable[]] {
 		p2.onmessage = (ev: MessageEvent<UIPartialRequest>) => {
 			let ctx = new Context();
 			let part = partials[ev.data.partial];
-			let entries = ctx.toEntries(part.v);
+			let entries = ctx.toEntries(part.v, part.rType);
 			let uiEntries: UIAny[] | TypedArray;
 			if (ArrayBuffer.isView(entries.entries)) {
 				uiEntries = entries.entries.slice(ev.data.start, ev.data.end);

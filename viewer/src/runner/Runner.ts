@@ -54,7 +54,7 @@ class ScriptRunner {
 					return;
 				}
 				self.console.log(...args);
-				let [uidata, transfer] = serialize(args);
+				let [uidata, transfer] = serialize(args, true);
 				this.respond<Log>({
 					type: "log",
 					level,
@@ -186,7 +186,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 				}
 
 				if (value) {
-					let [uidata, trans] = serialize([value]);
+					let [uidata, trans] = serialize([value], true);
 					script.respond<Log>({
 						type: "log",
 						level: "done",
@@ -222,10 +222,10 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		}
 
 		if (v.length == 1) {
-			return ServiceServer.return(...serialize(v[0]));
+			return ServiceServer.return(...serialize(v[0], true));
 		}
 
-		return ServiceServer.return(...serialize(v));
+		return ServiceServer.return(...serialize(v, true));
 	},
 });
 
