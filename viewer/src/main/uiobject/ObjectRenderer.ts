@@ -78,7 +78,7 @@ function getVisibleArea(e: Element): DOMRect {
 	);
 }
 
-export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean, showDefault: boolean): RenderedObject {
+export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean): RenderedObject {
 	let port = data.port;
 	port?.start();
 

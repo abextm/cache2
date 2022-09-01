@@ -8,14 +8,13 @@
 	export let value: UIData;
 	export let unwrap = false;
 	export let expanded = false;
-	export let showDefault = false;
 
 	let parent: HTMLDivElement;
 	let ins: RenderedObject;
 	$: {
 		if (parent && value) {
 			ins?.destroy(value);
-			ins = renderObject(parent, value, unwrap, showDefault);
+			ins = renderObject(parent, value, unwrap);
 		}
 	}
 	$: ins?.setExpanded(expanded);
