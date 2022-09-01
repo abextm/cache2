@@ -1,5 +1,6 @@
 import { capitalize } from "lodash";
 import { getCacheSharePort } from "./CacheShare";
+import { altCache, defaultCache } from "./db";
 import { ServiceClient } from "./ServiceClient";
 import { UIData } from "./uiobject";
 
@@ -87,7 +88,10 @@ export class Runner implements IRunner {
 	lookup = proxy("lookup");
 }
 
-export function getRunner(): Runner {
+defaultCache.subscribe(() => runner?.terminate());
+altCache.subscribe(() => runner?.terminate());
+
+export function getRunner(..._unusedCacheStores: any[]): Runner {
 	if (!runner) {
 		runner = new Runner();
 	}

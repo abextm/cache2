@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Writable } from "svelte/store";
+	import { altCache, defaultCache } from "../../common/db";
 	import { getRunner, LookupType } from "../../common/Runner";
 	import { historyStore } from "../HistoryStore";
 	import JSObject from "../uiobject/JSObject.svelte";
@@ -22,7 +23,7 @@
 		{#if $key}
 			<input class="filter" type="text" bind:value={$filter} placeholder="id or name regexp"/>
 			<div class="contents">
-				{#await getRunner().lookup($key, $filter)}
+				{#await getRunner($defaultCache, $altCache).lookup($key, $filter)}
 					Loading...
 				{:then value}
 					{#if value}

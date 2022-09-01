@@ -4,7 +4,7 @@
 	import Split from "../util/Split.svelte";
 	import { onMount, onDestroy } from "svelte";
 	import { ScriptResponse, getRunner, scriptRunner } from "../../common/Runner";
-	import { darkMode } from "../../common/db";
+	import { altCache, darkMode, defaultCache } from "../../common/db";
 	
 	let container: HTMLDivElement;
 	let monaco: typeof monaco_t;
@@ -116,6 +116,14 @@ import * as context from "viewer/context";
 	let stop = () => {
 		scriptRunner?.terminate();
 	}
+
+	function cacheChange() {
+		stop();
+		logs = [];
+	}
+
+	defaultCache.subscribe(cacheChange);
+	altCache.subscribe(cacheChange);
 </script>
 
 <style lang="scss">
