@@ -40,16 +40,19 @@ function stateToURL(state: State): string | undefined {
 	if (!state.tab) {
 		return undefined;
 	}
-	let s = "#/" + state.tab;
+	let bits: string[] = [state.tab];
 	if (state.tab === "viewer" && state.viewerKey) {
-		s += "/" + state.viewerKey + "/" + encodeURIComponent(state.viewerFilter);
+		bits.push(state.viewerKey);
+		if (state.viewerFilter) {
+			bits.push(state.viewerFilter);
+		}
 	}
-	return s;
+	return "#/" + bits.map(encodeURIComponent).join("/");
 }
 
 function urlToState(hash: string): Partial<State> {
 	hash = hash.replace(/^[^#]*#?\/?/, "");
-	let parts = hash.split("/");
+	let parts = hash.split("/").map(decodeURIComponent);
 	let newState: Partial<State> = {};
 	newState.tab = parts[0] as any;
 	if (newState.tab === "viewer") {
