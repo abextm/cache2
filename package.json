@@ -1,0 +1,25 @@
+{
+	"name": "cache2-parent",
+	"workspaces": [
+		"formatgen",
+		"cache2-ts",
+		"viewer"
+	],
+	"scripts": {
+		"serve": "npm -w viewer run serve",
+		"format": "dprint fmt",
+		"lint": "eslint .",
+		"test-all": "npm run -w cache2-ts test && npm run lint && npm run -w viewer svelte-check && dprint check"
+	},
+	"devDependencies": {
+		"@types/node": "^18.0.6",
+		"@typescript-eslint/eslint-plugin": "^5.36.1",
+		"@typescript-eslint/parser": "^5.36.1",
+		"dprint": "^0.31.1",
+		"eslint": "^8.23.0",
+		"eslint-plugin-svelte": "^2.7.0",
+		"ts-node": "^10.9.1",
+		"tsconfig-paths": "^4.0.0",
+		"typescript": "^4.7.4"
+	}
+}

@@ -1,0 +1,51 @@
+@use "uiobject/object.scss";
+
+body.dark {
+	--background: #1e1e1e;
+	--tooltip: #2c2c2cdd;
+	--color: #d4d4d4;
+	--color-inactive: #d4d4d4AA;
+}
+body.light {
+	--background: #eee;
+	--tooltip: #ccc3;
+	--color: #000;
+	--color-inactive: #000A;
+}
+body {
+	background-color: var(--background);
+	color: var(--color);
+	overflow: hidden;
+}
+
+html, body, .main {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "HelveticaNeue-Light", system-ui, "Ubuntu", "Droid Sans", sans-serif
+}
+
+.tab-padded {
+	padding: 4px 6px;
+	overflow: auto;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+// monaco is broken
+.monaco-aria-container {
+	display: none;
+}
+.monaco-editor.rename-box, .monaco-hover {
+	top: 0;
+}
+
+.tooltip {
+	background-color: var(--tooltip);
+	color: var(--color);
+	border: 1px solid #8888;
+	padding: 2px;
+	& > pre {
+		margin: 0 0;
+	}
+}

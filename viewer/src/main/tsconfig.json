@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"include": [
+		"../common/**/*.ts",
+		"../main/**/*"
+	],
+	"compilerOptions": {
+		"lib": ["ES2020", "WebWorker", "DOM"],
+		"types": [
+			"svelte",
+			"svelte/store",
+			"svelte/motion",
+			"svelte/transition",
+			"svelte/animate",
+			"svelte/easing",
+			"wicg-file-system-access"
+		]
+	}
+}

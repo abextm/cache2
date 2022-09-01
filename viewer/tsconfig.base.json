@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"sourceMap": true,
+		"strict": true,
+		"target": "ES2020",
+		"moduleResolution": "node",
+		"module": "ES2022",
+		"declaration": true,
+		"outDir": "build",
+		"stripInternal": true,
+		"importsNotUsedAsValues": "remove",
+		"rootDir": "../",
+		"experimentalDecorators": true,
+		"paths": {
+			"cache2": [
+				"../cache2-ts/src"
+			]
+		}
+	}
+}

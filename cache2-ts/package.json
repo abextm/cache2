@@ -1,0 +1,22 @@
+{
+	"name": "cache2",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"test": "jest",
+		"generate": "rm -rf src/generated && ts-node ../formatgen/src/ts.ts src/generated/",
+		"prepare": "npm run generate && rm -rf dist && tsc"
+	},
+	"author": "Abex",
+	"license": "BSD-2-Clause",
+	"dependencies": {
+		"fflate": "^0.7.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^28.1.6",
+		"just": "^0.1.8",
+		"ts-jest": "^28.0.7"
+	}
+}

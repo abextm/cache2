@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.base.json",
+	"include": [
+		"src/common/**/*.ts",
+		"src/worker/**/*.ts",
+		"src/runner/**/*.ts",
+		"src/context/**/*.ts",
+		"src/tspatch/**/*.ts"
+	],
+	"compilerOptions": {
+		"lib": ["ES2020", "WebWorker"]
+	}
+}

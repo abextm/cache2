@@ -1,0 +1,115 @@
+import { ArchiveData, CacheProvider, FileProvider, hash, IndexData } from "./Cache";
+
+export class FlatIndexData implements IndexData {
+	public protocol!: number;
+	public revision!: number;
+	public compression!: number;
+	public crc!: number;
+	public named!: boolean;
+
+	private archives: Map<number, ArchiveData> = new Map();
+	private constructor() {}
+
+	static async of(indexID: number, data: Uint8Array): Promise<FlatIndexData> {
+		const LF = 0x0A;
+		const EQ = 0x3D;
+		let fid = new FlatIndexData();
+		const td = new TextDecoder();
+		let ar: ArchiveData | undefined;
+		for (let i = 0; i < data.length; i++) {
+			let eol = data.indexOf(LF, i);
+			if (eol == -1) {
+				eol = data.length;
+			}
+			let line = data.subarray(i, eol);
+			i = eol;
+
+			let kvs = line.indexOf(EQ);
+			if (kvs == -1) {
+				continue;
+			}
+			let key = td.decode(line.subarray(0, kvs));
+			let value = td.decode(line.subarray(kvs + 1));
+
+			if (key === "id") {
+				fid.archives.set(~~value, ar = new ArchiveData(indexID, ~~value));
+				continue;
+			}
+
+			if (!ar) {
+				switch (key) {
+					case "named":
+						fid.named = value == "true";
+						break;
+					case "revision":
+					case "compression":
+					case "crc":
+						fid[key] = ~~value;
+						break;
+				}
+			} else {
+				switch (key) {
+					case "contents": {
+						let res = await fetch("data:application/octet-binary;base64," + value);
+						let data = await res.arrayBuffer();
+						ar!.compressedData = new Uint8Array(data);
+						break;
+					}
+					case "file": {
+						let [id, hash] = value.split("=");
+						ar!.addFile(~~id, ~~hash);
+						break;
+					}
+					case "namehash":
+					case "revision":
+					case "crc":
+					case "compression":
+						ar[key] = ~~value;
+						break;
+				}
+			}
+		}
+		return fid;
+	}
+
+	getArchive(archive: number): ArchiveData | undefined {
+		return this.archives.get(archive);
+	}
+
+	getArchiveByName(name: string | number): ArchiveData | undefined {
+		let namehash = hash(name);
+		for (let ar of this.archives.values()) {
+			if (ar.namehash == namehash) {
+				return ar;
+			}
+		}
+	}
+}
+
+export class FlatCacheProvider implements CacheProvider {
+	private indexes: Map<number, Promise<FlatIndexData | undefined>> = new Map();
+
+	constructor(private disk: FileProvider) {
+	}
+
+	public async getIndex(index: number): Promise<FlatIndexData | undefined> {
+		let idxp = this.indexes.get(index);
+		if (!idxp) {
+			this.indexes.set(
+				index,
+				idxp = this.disk.getFile(index + ".flatcache").then(data => data && FlatIndexData.of(index, data)),
+			);
+		}
+		return idxp;
+	}
+
+	public async getArchive(index: number, archive: number): Promise<ArchiveData | undefined> {
+		let idx = await this.getIndex(index);
+		return idx?.getArchive(archive);
+	}
+
+	public async getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined> {
+		let idx = await this.getIndex(index);
+		return idx?.getArchiveByName(name);
+	}
+}

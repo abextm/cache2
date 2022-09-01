@@ -1,0 +1,22 @@
+{
+	"lineWidth": 120,
+	"useTabs": true,
+	"typescript": {
+		"semiColons": "always",
+		"quoteStyle": "preferDouble",
+		"quoteProps": "asNeeded"
+	},
+	"json": {},
+	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
+	"excludes": [
+		"cache2-ts/src/generated",
+		"dist",
+		"build",
+		"**/node_modules",
+		"**/*-lock.json"
+	],
+	"plugins": [
+		"https://plugins.dprint.dev/typescript-0.71.2.wasm",
+		"https://plugins.dprint.dev/json-0.15.5.wasm"
+	]
+}

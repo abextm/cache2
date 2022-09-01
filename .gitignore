@@ -1,0 +1,10 @@
+dist/
+build/
+cache2-ts/src/generated
+*.tsbuildinfo
+node_modules
+.vscode
+.idea
+*.iml
+.DS_Store
+Thumbs.db

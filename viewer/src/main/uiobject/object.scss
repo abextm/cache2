@@ -1,0 +1,116 @@
+.light {
+	.jsobject {
+		.string {
+			color: #a31515;
+		}
+		.number {
+			color: #098658;
+		}
+		.boolean, .undefined, .null {
+			color: #0000ff;
+		}
+		.type {
+			color: #008080;
+		}
+	}
+}
+.dark {
+	.jsobject {
+		.string {
+			color: #ce9178;
+		}
+		.number, .bigint {
+			color: #b5cea8;
+		}
+		.boolean, .undefined, .null {
+			color: #569cd6;
+		}
+		.type {
+			color: #3dc9b0;
+		}
+	}
+}
+
+@mixin invis-select {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+.jsobject {
+	font-family: "Source Code Pro", "Droid Sans Mono", "monospace", monospace, "Droid Sans Fallback";
+	font-weight: normal;
+	font-size: 14px;
+	font-feature-settings: "liga" 0, "calt" 0;
+	line-height: 19px;
+	letter-spacing: 0px;
+
+	.expandable:not(.collapsed) {
+		&>.entries, &>.entries.inner, &>.entries>.blank {
+			display: block;
+			max-width: max-content;
+		}
+		&>.entries {
+			padding-left: 1em;
+		}
+	}
+	.entries > .inner, .entries.inner {
+		& > span::after {
+			content: ", ",
+		}
+	}
+	.expandable:not(.collapsed) {
+		& > .entries > .inner, & > .entries.inner {
+			& > span {
+				display: block;
+				max-width: max-content;
+				overflow: clip;
+
+				&:last-child:after {
+					@include invis-select();
+				}
+			}
+		}
+	}
+	.collapsed>.entries{
+		&, &>.inner {
+			& >span:last-child:after {
+				content: "";
+			}
+		}
+	}
+	.expandable.collapsed {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.expandable {
+		cursor: pointer
+	}
+
+	.hovered {
+		background: #8884;
+	}
+
+	.swatch {
+		width: .8em;
+		height: .8em;
+		margin-right: .2em;
+		display: inline-block;
+		border: 1px solid #8888;
+		vertical-align: middle;
+	}
+
+	a:link {
+		text-decoration: none;
+	}
+
+	a:link:hover {
+		text-decoration: underline;
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"include": [
+		"src/**/*"
+	],
+	"compilerOptions": {
+		"outDir": "dist/",
+		"rootDir": "src/",
+		"module": "ES2015",
+		"strict": true,
+		"target": "ES2017",
+		"declaration": true,
+		"declarationMap": true,
+		"moduleResolution": "node",
+		"composite": true,
+		"lib": ["ES2017", "DOM"],
+		"experimentalDecorators": true
+	}
+}
