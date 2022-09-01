@@ -1,7 +1,7 @@
 import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider } from "cache2";
 import { isEqual } from "lodash";
 import { cacheShare } from "./CacheShare";
-import { db } from "./db";
+import { altCache as altCacheID, defaultCache as defaultCacheID } from "./db";
 import { LazyPromise } from "./LazyPromise";
 
 export interface IndexedDBCacheID {
@@ -49,7 +49,7 @@ export function cacheIDEquals(a: CacheID | undefined, b: CacheID | undefined): b
 
 export async function loadCache(key: CacheID | "default" | "alt" = "default"): Promise<CacheProvider> {
 	if (key === "default" || key === "alt") {
-		let v: CacheID | undefined = await db.get("config", key + "Cache");
+		let v: CacheID | undefined = await (key === "alt" ? altCacheID : defaultCacheID).get();
 		if (!v) {
 			throw new Error(`${key} cache is not set. (Config tab)`);
 		}

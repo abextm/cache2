@@ -1,6 +1,6 @@
 import { DBSchema, IDBPDatabase, openDB, StoreKey, StoreNames, StoreValue } from "idb/with-async-ittr";
 import { Readable, Updater, Writable, writable } from "svelte/store";
-import { CacheID, IndexedDBCacheEntry } from "./CacheDirectory";
+import { CacheID, GithubCacheID, IndexedDBCacheEntry } from "./CacheDirectory";
 
 export type ConfigTypes = {
 	darkMode: boolean;
@@ -69,6 +69,7 @@ export async function dbAllEntries<K extends StoreNames<DB>>(
 
 export interface LiveQueryRO<T> extends Readable<T> {
 	ready: Promise<LiveQueryRO<T>>;
+	get(): Promise<T>;
 }
 
 export function liveQueryRO<T>(
@@ -93,6 +94,7 @@ export function liveQueryRO<T>(
 	});
 	let lq: LiveQueryRO<T> = {
 		subscribe: store.subscribe,
+		get,
 		ready: undefined!,
 	};
 	lq.ready = (async () => {
@@ -144,5 +146,15 @@ export const darkMode = await config(
 	"matchMedia" in self && (<any> self).matchMedia("(prefers-color-scheme: dark)").matches,
 ).ready;
 
-export const defaultCache = config("defaultCache", undefined);
-export const altCache = config("altCache", undefined);
+export const GITHUB_MASTER: GithubCacheID = {
+	type: "github",
+	username: "abextm",
+	repo: "osrs-cache",
+	commitish: "master",
+};
+export const GITHUB_PREV: GithubCacheID = {
+	...GITHUB_MASTER,
+	commitish: "master^",
+};
+export const defaultCache = config("defaultCache", GITHUB_MASTER);
+export const altCache = config("altCache", GITHUB_PREV);

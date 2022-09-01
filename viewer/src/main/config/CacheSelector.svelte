@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { getIndexDBCacheTree, refreshIDBEntry, deleteIDBEntry, idbCacheSupported } from "../IDBCache";
-	import { db, liveQueryRO } from "../../common/db";
+	import { db, GITHUB_MASTER, GITHUB_PREV, liveQueryRO } from "../../common/db";
 	import MDIButton from "../util/MDIButton.svelte";
 	import CacheSelectorEntry from "./CacheSelectorEntry.svelte";
 	import { mdiRefresh, mdiDelete } from "@mdi/js";
-	import { GithubCacheID } from "../../common/CacheDirectory";
 
 	let entries = liveQueryRO(["files", "fileCache"], getIndexDBCacheTree, []);
 	let dragover = false;
@@ -26,17 +25,6 @@
 			db.add("files", fsh);
 		}
 	}
-
-	const GITHUB_MASTER: GithubCacheID = {
-		type: "github",
-		username: "abextm",
-		repo: "osrs-cache",
-		commitish: "master",
-	};
-	const GITHUB_PREV: GithubCacheID = {
-		...GITHUB_MASTER,
-		commitish: "master^",
-	};
 </script>
 
 {#if idbCacheSupported}
