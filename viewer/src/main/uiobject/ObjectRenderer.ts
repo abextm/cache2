@@ -10,6 +10,7 @@ import {
 	UIPartialResponse,
 	UIType,
 } from "../../common/uiobject";
+import { measure, mutate } from "../util/DOMTiming";
 import { addTooltip, addTooltipAsync, hoverListener } from "../util/tooltip";
 import ReferenceTooltip from "./ReferenceTooltip.svelte";
 
@@ -195,10 +196,11 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			let allocated: HTMLElement[] = [firstEntry];
 			let numLinesAllocated = 0;
 
-			function attachVisibleElements(sentinals: HTMLElement[], parentScreen = visibleScreenArea(parent)) {
+			async function attachVisibleElements(sentinals: HTMLElement[], parentScreen = visibleScreenArea(parent)) {
 				if (!parentScreen || sentinals.length <= 0) {
 					return;
 				}
+				await measure();
 				let update: {
 					blank: HTMLElement;
 					sentinal: HTMLElement;
@@ -249,6 +251,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					break;
 				}
 
+				await mutate();
 				let outstandingUpdates = 0;
 				for (let { blank, sentinal, start, end, len, minEntry, maxEntry } of update) {
 					let temp = createBlank(minEntry + start, maxEntry + start, true);
@@ -278,7 +281,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						port!.removeEventListener("message", recv);
 						ev.stopPropagation();
 
-						await new Promise(requestAnimationFrame);
+						await measure();
 
 						let el = constructEntries(v[0], ev.data.entries, ev.data.start, ev.data.end);
 
@@ -303,6 +306,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 							attachVisibleElements(sentinals.filter(el => el.parentElement!.parentElement), parentScreen);
 						}
 
+						await mutate();
 						temp.replaceWith(el);
 						allocated.push(el);
 
@@ -342,7 +346,9 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						els.push(io.target as HTMLElement);
 					}
 				}
-				attachVisibleElements(els);
+				if (els.length) {
+					attachVisibleElements(els);
+				}
 			});
 			observers.push(obs);
 
