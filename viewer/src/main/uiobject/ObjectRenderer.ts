@@ -222,7 +222,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						obs.unobserve(sentinal);
 						blank.replaceWith(det);
 						detached.delete(blank);
-						continue;
+						break;
 					}
 
 					let start = ~~blank.dataset.start!;
@@ -246,6 +246,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 					maxEntry = Math.min(maxEntry, minEntry + 500);
 					update.push({ blank, sentinal, start, end, len, minEntry, maxEntry });
+					break;
 				}
 
 				let outstandingUpdates = 0;
@@ -285,7 +286,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						let free: { el: HTMLElement; height: number; }[] = [];
 						let parentScreen = visibleScreenArea(parent);
 						let noFree = parentScreen && addVerticalPadding(parentScreen, 750);
-						for (let t = 0; t < 5 && numLinesAllocated > 5; t++) {
+						for (let t = 0; t < 5 && numLinesAllocated > 500; t++) {
 							let el = allocated.shift()!;
 							if (!el) {
 								break;
