@@ -52,12 +52,22 @@
 	letter-spacing: 0px;
 
 	.expandable:not(.collapsed) {
-		&>.entries, &>.entries.inner, &>.entries>.blank {
+		&>.entries, &>.entries.inner {
 			display: block;
 			max-width: max-content;
 		}
 		&>.entries {
 			padding-left: 1em;
+		}
+		&>.entries>.blank{
+			display: block;
+			overflow: visible;
+			&>.sentinal {
+				display: block;
+				height: calc(100% + 1000px);
+				position: relative;
+				top: -500px;
+			}
 		}
 	}
 	.entries > .inner, .entries.inner {

@@ -56,25 +56,53 @@ function onClick<T extends HTMLElement>(
 	return e;
 }
 
-function intersection(a: DOMRect, b: DOMRect): DOMRect {
+function intersect(a: DOMRect | undefined, b: DOMRect | HTMLElement | undefined): DOMRect | undefined {
+	if (!a || !b) {
+		return;
+	}
+
+	if (b instanceof Element) {
+		b = b.getBoundingClientRect();
+	}
+
 	let left = Math.max(a.left, b.left);
-	let right = Math.min(a.right, b.right);
 	let top = Math.max(a.top, b.top);
+	let right = Math.min(a.right, b.right);
 	let bottom = Math.min(a.bottom, b.bottom);
-	return new DOMRect(left, top, Math.max(0, right - left), Math.max(0, bottom - top));
+
+	if (left > right || top > bottom || (top == bottom && right == bottom)) {
+		return;
+	}
+
+	return new DOMRect(left, top, right - left, bottom - top);
 }
 
-function getVisibleArea(e: Element): DOMRect {
-	let myBounds = e.getBoundingClientRect();
-	let clip = myBounds;
-	for (let p = e.parentElement; p; p = p.parentElement!) {
-		clip = intersection(clip, p!.getBoundingClientRect());
+function visibleScreenArea(element: HTMLElement): DOMRect | undefined {
+	let screenVis = element.getBoundingClientRect();
+	for (let p = element.parentElement!; p && (p = p.parentElement!) && p !== document.documentElement;) {
+		if (!(screenVis = intersect(screenVis, p)!)) {
+			break;
+		}
 	}
+	return screenVis;
+}
+
+function screenToElement(screen: DOMRect, element: HTMLElement): DOMRect {
+	let rect = element.getBoundingClientRect();
 	return new DOMRect(
-		clip.x - myBounds.x,
-		clip.y - myBounds.y,
-		clip.width,
-		clip.height,
+		screen.x - rect.x,
+		screen.y - rect.y,
+		screen.width,
+		screen.height,
+	);
+}
+
+function addVerticalPadding(r: DOMRect, dh: number): DOMRect {
+	return new DOMRect(
+		r.x,
+		r.y - dh,
+		r.width,
+		r.height + dh + dh,
 	);
 }
 
@@ -145,12 +173,6 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 	let lineHeight = parseInt(window.getComputedStyle(parent).lineHeight);
 
-	function recalcHeight(el: HTMLElement): void {
-		let start = parseInt(el.dataset.start!);
-		let end = parseInt(el.dataset.end!);
-		el.style.height = (lineHeight * (end - start)) + "px";
-	}
-
 	let observers: IntersectionObserver[] = [];
 
 	function renderList(
@@ -173,40 +195,38 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			let allocated: HTMLElement[] = [firstEntry];
 			let numLinesAllocated = 0;
 
-			// Using InteractionObserver is a bad idea, it won't fire updates
-			// in certain cases and is impossible to avoid flashes of missing
-			// entries
-			// TODO: switch to something more reliable
-			let obs = new IntersectionObserver(ios => {
+			function attachVisibleElements(sentinals: HTMLElement[], parentScreen = visibleScreenArea(parent)) {
+				if (!parentScreen || sentinals.length <= 0) {
+					return;
+				}
 				let update: {
-					el: HTMLElement;
+					blank: HTMLElement;
+					sentinal: HTMLElement;
 					start: number;
 					end: number;
 					len: number;
 					minEntry: number;
 					maxEntry: number;
 				}[] = [];
-				for (let io of ios) {
-					if (io.intersectionRatio <= 0) {
+				for (let sentinal of sentinals) {
+					let blank = sentinal.parentElement!;
+					let screenVisibleArea = intersect(addVerticalPadding(parentScreen, 500), blank.getBoundingClientRect());
+					if (!screenVisibleArea) {
 						continue;
 					}
 
-					let el = io.target as HTMLElement;
+					let visibleArea = screenToElement(screenVisibleArea, blank);
 
-					let visibleArea = getVisibleArea(el);
-					if (visibleArea.height <= 0) {
-						continue;
-					}
-
-					let det = detached.get(el);
+					let det = detached.get(blank);
 					if (det) {
-						el.replaceWith(det);
-						detached.delete(el);
+						obs.unobserve(sentinal);
+						blank.replaceWith(det);
+						detached.delete(blank);
 						continue;
 					}
 
-					let start = ~~el.dataset.start!;
-					let end = ~~el.dataset.end!;
+					let start = ~~blank.dataset.start!;
+					let end = ~~blank.dataset.end!;
 					let len = end - start;
 
 					let minEntry = Math.floor(visibleArea.top / lineHeight) - 20;
@@ -216,38 +236,45 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					}
 					if (maxEntry > len - 10) {
 						maxEntry = len;
+						if (minEntry >= maxEntry) {
+							minEntry = Math.max(0, len - 50);
+						}
 					}
 					if (minEntry >= maxEntry) {
 						continue;
 					}
 
-					maxEntry = Math.min(maxEntry, minEntry + 200);
-					update.push({ el, start, end, len, minEntry, maxEntry });
+					maxEntry = Math.min(maxEntry, minEntry + 500);
+					update.push({ blank, sentinal, start, end, len, minEntry, maxEntry });
 				}
 
-				for (let { el, start, end, len, minEntry, maxEntry } of update) {
+				let outstandingUpdates = 0;
+				for (let { blank, sentinal, start, end, len, minEntry, maxEntry } of update) {
 					let temp = createBlank(minEntry + start, maxEntry + start, true);
 
+					let bits: HTMLElement[] = [];
 					if (minEntry > 0) {
-						entries.insertBefore(createBlank(start, minEntry + start, false), el);
+						bits.push(createBlank(start, minEntry + start, false));
 					}
-					entries.insertBefore(temp, el);
+					bits.push(temp);
 					if (maxEntry < len) {
-						entries.insertBefore(createBlank(maxEntry + start, end, false), el);
+						bits.push(createBlank(maxEntry + start, end, false));
 					}
-					obs.unobserve(el);
-					el.remove();
+					obs.unobserve(sentinal);
+					blank.replaceWith(...bits);
 
 					let req: UIPartialRequest = {
 						partial,
 						start: minEntry + start,
 						end: maxEntry + start,
 					};
+					outstandingUpdates++;
 					async function recv(ev: MessageEvent<UIPartialResponse>) {
 						if (ev.data.partial !== req.partial || ev.data.start !== req.start || ev.data.end !== req.end) {
 							return;
 						}
 
+						port!.removeEventListener("message", recv);
 						ev.stopPropagation();
 
 						await new Promise(requestAnimationFrame);
@@ -256,19 +283,29 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 						numLinesAllocated += el.children.length;
 						let free: { el: HTMLElement; height: number; }[] = [];
-
-						for (let t = 0; t < 5 && numLinesAllocated > 500; t++) {
+						let parentScreen = visibleScreenArea(parent);
+						let noFree = parentScreen && addVerticalPadding(parentScreen, 750);
+						for (let t = 0; t < 5 && numLinesAllocated > 5; t++) {
 							let el = allocated.shift()!;
 							if (!el) {
 								break;
 							}
-							let vis = getVisibleArea(el);
-							if (vis.height > 0) {
+							if (intersect(noFree, el)) {
 								allocated.push(el);
 								continue;
 							}
 
 							let height = el.getBoundingClientRect().height;
+							free.push({ el, height });
+						}
+						if (--outstandingUpdates === 0) {
+							attachVisibleElements(sentinals.filter(el => el.parentElement!.parentElement), parentScreen);
+						}
+
+						temp.replaceWith(el);
+						allocated.push(el);
+
+						for (let { el, height } of free) {
 							if (Math.abs(height - el.childNodes.length * lineHeight) > 2) {
 								let bl = createBlank(~~el.dataset.start!, ~~el.dataset.end!, false, height);
 								bl.classList.add("nomerge");
@@ -277,35 +314,17 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 								continue;
 							}
 
-							free.push({ el, height });
-						}
-
-						temp.replaceWith(el);
-						allocated.push(el);
-
-						for (let { el, height } of free) {
-							let mergeSibs = [el.previousElementSibling, el.nextElementSibling]
-								.filter(el => el && el.classList.contains("blank") && !el.classList.contains("nomerge"))
-								.map(v => v as HTMLElement);
-
-							if (mergeSibs.length === 2) {
-								el.remove();
-								obs.unobserve(mergeSibs[1]);
-								mergeSibs[1].remove();
-								mergeSibs[0].dataset.end = mergeSibs[1].dataset.end;
-								recalcHeight(mergeSibs[0]);
-							} else if (mergeSibs[0] === el.previousElementSibling) {
-								el.remove();
-								mergeSibs[0].dataset.end = el.dataset.end;
-								recalcHeight(mergeSibs[0]);
-							} else if (mergeSibs[0] === el.nextElementSibling) {
-								el.remove();
-								mergeSibs[0].dataset.start = el.dataset.start;
-								recalcHeight(mergeSibs[0]);
-							} else {
-								let bl = createBlank(~~el.dataset.start!, ~~el.dataset.end!, false, height);
-								el.replaceWith(bl);
+							function isMergable(el: Element | null): HTMLElement | undefined {
+								return el && el.classList.contains("blank") && !el.classList.contains("nomerge")
+									? el as HTMLElement
+									: undefined;
 							}
+							let start = isMergable(el.previousElementSibling) ?? el;
+							let end = isMergable(el.nextElementSibling) ?? el;
+							let bl = createBlank(~~start.dataset.start!, ~~end.dataset.end!, false);
+							el.replaceWith(bl);
+							start.remove();
+							end.remove();
 							numLinesAllocated -= el.children.length;
 						}
 					}
@@ -313,6 +332,16 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					port!.addEventListener("message", recv);
 					port!.postMessage(req);
 				}
+			}
+
+			let obs = new IntersectionObserver(ios => {
+				let els: HTMLElement[] = [];
+				for (let io of ios) {
+					if (io.isIntersecting) {
+						els.push(io.target as HTMLElement);
+					}
+				}
+				attachVisibleElements(els);
 			});
 			observers.push(obs);
 
@@ -323,7 +352,9 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				element.dataset.end = "" + end;
 
 				if (!temp) {
-					obs.observe(element);
+					let sentinal = sp([], "sentinal");
+					element.appendChild(sentinal);
+					obs.observe(sentinal);
 				} else {
 					element.classList.add("nomerge");
 				}
@@ -338,14 +369,14 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 		entries.classList.add("entries");
 
-		let e = sp([
+		let expander = sp([
 			name && sp(name, "type"),
 			startBrace,
 			entries,
 			endBrace,
 		], "list");
-		expandable(e, clickParent);
-		return e;
+		expandable(expander, clickParent);
+		return expander;
 	}
 
 	function renderAny(

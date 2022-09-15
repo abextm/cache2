@@ -141,7 +141,7 @@ import * as context from "viewer/context";
 		height: 0; // I'm sure there is some valid reason this works
 	}
 	.logs {
-		overflow: auto;
+		overflow: clip auto;
 		.content:not(:last-child) {
 			border-bottom: 1px solid rgba(128, 128, 128, 128);
 		}
