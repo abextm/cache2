@@ -104,8 +104,7 @@
 		margin-left: auto;
 		padding: 0 2px;
 		:global(svg) {
-			width: auto;
-			height: 100%;
+			width: 1.8em;
 			padding: 2px;
 			padding-top: 3px;
 			box-sizing: border-box;
