@@ -7,6 +7,8 @@
 	import { historyStore } from "./HistoryStore";
 	import { darkMode } from "../common/db";
 	import { Writable } from "svelte/store";
+	import { mdiGithub } from "@mdi/js";
+  import MDI from "./util/MDI.svelte";
 
 	let tab: Writable<string> = historyStore("tab", "config");
 
@@ -39,6 +41,9 @@
 		<Tab bind:tab={$tab} key="viewer">Viewer</Tab
 		><Tab bind:tab={$tab} key="editor">Editor</Tab
 		><Tab bind:tab={$tab} key="config">Config</Tab>
+		<span class="links">
+			<a href="https://github.com/abextm/cache2/"><MDI icon={mdiGithub} alt="Github"/></a>
+		</span>
 	</div>
 	<TabContents tab={$tab} key="viewer">
 		<Viewer/>
@@ -92,6 +97,18 @@
 		box-shadow: #000 0px 0px 4px;
 		& > button {
 			float: right;
+		}
+	}
+
+	.links {
+		margin-left: auto;
+		padding: 0 2px;
+		:global(svg) {
+			width: auto;
+			height: 100%;
+			padding: 2px;
+			padding-top: 3px;
+			box-sizing: border-box;
 		}
 	}
 </style>
