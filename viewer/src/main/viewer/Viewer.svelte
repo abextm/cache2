@@ -14,6 +14,7 @@
 
 <Split size={20}>
 	<div slot=1>
+		<ViewType name="index" bind:key={$key}>All Indexes</ViewType>
 		<Section name="Config" index={2}>
 			<ViewType name="item" bind:key={$key}/>
 			<ViewType name="hitsplat" bind:key={$key}/>

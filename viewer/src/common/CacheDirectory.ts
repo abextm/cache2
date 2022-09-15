@@ -73,6 +73,9 @@ export async function loadCache(key: CacheID | "default" | "alt" = "default"): P
 				let req = await fetch(
 					`https://raw.githubusercontent.com/${key0.username}/${key0.repo}/${key0.commitish}/${name}`,
 				);
+				if (!req.ok) {
+					return;
+				}
 				let ab = await req.arrayBuffer();
 				return new Uint8Array(ab);
 			},

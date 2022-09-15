@@ -1,19 +1,18 @@
 import { ArchiveData, CacheProvider, FileProvider, hash, IndexData } from "./Cache";
 
 export class FlatIndexData implements IndexData {
-	public protocol!: number;
 	public revision!: number;
 	public compression!: number;
 	public crc!: number;
 	public named!: boolean;
 
-	private archives: Map<number, ArchiveData> = new Map();
-	private constructor() {}
+	/**@internal*/ archives: Map<number, ArchiveData> = new Map();
+	private constructor(public id: number) {}
 
 	static async of(indexID: number, data: Uint8Array): Promise<FlatIndexData> {
 		const LF = 0x0A;
 		const EQ = 0x3D;
-		let fid = new FlatIndexData();
+		let fid = new FlatIndexData(indexID);
 		const td = new TextDecoder();
 		let ar: ArchiveData | undefined;
 		for (let i = 0; i < data.length; i++) {

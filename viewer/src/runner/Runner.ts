@@ -162,7 +162,87 @@ class ScriptRunner {
 
 let activeScript: ScriptRunner | undefined;
 
+let index = {
+	convertArchiveData(ad: c2.ArchiveData, named: boolean): any {
+		let filesOut: any;
+		if (named) {
+			let files: Map<number, number> = new Map();
+			for (let [fi, fd] of ad.files) {
+				files.set(fi, fd.namehash);
+			}
+			filesOut = files;
+		} else {
+			filesOut = Array.from(ad.files.keys());
+		}
+
+		return {
+			archive: ad.archive,
+			namehash: ad.namehash,
+			revision: ad.revision,
+			compression: ad.compression,
+			crc: ad.crc,
+			files: filesOut,
+		};
+	},
+	async decode(cache: Promise<CacheProvider>, id: number): Promise<any> {
+		try {
+			let c = await cache;
+			let v = await c.getIndex(id);
+
+			if (!v) {
+				return;
+			}
+
+			let archives: Map<number, any> = new Map();
+			if (v instanceof c2.DiskIndexData || v instanceof c2.FlatIndexData) {
+				for (let [aid, ad] of v.archives) {
+					archives.set(aid, this.convertArchiveData(ad, v.named));
+				}
+			} else {
+				throw new Error("unsupported cache type");
+			}
+
+			let out: any = {
+				id: v.id,
+				revision: v.revision,
+				compression: v.compression,
+				crc: v.crc,
+				named: v.named,
+				archives,
+			};
+			if ("protocol" in v) {
+				out.protocol = v.protocol;
+			}
+			return out;
+		} catch {
+			// ignored
+		}
+	},
+	async all(c: Promise<CacheProvider>): Promise<any[]> {
+		let lastIndex = 21;
+		let indexes: c2.IndexData[] = await Promise.all(
+			_.range(0, lastIndex + 1)
+				.map(async i => this.decode(c, i)),
+		);
+		indexes = indexes.filter(v => v);
+
+		for (let i = lastIndex; i < 255; i++) {
+			let lastOk = indexes[indexes.length - 1].id;
+			if (lastOk < i - 2) {
+				break;
+			}
+			let v = await this.decode(c, i);
+			if (v) {
+				indexes.push(v);
+			}
+		}
+
+		return indexes;
+	},
+};
+
 let types = {
+	index,
 	item: c2.Item,
 	hitsplat: c2.Hitsplat,
 };
@@ -197,7 +277,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	},
 	async lookup(type, filter) {
 		let typ: {
-			decode: (c: Promise<CacheProvider>, id: number) => any;
+			decode(c: Promise<CacheProvider>, id: number): Promise<any>;
 			all(c: Promise<CacheProvider>): Promise<any[]>;
 		} = types[type];
 		let v: any[];

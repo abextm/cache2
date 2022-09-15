@@ -14,7 +14,8 @@ export interface FileProvider {
 }
 
 export interface IndexData {
-	protocol: number;
+	id: number;
+	protocol?: number;
 	revision: number;
 	compression: number;
 	crc: number;

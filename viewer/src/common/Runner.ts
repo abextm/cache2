@@ -8,7 +8,7 @@ export const lookupTypes = {
 	ItemID: "item",
 	HitsplatID: "hitsplat",
 } as const;
-export type LookupType = "item" | "hitsplat";
+export type LookupType = "index" | "item" | "hitsplat";
 
 export function uiType(t: LookupType): string {
 	return capitalize(t);

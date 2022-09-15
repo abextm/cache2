@@ -2,6 +2,7 @@ import { ArchiveData, CacheProvider, FileProvider, IndexData } from "./Cache";
 import { Reader } from "./Reader";
 
 export class DiskIndexData implements IndexData {
+	public id!: number;
 	public protocol!: number;
 	public revision!: number;
 	public compression!: number;
@@ -36,6 +37,7 @@ export class DiskCacheProvider implements CacheProvider {
 					let r = new Reader(ad.getFile(0)!.data);
 
 					let out = new DiskIndexData();
+					out.id = index;
 					let protocol = out.protocol = r.u8();
 					out.revision = protocol >= 6 ? r.i32() : -1;
 
