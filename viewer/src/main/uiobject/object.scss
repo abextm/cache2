@@ -71,7 +71,7 @@
 		}
 	}
 	.entries > .inner, .entries.inner {
-		& > span::after {
+		& > *::after {
 			content: ", ",
 		}
 	}
@@ -83,14 +83,14 @@
 				overflow: clip;
 
 				&:last-child:after {
-					@include invis-select();
+					user-select: none;
 				}
 			}
 		}
 	}
 	.collapsed>.entries{
 		&, &>.inner {
-			& >span:last-child:after {
+			&>*:last-child:after {
 				content: "";
 			}
 		}
