@@ -80,6 +80,7 @@
 			& > span {
 				display: block;
 				max-width: max-content;
+				white-space: nowrap;
 				overflow: clip;
 
 				&:last-child:after {
@@ -89,7 +90,7 @@
 		}
 	}
 	.collapsed>.entries{
-		&, &>.inner {
+		&, &>.inner:last-child {
 			&>*:last-child:after {
 				content: "";
 			}
