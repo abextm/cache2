@@ -374,10 +374,19 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			entries.appendChild(createBlank(end, v[2], false));
 		}
 
+		let len = v[2];
+		if (!len) {
+			len = v[1].length;
+			if (v[0] === UIType.Object || v[0] === UIType.Map) {
+				len /= 2;
+			}
+		}
+
 		entries.classList.add("entries");
 
 		let expander = sp([
 			name && sp(name, "type"),
+			v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
 			startBrace,
 			entries,
 			endBrace,
