@@ -184,7 +184,7 @@ let index = {
 			files: filesOut,
 		};
 	},
-	async decode(cache: Promise<CacheProvider>, id: number): Promise<any> {
+	async load(cache: Promise<CacheProvider>, id: number): Promise<any> {
 		try {
 			let c = await cache;
 			let v = await c.getIndex(id);
@@ -222,7 +222,7 @@ let index = {
 		let lastIndex = 21;
 		let indexes: c2.IndexData[] = await Promise.all(
 			_.range(0, lastIndex + 1)
-				.map(async i => this.decode(c, i)),
+				.map(async i => this.load(c, i)),
 		);
 		indexes = indexes.filter(v => v);
 
@@ -231,7 +231,7 @@ let index = {
 			if (lastOk < i - 2) {
 				break;
 			}
-			let v = await this.decode(c, i);
+			let v = await this.load(c, i);
 			if (v) {
 				indexes.push(v);
 			}
@@ -277,7 +277,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	},
 	async lookup(type, filter) {
 		let typ: {
-			decode(c: Promise<CacheProvider>, id: number): Promise<any>;
+			load(c: Promise<CacheProvider>, id: number): Promise<any>;
 			all(c: Promise<CacheProvider>): Promise<any[]>;
 		} = types[type];
 		let v: any[];
@@ -293,7 +293,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 						}
 						return _.range(~~d[0], ~~d[1] + 1);
 					})
-					.map(id => typ.decode(ctx.cache, id)),
+					.map(id => typ.load(ctx.cache, id)),
 			);
 		} else {
 			let re = new RegExp(filter, "iu");

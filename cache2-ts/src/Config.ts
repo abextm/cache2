@@ -1,33 +1,11 @@
 import { CacheProvider } from "./Cache";
 import * as def from "./def";
+import { Loadable } from "./Loadable";
 import { Reader } from "./Reader";
 
-function decode0<
-	I extends Config,
-	ID extends number,
->(
-	typ: {
-		new(id: ID): I;
-		config: def.Config;
-	},
-	reader: Reader | ArrayBufferView | ArrayBuffer,
-	id: ID | number,
-): I {
-	if (!(reader instanceof Reader)) {
-		reader = new Reader(reader);
-	}
-	const v = new typ(id as ID);
-	for (let opcode: number; (opcode = reader.u8()) != 0;) {
-		v.readOpcode(opcode, reader);
-	}
-	return v;
-}
-
-export abstract class Config {
+export abstract class Config extends Loadable {
 	public static readonly config: def.Config;
 
-	protected constructor() {}
-
 	public static decode<
 		I extends Config,
 		ID extends number,
@@ -36,42 +14,29 @@ export abstract class Config {
 			new(id: ID): I;
 			config: def.Config;
 		},
-		cache: CacheProvider | Promise<CacheProvider>,
-		id: ID | number,
-	): Promise<I | undefined>;
-	public static decode<
-		I extends Config,
-		ID extends number,
-	>(
-		this: {
-			new(id: ID): I;
-			config: def.Config;
-		},
-		reader: Reader | ArrayBufferView | ArrayBuffer,
-		id: ID | number,
-	): I;
-	public static decode<
-		I extends Config,
-		ID extends number,
-	>(
-		this: {
-			new(id: ID): I;
-			config: def.Config;
-		},
-		reader: Reader | ArrayBufferView | ArrayBuffer | CacheProvider | Promise<CacheProvider>,
-		id: ID | number,
-	): I | Promise<I | undefined> {
-		if (reader instanceof Reader || reader instanceof ArrayBuffer || ArrayBuffer.isView(reader)) {
-			return decode0(this, reader, id);
-		} else {
-			return (async () => {
-				let v = await (await reader).getArchive(2, this.config.archiveID);
-				let fi = v?.getFile(id);
-				if (fi) {
-					return decode0(this, fi.data, id);
-				}
-			})();
+		reader: Reader,
+		id: ID,
+	): I {
+		const v = new this(id);
+		for (let opcode: number; (opcode = reader.u8()) != 0;) {
+			v.readOpcode(opcode, reader);
 		}
+		return v;
+	}
+
+	public static async loadData<
+		I extends Config,
+		ID extends number,
+	>(
+		this: {
+			new(id: ID): I;
+			config: def.Config;
+		},
+		cache: CacheProvider,
+		id: ID,
+	): Promise<Uint8Array | undefined> {
+		let ad = await cache.getArchive(2, this.config.archiveID);
+		return ad?.getFile(id)?.data;
 	}
 
 	public static async all<
@@ -85,7 +50,8 @@ export abstract class Config {
 		if (!ar) {
 			return [];
 		}
-		return [...ar.getFiles().values()].map(v => decode0(this, v.data, v.id));
+		return [...ar.getFiles().values()]
+			.map(v => Config.decode<I, ID>.call(this, new Reader(v.data), v.id as ID));
 	}
 
 	public getConfig(): def.Config {
