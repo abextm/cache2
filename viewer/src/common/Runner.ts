@@ -7,8 +7,9 @@ import { UIData } from "./uiobject";
 export const lookupTypes = {
 	ItemID: "item",
 	HitsplatID: "hitsplat",
+	SpriteID: "sprite",
 } as const;
-export type LookupType = "index" | "item" | "hitsplat";
+export type LookupType = "index" | "item" | "hitsplat" | "sprite";
 
 export function uiType(t: LookupType): string {
 	return capitalize(t);

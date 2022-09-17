@@ -107,6 +107,15 @@ export class FlatCacheProvider implements CacheProvider {
 		return idx?.getArchive(archive);
 	}
 
+	public async getArchives(index: number): Promise<number[] | undefined> {
+		let idx = await this.getIndex(index);
+		if (!idx) {
+			return;
+		}
+
+		return Array.from(idx.archives.keys());
+	}
+
 	public async getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined> {
 		let idx = await this.getIndex(index);
 		return idx?.getArchiveByName(name);

@@ -245,6 +245,7 @@ let types = {
 	index,
 	item: c2.Item,
 	hitsplat: c2.Hitsplat,
+	sprite: c2.Sprites,
 };
 
 new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {

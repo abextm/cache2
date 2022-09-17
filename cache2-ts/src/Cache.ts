@@ -7,6 +7,7 @@ export interface CacheProvider {
 	getIndex(index: number): Promise<IndexData | undefined>;
 	getArchive(index: number, archive: number): Promise<ArchiveData | undefined>;
 	getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined>;
+	getArchives(index: number): Promise<number[] | undefined>;
 }
 
 export interface FileProvider {

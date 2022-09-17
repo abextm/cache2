@@ -19,6 +19,7 @@
 			<ViewType name="item" bind:key={$key}/>
 			<ViewType name="hitsplat" bind:key={$key}/>
 		</Section>
+		<ViewType name="sprite" bind:key={$key}>Sprites</ViewType>
 	</div>
 	<div slot=2 class="rhs">
 		{#if $key}

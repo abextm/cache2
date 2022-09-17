@@ -109,6 +109,15 @@ export class DiskCacheProvider implements CacheProvider {
 		return ptrs;
 	}
 
+	public async getArchives(index: number): Promise<number[] | undefined> {
+		let idx = await this.getIndex(index);
+		if (!idx) {
+			return;
+		}
+
+		return Array.from(idx.archives.keys());
+	}
+
 	public async getArchive(index: number, archive: number): Promise<ArchiveData | undefined> {
 		let idx = await this.getIndex(index);
 		if (!idx) {

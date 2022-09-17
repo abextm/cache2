@@ -39,3 +39,39 @@ export abstract class Loadable {
 		}
 	}
 }
+
+export abstract class PerArchiveLoadable extends Loadable {
+	public static loadData(this: { index: number; }, cache: CacheProvider, id: number): Promise<Uint8Array | undefined> {
+		return cache.getArchive(this.index, id as number).then(v => v?.getFile(0)?.data);
+	}
+
+	public static async all<
+		I extends PerArchiveLoadable,
+		ID extends number,
+	>(this: {
+		index: number;
+		decode(reader: Reader, id: ID): I;
+	}, cache0: CacheProvider | Promise<CacheProvider>): Promise<I[]> {
+		let cache = await cache0;
+		let ids = await cache.getArchives(this.index);
+		if (!ids) {
+			return [];
+		}
+
+		let archives = await Promise.all(ids.map(id => cache.getArchive(this.index, id)));
+
+		return archives
+			.filter(v => v)
+			.map(v => {
+				try {
+					return this.decode(new Reader(v!.getFile(0)!.data), v!.archive as ID);
+				} catch (e) {
+					if (typeof e === "object" && e && "message" in e) {
+						let ea = e as any;
+						ea.message = v!.archive + ": " + ea.message;
+					}
+					throw e;
+				}
+			});
+	}
+}
