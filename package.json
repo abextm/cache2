@@ -12,12 +12,17 @@
 		"test-all": "npm run -w cache2-ts test && npm run lint && npm run -w viewer svelte-check && dprint check"
 	},
 	"devDependencies": {
+		"@types/chai": "^4.3.3",
+		"@types/mocha": "^9.1.1",
 		"@types/node": "^18.0.6",
 		"@typescript-eslint/eslint-plugin": "^5.36.1",
 		"@typescript-eslint/parser": "^5.36.1",
+		"chai": "^4.3.6",
 		"dprint": "^0.31.1",
 		"eslint": "^8.23.0",
 		"eslint-plugin-svelte": "^2.7.0",
+		"mocha": "^10.0.0",
+		"ts-mocha": "^10.0.0",
 		"ts-node": "^10.9.1",
 		"tsconfig-paths": "^4.0.0",
 		"typescript": "^4.7.4"
