@@ -13,7 +13,8 @@
 		"dist",
 		"build",
 		"**/node_modules",
-		"**/*-lock.json"
+		"**/*-lock.json",
+		"*.out.js"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.71.2.wasm",

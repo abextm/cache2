@@ -4,6 +4,7 @@ module.exports = {
 		"dist",
 		"build",
 		"cache2-ts/src/generated",
+		"*.out.js",
 	],
 	env: {
 		node: true,

@@ -15,5 +15,6 @@
 		"fflate": "^0.7.1"
 	},
 	"devDependencies": {
+		"@typescript/vfs": "^1.4.0"
 	}
 }
