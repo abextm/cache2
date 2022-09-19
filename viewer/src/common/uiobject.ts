@@ -156,7 +156,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 					uiEntries = entries.entries;
 				} else {
 					uiEntries = entries.entries.slice(0, end);
-					this.transferables.push(uiEntries);
+					this.transferables.push(uiEntries.buffer);
 					if (end != entries.entries.length) {
 						isPartial = true;
 					}
@@ -293,7 +293,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 			let uiEntries: UIAny[] | TypedArray;
 			if (ArrayBuffer.isView(entries.entries)) {
 				uiEntries = entries.entries.slice(ev.data.start, ev.data.end);
-				ctx.transferables.push(uiEntries);
+				ctx.transferables.push(uiEntries.buffer);
 			} else {
 				for (let _s of ctx.serEntries(entries, COLUMNS, uiEntries = [], part.rType, ev.data.start, ev.data.end));
 			}
