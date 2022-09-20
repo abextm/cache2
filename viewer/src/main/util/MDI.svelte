@@ -6,17 +6,18 @@
 
 <svg xmlns="http://www.w3.org/2000/svg"
 	viewBox="0 0 24 24"
+	class="mdi"
 	{style}>
 	<title>{alt}</title>
 	<path d={icon} />
 </svg>
 
 <style>
-	svg {
+	:global(.mdi) {
 		width: 1em;
 		vertical-align: middle;
 	}
-	path {
+	:global(.mdi path) {
 		fill: var(--color);
 	}
 </style>

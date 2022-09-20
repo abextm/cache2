@@ -1,5 +1,7 @@
+import { mdiRepeatVariant } from "@mdi/js";
 import { getRunner, lookupTypes } from "../../common/Runner";
 import {
+	PartialListID,
 	TypedArray,
 	UIAny,
 	UIData,
@@ -111,6 +113,9 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	let port = data.port;
 	port?.start();
 
+	let loadedPartials = new Map<PartialListID, number>();
+	(<any> window).ll = loadedPartials;
+
 	function expandable<T extends HTMLElement>(e: T, clickParent: HTMLElement = e): T {
 		e.classList.add("expandable", "collapsed");
 		onClick(clickParent, () => setExpanded(e), ev => {
@@ -183,13 +188,21 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		endBrace: string,
 		clickParent: HTMLElement | undefined,
 	): HTMLElement {
+		let thisPartialLoaded = 0;
+		if (v.length === 5) {
+			const partial = v[3];
+			thisPartialLoaded = loadedPartials.get(partial) ?? 0;
+			loadedPartials.set(partial, thisPartialLoaded + 1);
+		}
+
 		let entries = constructEntries(v[0], v[1]);
 
-		if (v.length === 4) {
+		if (v.length === 5) {
 			const partial = v[3];
 
 			let firstEntry = entries;
-			entries = sp([firstEntry]);
+			entries = sp([v[1].length > 0 ? firstEntry : null]);
+			entries.dataset.partial = "" + partial;
 
 			let detached = new Map<HTMLElement, HTMLElement>();
 
@@ -311,6 +324,12 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						allocated.push(el);
 
 						for (let { el, height } of free) {
+							el.querySelectorAll("[data-partial]")
+								.forEach(p => {
+									let partial = ~~(p as HTMLElement).dataset.partial! as PartialListID;
+									loadedPartials.set(partial, (loadedPartials.get(partial) ?? 0) - 1);
+								});
+
 							if (Math.abs(height - el.childNodes.length * lineHeight) > 2) {
 								let bl = createBlank(~~el.dataset.start!, ~~el.dataset.end!, false, height);
 								bl.classList.add("nomerge");
@@ -382,12 +401,25 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			}
 		}
 
+		let cycle: Element | undefined;
 		entries.classList.add("entries");
+		if (v[4] && thisPartialLoaded > 0) {
+			entries.classList.add("cycle");
+
+			const svgns = "http://www.w3.org/2000/svg";
+			cycle = document.createElementNS(svgns, "svg");
+			cycle.classList.add("mdi", "cycle-icon");
+			cycle.setAttribute("viewBox", "0 0 24 24");
+			let p = document.createElementNS(svgns, "path");
+			p.setAttribute("d", mdiRepeatVariant);
+			cycle.appendChild(p);
+		}
 
 		let expander = sp([
 			name && sp(name, "type"),
 			v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
 			startBrace,
+			cycle,
 			entries,
 			endBrace,
 		], "list");

@@ -39,7 +39,13 @@ const TypedArrays = [
 export type TypedArray = InstanceType<typeof TypedArrays[number]>;
 export type UIListType = UIType.Object | UIType.Map | UIType.Array | UIType.Set | UIType.ArrayBuffer | `${string}Array`;
 export type UIList<T extends UIListType = UIListType> = [T, UIAny[] | TypedArray];
-export type UIPartialList<T extends UIListType = UIListType> = [T, UIAny[] | TypedArray, number, PartialListID];
+export type UIPartialList<T extends UIListType = UIListType> = [
+	T,
+	UIAny[] | TypedArray,
+	number,
+	PartialListID,
+	boolean,
+];
 export type PartialListID = NewType<number>;
 
 export type UIToStringed = [UIType.ToStringed, string, string];
@@ -70,9 +76,32 @@ interface Entries {
 }
 
 export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[]] {
-	let seen: Map<any, [UIAny, number]> = new Map();
+	let references = new Map<any, UIPartialList | null>();
 	let types: Map<string, UITypeRef> = new Map();
 	let partials: { v: any; rType: Typed.Any | undefined; }[] = [];
+
+	{
+		let seen = new Set<any>();
+		function see(v: any) {
+			if (typeof v !== "object" || !v) {
+				return;
+			}
+			if (seen.has(v)) {
+				references.set(v, null);
+				return;
+			}
+
+			seen.add(v);
+
+			if (!Array.isArray(v)) {
+				v = Object.values(v);
+			}
+			for (let va of v) {
+				see(va);
+			}
+		}
+		see(v);
+	}
 
 	const ROOT_ROWS = 50;
 	const COLUMNS = 200;
@@ -140,18 +169,26 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 				], (v.name || "").length + (v.message || "").length];
 			}
 
-			let existing = seen.get(v);
-			if (existing) {
-				return existing;
+			let ref = references.get(v);
+			if (Array.isArray(ref)) {
+				return [ref, 8];
 			}
 
-			let entries = this.toEntries(v, rType);
 			let isPartial = false;
+			let uiEntries: TypedArray | UIAny[] = [];
+			let size = 2;
+			let entries = this.toEntries(v, rType);
+
+			if (ref === null) {
+				isPartial = true;
+				size = 8;
+				ref = [entries.type, [], entries.entries.length, undefined!, true];
+				references.set(v, ref);
+			}
 
 			if (ArrayBuffer.isView(entries.entries)) {
 				let lim = limit >= 0 ? limit : COLUMNS * ROOT_ROWS;
 				let end = Math.max(8, lim / 4);
-				let uiEntries: TypedArray;
 				if (end >= entries.entries.length) {
 					uiEntries = entries.entries;
 				} else {
@@ -161,15 +198,9 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 						isPartial = true;
 					}
 				}
-				existing = [[entries.type, uiEntries], uiEntries.length + 2];
-				seen.set(v, existing);
+				size += uiEntries.length;
 			} else {
-				let uiEntries: UIAny[] = [];
-				existing = [[entries.type, uiEntries], 8];
-				seen.set(v, existing);
-
 				let perLimit = limit == -1 ? COLUMNS : limit / Math.min(entries.entries.length + 1, 6);
-				let size = 2;
 
 				for (let s of ctx.serEntries(entries, perLimit, uiEntries, rType)) {
 					size += s;
@@ -188,14 +219,19 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 				}
 			}
 
+			let list: UIList = [entries.type, uiEntries];
+
 			if (isPartial) {
 				let id = partials.length as PartialListID;
 				partials.push({ v, rType });
-				// @ts-ignore  turn the UIList into UIPartialList in place, as it might already have been referenced somewhere else
-				existing[0].push(entries.entries.length, id);
+				if (ref) {
+					ref[3] = id;
+				}
+				let partialList: UIPartialList = [...list, entries.entries.length, id, ref !== undefined];
+				return [partialList, size];
 			}
 
-			return existing;
+			return [list, size];
 		}
 
 		*serEntries(

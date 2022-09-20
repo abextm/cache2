@@ -43,6 +43,7 @@ export class ServiceServer<T extends object> {
 				}, err.transfer);
 				return;
 			}
+			console.debug(err);
 			let msg: ErrorMessage = {
 				name: err?.name || Object.getPrototypeOf(err)?.constructor?.name || typeof err,
 				message: err.message || JSON.stringify(err),

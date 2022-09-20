@@ -83,6 +83,17 @@
 		padding-right: .5em;
 	}
 
+	.expandable.collapsed>.entries.cycle {
+		display: none;
+	}
+	.expandable:not(.collapsed)>.cycle-icon {
+		display: none;
+	}
+
+	.cycle-icon {
+		--color: var(--color-inactive);
+	}
+
 	.collapsed .blank {
 		max-height: 1px;
 	}
