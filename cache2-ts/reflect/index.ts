@@ -211,9 +211,18 @@ export const addTypeInfo =
 			}
 
 			if (t.aliasSymbol?.escapedName) {
+				let name = t.aliasSymbol.escapedName;
+				if (name === "PrimitiveArray" && t.aliasTypeArguments?.length == 2) {
+					let out = preTypeCache(t);
+					let entries = typeToTyped(t.aliasTypeArguments[0], node);
+					return entries && out({
+						type: "list",
+						entries,
+					});
+				}
 				return {
 					type: "named",
-					name: t.aliasSymbol.escapedName as string,
+					name: name as string,
 				};
 			}
 

@@ -186,7 +186,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 				references.set(v, ref);
 			}
 
-			if (ArrayBuffer.isView(entries.entries)) {
+			if (ArrayBuffer.isView(entries.entries) && !rType) {
 				let lim = limit >= 0 ? limit : COLUMNS * ROOT_ROWS;
 				let end = Math.max(8, lim / 4);
 				if (end >= entries.entries.length) {
@@ -327,7 +327,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 			let part = partials[ev.data.partial];
 			let entries = ctx.toEntries(part.v, part.rType);
 			let uiEntries: UIAny[] | TypedArray;
-			if (ArrayBuffer.isView(entries.entries)) {
+			if (ArrayBuffer.isView(entries.entries) && !part.rType) {
 				uiEntries = entries.entries.slice(ev.data.start, ev.data.end);
 				ctx.transferables.push(uiEntries.buffer);
 			} else {

@@ -4,6 +4,22 @@ export type NewType<T> = T & {
 };
 export type AliasType<T> = T | NewType<T>;
 
+type TypedArray =
+	| Uint8Array
+	| Int8Array
+	| Uint8ClampedArray
+	| Uint16Array
+	| Int16Array
+	| Uint32Array
+	| Int32Array
+	| BigUint64Array
+	| BigInt64Array
+	| Float32Array
+	| Float64Array;
+export type PrimitiveArray<T extends A[0], A extends TypedArray> = A & {
+	[index: number]: T;
+};
+
 export enum CompressionType {
 	NONE = 0,
 	BZ2 = 1,

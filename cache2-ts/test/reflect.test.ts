@@ -1,9 +1,12 @@
 import * as tvfs from "@typescript/vfs";
 import { assert } from "chai";
 import * as fs from "node:fs";
+import { inspect } from "node:util";
 import * as ts from "typescript";
 import { addTypeInfo } from "../reflect";
 import { Typed } from "../src";
+
+inspect.defaultOptions.depth = 5;
 
 function testCompile(
 	name: string,
@@ -139,6 +142,25 @@ export const v2 = c2.Typed(v);
 			assert.equal(typ.type, "obj");
 			assert.equal(typ.entries.a.type, "obj");
 			assert.equal(typ.entries.a.entries.b, typ);
+		},
+	);
+
+	testCompile(
+		"primitive array",
+		false,
+		`
+import * as c2 from "../src";
+
+@c2.Typed
+export class Px {
+	p!: c2.PrimitiveArray<c2.RGB, Uint32Array>;
+}
+`,
+		e => {
+			let typ = e.Px.prototype[Typed.type];
+			assert.equal(typ.type, "obj");
+			assert.equal(typ.entries.p.type, "list");
+			assert.equal(typ.entries.p.entries.name, "RGB");
 		},
 	);
 });
