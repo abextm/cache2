@@ -483,6 +483,25 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				let e = sp(["Blob(", renderAny(v.size), ")"], "blob");
 				e.addEventListener("click", _ev => openBlob(v));
 				return e;
+			} else if (v instanceof ImageData) {
+				let c = document.createElement("canvas");
+				c.width = v.width;
+				c.height = v.height;
+				c.getContext("2d")?.putImageData(v, 0, 0);
+				expandable(c, clickParent);
+				addTooltip(clickParent ?? c, p => {
+					let c = document.createElement("canvas");
+					c.width = v.width;
+					c.height = v.height;
+					c.getContext("2d")?.putImageData(v, 0, 0);
+					p.appendChild(c);
+					return {
+						$destroy() {
+							c.remove();
+						},
+					};
+				});
+				return c;
 			} else {
 				return sp("unknown");
 			}

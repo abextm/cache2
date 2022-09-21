@@ -6,7 +6,7 @@ import { isEqual } from "lodash";
 // posted via structured clone which seems to be faster with arrays since it doesn't
 // have to copy object keys
 
-export type UIPrimitive = string | number | boolean | undefined | bigint | null | Blob;
+export type UIPrimitive = string | number | boolean | undefined | bigint | null | Blob | ImageData;
 export type UIAny = UIPrimitive | UITyped | UIList | UIPartialList | UIToStringed | UIError;
 export type UITyped = [UIType.Typed, UITypeRef, UIPrimitive];
 export type UITypeRef = [string];
@@ -21,6 +21,7 @@ export enum UIType {
 	Error = 7,
 	ArrayBuffer = 8,
 	DefaultValue = 9,
+	Instance = 10,
 }
 
 const TypedArrays = [
@@ -142,7 +143,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 				case "symbol":
 					return this.serStringed(v);
 				case "object":
-					if (v === null || v instanceof Blob) {
+					if (v === null || v instanceof Blob || v instanceof ImageData) {
 						return [wrapType(rType, v), 4];
 					}
 			}

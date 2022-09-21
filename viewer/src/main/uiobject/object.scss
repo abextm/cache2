@@ -105,6 +105,10 @@
 		top: -500px;
 	}
 
+	canvas.collapsed {
+		max-height: 1em;
+	}
+
 	.hovered {
 		background: #8884;
 	}
