@@ -552,12 +552,31 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		}
 
 		if (type === UIType.Typed) {
+			let type = v[1][0];
+			let val = v[2];
+			if (typeof val === "number" && (type === "HSL" || type === "RGB")) {
+				let color: string;
+				let str: string;
+				if (type === "HSL") {
+					let h = ((val >> 10) & 63) / 64;
+					let s = ((val >> 7) & 7) / 8;
+					let l = (val & 127) / 128;
+					h += .5 / 64;
+					s += .5 / 8;
+					color = `hsl(${h * 360}deg, ${s * 100}%, ${l * 100}%)`;
+					str = "" + val;
+				} else {
+					color = `rgb(${val >> 16 & 0xFF}, ${val >> 8 & 0xFF}, ${val & 0xFF})`;
+					str = "0x" + val.toString(16);
+				}
+				let swatch = sp([], "swatch");
+				swatch.style.backgroundColor = color;
+				return sp([swatch, str]);
+			}
 			let e = renderAny(v[2], { unwrap, clickParent });
 			if (e) {
-				let type = v[1][0];
 				e.dataset.type = type;
 
-				let val = v[2];
 				if (typeof val === "number" && type in lookupTypes) {
 					let ty2 = lookupTypes[type as keyof typeof lookupTypes];
 					let a = document.createElement("a");
@@ -570,22 +589,6 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 						let value = await getRunner().lookup(ty2, "" + val);
 						return target => new ReferenceTooltip({ target, props: { value, type: ty2 } });
 					});
-				}
-				if (typeof val === "number" && (type === "HSL" || type === "RGB")) {
-					let color: string;
-					if (type === "HSL") {
-						let h = ((val >> 10) & 63) / 64;
-						let s = ((val >> 7) & 7) / 8;
-						let l = (val & 127) / 128;
-						h += .5 / 64;
-						s += .5 / 8;
-						color = `hsl(${h * 360}deg, ${s * 100}%, ${l * 100}%)`;
-					} else {
-						color = `rgb(${val >> 16 & 0xFF}, ${val >> 8 & 0xFF}, ${val & 0xFF})`;
-					}
-					let swatch = sp([], "swatch");
-					swatch.style.backgroundColor = color;
-					e = sp([swatch, e]);
 				}
 			}
 			return e;
