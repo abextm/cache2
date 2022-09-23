@@ -8,6 +8,7 @@ import { UIData } from "./uiobject";
 export const lookupTypes = {
 	ItemID: "item",
 	HitsplatID: "hitsplat",
+	NPCID: "npc",
 	SpriteID: "sprite",
 } as const;
 export type LookupType = "index" | "item" | "hitsplat" | "npc" | "sprite";
