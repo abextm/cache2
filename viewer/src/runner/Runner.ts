@@ -2,7 +2,7 @@ import * as c2 from "cache2";
 import { CacheProvider } from "cache2";
 import * as _ from "lodash";
 import { setCacheShare } from "../common/CacheShare";
-import { ClearConsole, IRunnerPrivate, Log, LogLevel, ScriptResponse } from "../common/Runner";
+import { ClearConsole, IRunnerPrivate, Log, LogLevel, LookupType, ScriptResponse } from "../common/Runner";
 import { ServiceClient } from "../common/ServiceClient";
 import { ServiceServer } from "../common/ServiceServer";
 import { serialize } from "../common/uiobject";
@@ -241,12 +241,41 @@ let index = {
 	},
 };
 
-let types = {
+interface Filterable<T> {
+	load(c: Promise<CacheProvider>, id: number): Promise<T>;
+	all(c: Promise<CacheProvider>): Promise<T[]>;
+}
+
+let types: Record<LookupType, Filterable<unknown>> = {
 	index,
 	item: c2.Item,
 	hitsplat: c2.Hitsplat,
 	sprite: c2.Sprites,
 };
+
+async function loadAndFilter<T>(typ: Filterable<T>, filter: string): Promise<T[]> {
+	let v: T[];
+	if (/^[0-9, -]+$/.test(filter)) {
+		v = await Promise.all(
+			filter.split(",")
+				.map(v => v.trim())
+				.filter(v => v)
+				.flatMap(v => {
+					let d = v.split("-");
+					if (d.length == 1) {
+						return [~~d[0]];
+					}
+					return _.range(~~d[0], ~~d[1] + 1);
+				})
+				.map(id => typ.load(ctx.cache, id)),
+		);
+	} else {
+		let re = new RegExp(filter, "iu");
+		v = (await typ.all(ctx.cache))
+			.filter(v => re.test((v as any)?.name));
+	}
+	return v;
+}
 
 new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	async prepare(cacheShare) {
@@ -277,36 +306,31 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 			});
 	},
 	async lookup(type, filter) {
-		let typ: {
-			load(c: Promise<CacheProvider>, id: number): Promise<any>;
-			all(c: Promise<CacheProvider>): Promise<any[]>;
-		} = types[type];
-		let v: any[];
-		if (/^[0-9, -]+$/.test(filter)) {
-			v = await Promise.all(
-				filter.split(",")
-					.map(v => v.trim())
-					.filter(v => v)
-					.flatMap(v => {
-						let d = v.split("-");
-						if (d.length == 1) {
-							return [~~d[0]];
-						}
-						return _.range(~~d[0], ~~d[1] + 1);
-					})
-					.map(id => typ.load(ctx.cache, id)),
-			);
-		} else {
-			let re = new RegExp(filter, "iu");
-			v = (await typ.all(ctx.cache))
-				.filter(v => re.test(v?.name));
-		}
+		let v = await loadAndFilter(types[type], filter);
 
 		if (v.length == 1) {
 			return ServiceServer.return(...serialize(v[0], true));
 		}
 
 		return ServiceServer.return(...serialize(v, true));
+	},
+	async spriteMetadata(filter) {
+		let sprites = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);
+		return <c2.Sprites[]> <any> sprites.map(s => ({
+			...s,
+			palette: undefined!,
+			sprites: s.sprites.map(sp => ({
+				...sp,
+				pixels: undefined!,
+			})),
+		}));
+	},
+	async spriteImageData(id) {
+		let sprite = await c2.Sprites.load(ctx.cache, id);
+		if (!sprite) {
+			return [];
+		}
+		return sprite.sprites.map(v => v.asImageData(true));
 	},
 });
 

@@ -1,5 +1,6 @@
 import { mdiRepeatVariant } from "@mdi/js";
-import { getRunner, lookupTypes } from "../../common/Runner";
+import { ComponentConstructorOptions, SvelteComponentTyped } from "svelte";
+import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
 import {
 	PartialListID,
 	TypedArray,
@@ -14,7 +15,9 @@ import {
 } from "../../common/uiobject";
 import { measure, mutate } from "../util/DOMTiming";
 import { addTooltip, addTooltipAsync, hoverListener } from "../util/tooltip";
+import JSObject from "./JSObject.svelte";
 import ReferenceTooltip from "./ReferenceTooltip.svelte";
+import Sprites from "./Sprites.svelte";
 
 // we don't use svelte to construct this because the svelte impl
 // was very ugly and hard to change. Manually constructing the dom tree
@@ -23,6 +26,40 @@ import ReferenceTooltip from "./ReferenceTooltip.svelte";
 export interface RenderedObject {
 	setExpanded(v: boolean): void;
 	destroy(destroyData: boolean | UIData): void;
+}
+
+function patchProps<A extends object, B extends object>(
+	ctor: typeof SvelteComponentTyped<A>,
+	props: Omit<A, keyof B>,
+): typeof SvelteComponentTyped<B> {
+	return <any> function(opts: ComponentConstructorOptions<B>) {
+		return new ctor({
+			...opts,
+			props: <any> {
+				...opts.props!,
+				...props,
+			},
+		});
+	};
+}
+
+export async function lookupUI<T extends LookupType>(
+	runner: Runner,
+	type: T,
+	filter: string | number,
+	style: string,
+): Promise<typeof SvelteComponentTyped<{ context: "viewer" | "tooltip"; }> | undefined> {
+	if (type === "sprite" && style === "default") {
+		let sprites = await runner.spriteMetadata("" + filter);
+		return patchProps(Sprites, { sprites, runner });
+	}
+	let uiobj = await runner.lookup(type, "" + filter);
+	if (uiobj) {
+		return patchProps(JSObject, {
+			expanded: true,
+			value: uiobj,
+		});
+	}
 }
 
 let activeBlob: string | undefined;
@@ -586,8 +623,8 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					a.addEventListener("click", ev => ev.stopPropagation());
 					e = a;
 					addTooltipAsync(clickParent ?? e, async () => {
-						let value = await getRunner().lookup(ty2, "" + val);
-						return target => new ReferenceTooltip({ target, props: { value, type: ty2 } });
+						let ctor = await lookupUI(getRunner(), ty2, "" + val, "default");
+						return target => new ReferenceTooltip({ target, props: { ctor, type: ty2 } });
 					});
 				}
 			}

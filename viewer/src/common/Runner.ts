@@ -1,3 +1,4 @@
+import { Sprites } from "cache2";
 import { capitalize } from "lodash";
 import { getCacheSharePort } from "./CacheShare";
 import { altCache, defaultCache } from "./db";
@@ -17,6 +18,8 @@ export function uiType(t: LookupType): string {
 
 export interface IRunner {
 	lookup(type: LookupType, filter: string): Promise<UIData | undefined>;
+	spriteMetadata(filter: string): Promise<Sprites[]>;
+	spriteImageData(id: number): Promise<ImageData[]>;
 }
 
 export interface IRunnerPrivate extends IRunner {
@@ -87,6 +90,8 @@ export class Runner implements IRunner {
 	}
 
 	lookup = proxy("lookup");
+	spriteMetadata = proxy("spriteMetadata");
+	spriteImageData = proxy("spriteImageData");
 }
 
 defaultCache.subscribe(() => runner?.terminate());

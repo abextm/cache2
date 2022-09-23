@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { LookupType, uiType } from "../../common/Runner";
-	import { UIData } from "../../common/uiobject";
-	import JSObject from "./JSObject.svelte";
+  import { lookupUI } from "./ObjectRenderer";
 
-	export let value: UIData | undefined;
+	export let ctor: Awaited<ReturnType<typeof lookupUI>>;
 	export let type: LookupType;
 </script>
 
 {uiType(type)}
-{#if value}
-	<JSObject {value} expanded/>
+{#if ctor}
+	<svelte:component this={ctor} context="tooltip" />
 {:else}
 	Invalid
 {/if}
