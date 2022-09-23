@@ -18,8 +18,16 @@ export abstract class Config extends Loadable {
 		id: ID,
 	): I {
 		const v = new this(id);
-		for (let opcode: number; (opcode = reader.u8()) != 0;) {
-			v.readOpcode(opcode, reader);
+		try {
+			for (let opcode: number; (opcode = reader.u8()) != 0;) {
+				v.readOpcode(opcode, reader);
+			}
+		} catch (e) {
+			if (typeof e === "object" && e && "message" in e) {
+				let ea = e as any;
+				ea.message = id + ": " + ea.message;
+			}
+			throw e;
 		}
 		return v;
 	}

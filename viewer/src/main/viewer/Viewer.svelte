@@ -33,6 +33,7 @@
 		<Section name="Config" index={2}>
 			<ViewType name="item" bind:key={$key}/>
 			<ViewType name="hitsplat" bind:key={$key}/>
+			<ViewType name="npc" bind:key={$key}/>
 		</Section>
 		<ViewType name="sprite" bind:key={$key}>Sprites</ViewType>
 	</div>
@@ -50,7 +51,7 @@
 				<input class="filter" type="text" bind:value={$filter} placeholder="id or name regexp"/>
 			</div>
 			<div class="contents tab-padded">
-				{#await lookupUI(getRunner($defaultCache, $altCache), $key, $filter, style)}
+				{#await lookupUI(getRunner($defaultCache, $altCache), $key, $filter ?? "", style)}
 					Loading...
 				{:then ctor}
 					{#if ctor}

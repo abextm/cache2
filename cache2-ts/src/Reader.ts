@@ -101,6 +101,9 @@ export class Reader {
 	public [def.Coder.True](): boolean {
 		return true;
 	}
+	public [def.Coder.False](): boolean {
+		return false;
+	}
 	public [def.Coder.Zero](): number {
 		return 0;
 	}

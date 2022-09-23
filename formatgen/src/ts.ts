@@ -65,13 +65,15 @@ const tsType = (t: Type): string => {
 const defaultForType = (t: Type): any => {
 	if (typeof t === "string") {
 		switch (t) {
-			case PType.ModelID:
-			case PType.ItemID:
-			case PType.TextureID:
-			case PType.FontID:
+			case PType.AnimationID:
 			case PType.CategoryID:
+			case PType.FontID:
 			case PType.HitsplatID:
+			case PType.ItemID:
+			case PType.ModelID:
+			case PType.NPCID:
 			case PType.SpriteID:
+			case PType.TextureID:
 			case PType.VarbitID:
 			case PType.VarPID:
 				return -1;

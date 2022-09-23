@@ -6,15 +6,17 @@ export enum PType {
 	HSL = "HSL",
 	RGB = "RGB",
 
-	ModelID = "ModelID",
-	ItemID = "ItemID",
-	TextureID = "TextureID",
+	AnimationID = "AnimationID",
+	CategoryID = "CategoryID",
 	FontID = "FontID",
+	HitsplatID = "HitsplatID",
+	ItemID = "ItemID",
+	ModelID = "ModelID",
+	NPCID = "NPCID",
 	SpriteID = "SpriteID",
+	TextureID = "TextureID",
 	VarbitID = "VarbitID",
 	VarPID = "VarPID",
-	HitsplatID = "HitsplatID",
-	CategoryID = "CategoryID",
 
 	Params = "Params",
 }
@@ -35,6 +37,7 @@ export enum Coder {
 	I32 = "i32",
 	S2o4n = "s2o4n",
 	True = "true",
+	False = "false",
 	Zero = "zero",
 	String = "string",
 	VString = "vString",
@@ -48,7 +51,7 @@ export interface Field {
 	name: string;
 	type: Type;
 	doc?: string;
-	default?: string | number | (null | string)[] | number[];
+	default?: string | number | boolean | (null | string)[] | number[];
 }
 
 export type IntoCoder = {

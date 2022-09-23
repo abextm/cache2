@@ -10,9 +10,12 @@ export const lookupTypes = {
 	HitsplatID: "hitsplat",
 	SpriteID: "sprite",
 } as const;
-export type LookupType = "index" | "item" | "hitsplat" | "sprite";
+export type LookupType = "index" | "item" | "hitsplat" | "npc" | "sprite";
 
 export function uiType(t: LookupType): string {
+	if (t === "npc") {
+		return "NPC";
+	}
 	return capitalize(t);
 }
 
