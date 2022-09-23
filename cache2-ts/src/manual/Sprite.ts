@@ -5,13 +5,15 @@ import * as types from "../types";
 
 @Typed
 export class Sprite {
-	constructor(public readonly sprites: Sprites, private readonly index: number) {
+	constructor(public readonly sprites: Sprites, public readonly index: number) {
 	}
 
 	offsetX = 0;
 	offsetY = 0;
 	pixelsWidth = 0;
 	pixelsHeight = 0;
+
+	encodingMode!: number;
 
 	pixels: Uint8Array = undefined!;
 
@@ -36,7 +38,7 @@ export class Sprite {
 		let ph = this.pixelsHeight;
 		for (let y = 0; y < ph; y++) {
 			let po = y * pw;
-			let to = (y + ty) * th;
+			let to = (y + ty) * tw;
 			for (let x = 0; x < pw; x++) {
 				let rgb = palette[px[po + x]];
 				let oi = 4 * (to + tx + x);
@@ -103,7 +105,7 @@ export class Sprites extends PerArchiveLoadable {
 		r.offset = 0;
 		for (let i = 0; i < count; i++) {
 			let sprite = out.sprites[i];
-			let mode = r.u8();
+			let mode = sprite.encodingMode = r.u8();
 
 			if (mode == 0) {
 				sprite.pixels = r.array(sprite.pixelsWidth * sprite.pixelsHeight);
