@@ -96,10 +96,10 @@ export class ArchiveData {
 
 			if (numChunks == 1) {
 				let size = 0;
-				for (let id = 0; id < fileCount; id++) {
+				for (let file of this.files.values()) {
 					size += dv.getInt32(off);
 					off += 4;
-					this.files.get(id)!.data = data.subarray(doff, doff + size);
+					file.data = data.subarray(doff, doff + size);
 					doff += size;
 				}
 			} else {
