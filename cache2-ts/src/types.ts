@@ -40,6 +40,7 @@ export type ModelID = NewType<number>;
 export type NPCID = NewType<number>;
 export type ParamID = NewType<number>;
 export type SpriteID = NewType<number>;
+export type StructID = NewType<number>;
 export type TextureID = NewType<number>;
 export type VarbitID = NewType<number>;
 export type VarPID = NewType<number>;

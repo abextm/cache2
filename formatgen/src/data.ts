@@ -2,6 +2,7 @@ import * as hitsplat from "./datas/hitsplat";
 import * as item from "./datas/item";
 import * as npc from "./datas/npc";
 import * as param from "./datas/param";
+import * as struct from "./datas/struct";
 import { Config } from "./def";
 
 export const configs: { [name: string]: Config; } = {
@@ -9,4 +10,5 @@ export const configs: { [name: string]: Config; } = {
 	hitsplat: hitsplat.config,
 	npc: npc.config,
 	param: param.config,
+	struct: struct.config,
 };

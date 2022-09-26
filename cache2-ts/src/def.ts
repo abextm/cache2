@@ -16,6 +16,7 @@ export enum PType {
 	ModelID = "ModelID",
 	NPCID = "NPCID",
 	SpriteID = "SpriteID",
+	StructID = "StructID",
 	TextureID = "TextureID",
 	VarbitID = "VarbitID",
 	VarPID = "VarPID",

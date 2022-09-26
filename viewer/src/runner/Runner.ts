@@ -254,6 +254,7 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	npc: c2.NPC,
 	param: c2.Param,
 	sprite: c2.Sprites,
+	struct: c2.Struct,
 };
 
 async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Promise<T[]> {

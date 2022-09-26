@@ -89,7 +89,7 @@ export class ScriptVarType {
 	static readonly mapSceneIcon = t({ id: 55, char: "£", jag: "mapsceneicon" });
 	static readonly mapElement = t({ id: 59, char: "µ", jag: "mapelement" });
 	static readonly hitsplat = t({ id: 62, char: "×", jag: "hitmark", type: "HitsplatID" });
-	static readonly struct = t({ id: 73, char: "J", jag: "struct" });
+	static readonly struct = t({ id: 73, char: "J", jag: "struct", type: "StructID" });
 	static readonly dbRow = t({ id: 74, char: "Ð", jag: "dbrow" });
 }
 
