@@ -1,4 +1,5 @@
 import * as def from "./def";
+import { ParamID, Params } from "./types";
 
 const cp1252CharMap: string[] = (() => {
 	const ext = "€?‚ƒ„…†‡ˆ‰Š‹Œ?Ž??‘’“”•–—˜™š›œ?žŸ";
@@ -127,19 +128,19 @@ export class Reader {
 		}
 		return s;
 	}
-	public [def.Coder.Params](): Map<number, string | number> {
+	public [def.Coder.Params](): Params {
 		let count = this.u8();
-		let out = new Map<number, string | number>();
+		let out = new Params();
 
 		for (let i = 0; i < count; i++) {
 			let type = this.u8();
 			let param = this.u24();
 			switch (type) {
 				case 0:
-					out.set(param, this.i32());
+					out.set(param as ParamID, this.i32());
 					break;
 				case 1:
-					out.set(param, this.string());
+					out.set(param as ParamID, this.string());
 					break;
 				default:
 					throw new Error(`invalid type in param table ${type}`);

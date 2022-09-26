@@ -28,6 +28,8 @@ export enum CompressionType {
 
 export type XTEAKey = [number, number, number, number];
 
+export type ScriptVarChar = NewType<number>;
+
 export type AnimationID = NewType<number>;
 export type CategoryID = NewType<number>;
 export type FontID = NewType<number>;
@@ -35,6 +37,7 @@ export type HitsplatID = NewType<number>;
 export type ItemID = NewType<number>;
 export type ModelID = NewType<number>;
 export type NPCID = NewType<number>;
+export type ParamID = NewType<number>;
 export type SpriteID = NewType<number>;
 export type TextureID = NewType<number>;
 export type VarbitID = NewType<number>;
@@ -42,3 +45,6 @@ export type VarPID = NewType<number>;
 
 export type HSL = AliasType<number>;
 export type RGB = AliasType<number>;
+
+export class Params extends Map<ParamID, string | number> {
+}

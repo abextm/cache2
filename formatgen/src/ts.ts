@@ -7,6 +7,8 @@ const root = process.argv[2];
 fs.rmSync(root, { recursive: true, force: true });
 fs.mkdirSync(root, { recursive: true });
 
+const PARAMS_DEFAULT = {};
+
 class TSWriter extends SourceWriter {
 	constructor(name: string) {
 		super(name + ".ts");
@@ -26,11 +28,8 @@ class TSWriter extends SourceWriter {
 	}
 
 	value(value: any): this {
-		if (value instanceof Map) {
-			if (value.size != 0) {
-				throw new Error();
-			}
-			return this.write(`new Map()`);
+		if (value === PARAMS_DEFAULT) {
+			return this.write(`new types.Params()`);
 		}
 		return this.write(JSON.stringify(value, undefined, "\t"));
 	}
@@ -48,8 +47,6 @@ const tsType = (t: Type): string => {
 		throw new Error();
 	} else {
 		switch (t) {
-			case PType.Params:
-				return "Map<number, string|number>";
 			case PType.Int:
 				return "number";
 			case PType.Boolean:
@@ -65,18 +62,7 @@ const tsType = (t: Type): string => {
 const defaultForType = (t: Type): any => {
 	if (typeof t === "string") {
 		switch (t) {
-			case PType.AnimationID:
-			case PType.CategoryID:
-			case PType.FontID:
-			case PType.HitsplatID:
-			case PType.ItemID:
-			case PType.ModelID:
-			case PType.NPCID:
-			case PType.SpriteID:
-			case PType.TextureID:
-			case PType.VarbitID:
-			case PType.VarPID:
-				return -1;
+			case PType.ScriptVarChar:
 			case PType.Int:
 			case PType.HSL:
 			case PType.RGB:
@@ -86,9 +72,11 @@ const defaultForType = (t: Type): any => {
 			case PType.String:
 				return null;
 			case PType.Params:
-				return new Map();
+				return PARAMS_DEFAULT;
 			default: {
-				let _exhaustive: never = t;
+				if (t.endsWith("ID")) {
+					return -1;
+				}
 				throw new Error();
 			}
 		}

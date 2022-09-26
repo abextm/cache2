@@ -9,9 +9,10 @@ export const lookupTypes = {
 	ItemID: "item",
 	HitsplatID: "hitsplat",
 	NPCID: "npc",
+	ParamID: "param",
 	SpriteID: "sprite",
 } as const;
-export type LookupType = "index" | "item" | "hitsplat" | "npc" | "sprite";
+export type LookupType = "index" | "item" | "hitsplat" | "npc" | "param" | "sprite";
 
 export function uiType(t: LookupType): string {
 	if (t === "npc") {

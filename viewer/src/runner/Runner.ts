@@ -251,6 +251,7 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	item: c2.Item,
 	hitsplat: c2.Hitsplat,
 	npc: c2.NPC,
+	param: c2.Param,
 	sprite: c2.Sprites,
 };
 

@@ -29,13 +29,14 @@
 
 <Split size={20}>
 	<div slot=1>
-		<ViewType name="index" bind:key={$key}>All Indexes</ViewType>
+		<ViewType name="index" bind:key={$key} index={255}>All Indexes</ViewType>
 		<Section name="Config" index={2}>
-			<ViewType name="item" bind:key={$key}/>
-			<ViewType name="hitsplat" bind:key={$key}/>
-			<ViewType name="npc" bind:key={$key}/>
+			<ViewType name="item" bind:key={$key} index={10}/>
+			<ViewType name="hitsplat" bind:key={$key} index={32}/>
+			<ViewType name="npc" bind:key={$key} index={9}/>
+			<ViewType name="param" bind:key={$key} index={11}/>
 		</Section>
-		<ViewType name="sprite" bind:key={$key}>Sprites</ViewType>
+		<ViewType name="sprite" bind:key={$key} index={8}>Sprites</ViewType>
 	</div>
 	<div slot=2 class="rhs">
 		{#if $key}

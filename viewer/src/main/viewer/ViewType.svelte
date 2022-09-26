@@ -3,12 +3,14 @@
 
 	export let name: LookupType;
 	export let key: LookupType | undefined;
+	export let index: number;
 </script>
 
 <div on:click|preventDefault={() => key = name}>
 	<slot>
 		{uiType(name)}
 	</slot>
+	<span class="viewer-id">{index}</span>
 </div>
 
 <style>

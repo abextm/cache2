@@ -59,6 +59,7 @@ export abstract class Config extends Loadable {
 			return [];
 		}
 		return [...ar.getFiles().values()]
+			.filter(v => v.data.length > 1 && v.data[0] != 0)
 			.map(v => Config.decode<I, ID>.call(this, new Reader(v.data), v.id as ID));
 	}
 
