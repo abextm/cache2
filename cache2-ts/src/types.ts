@@ -29,6 +29,7 @@ export enum CompressionType {
 export type XTEAKey = [number, number, number, number];
 
 export type ScriptVarChar = NewType<number>;
+export type ScriptVarID = NewType<number>;
 
 export type AnimationID = NewType<number>;
 export type CategoryID = NewType<number>;

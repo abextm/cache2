@@ -27,7 +27,13 @@ export namespace Typed {
 		name?: string;
 		default?: any;
 	};
-	export type Any = Typed.Object | Typed.List | Typed.Tuple | Typed.Named | undefined;
+	export type Map = {
+		type: "map";
+		key?: Any;
+		value?: Any;
+		default?: any;
+	};
+	export type Any = Typed.Object | Typed.List | Typed.Tuple | Typed.Named | Typed.Map | undefined;
 
 	export type Value<T> = {
 		[Typed.type]: Typed.Any;

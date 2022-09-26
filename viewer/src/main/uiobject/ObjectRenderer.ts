@@ -1,4 +1,5 @@
 import { mdiRepeatVariant } from "@mdi/js";
+import { ScriptVarChar, ScriptVarID, ScriptVarType } from "cache2";
 import { ComponentConstructorOptions, SvelteComponentTyped } from "svelte";
 import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
 import {
@@ -609,6 +610,14 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				let swatch = sp([], "swatch");
 				swatch.style.backgroundColor = color;
 				return sp([swatch, str]);
+			}
+			if (typeof val === "number" && (type === "ScriptVarChar" || type === "ScriptVarID")) {
+				let svt = type === "ScriptVarChar"
+					? ScriptVarType.forChar(val as ScriptVarChar)
+					: ScriptVarType.forID(val as ScriptVarID);
+				if (svt) {
+					return sp([svt.name], "type");
+				}
 			}
 			let e = renderAny(v[2], { unwrap, clickParent });
 			if (e) {

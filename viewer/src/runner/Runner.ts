@@ -54,12 +54,13 @@ class ScriptRunner {
 					return;
 				}
 				self.console.log(...args);
-				let [uidata, transfer] = serialize(args, true);
-				this.respond<Log>({
-					type: "log",
-					level,
-					args: uidata,
-				}, transfer);
+				serialize(args, true, ctx.cache).then(([uidata, transfer]) =>
+					this.respond<Log>({
+						type: "log",
+						level,
+						args: uidata,
+					}, transfer)
+				);
 			};
 		};
 
@@ -298,12 +299,13 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 				}
 
 				if (value) {
-					let [uidata, trans] = serialize([value], true);
-					script.respond<Log>({
-						type: "log",
-						level: "done",
-						args: uidata,
-					}, trans);
+					serialize([value], true, ctx.cache).then(([uidata, trans]) =>
+						script.respond<Log>({
+							type: "log",
+							level: "done",
+							args: uidata,
+						}, trans)
+					);
 				}
 			});
 	},
@@ -311,10 +313,10 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		let v = await loadAndFilter(types[type], filter);
 
 		if (v.length == 1) {
-			return ServiceServer.return(...serialize(v[0], true));
+			return ServiceServer.return(...await serialize(v[0], true, ctx.cache));
 		}
 
-		return ServiceServer.return(...serialize(v, true));
+		return ServiceServer.return(...await serialize(v, true, ctx.cache));
 	},
 	async spriteMetadata(filter) {
 		let sprites = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);

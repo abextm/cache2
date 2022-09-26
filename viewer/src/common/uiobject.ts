@@ -1,4 +1,4 @@
-import { NewType, Typed } from "cache2";
+import { CacheProvider, NewType, Param, ParamID, Params, ScriptVarType, Typed } from "cache2";
 import * as _ from "lodash";
 import { isEqual } from "lodash";
 
@@ -74,15 +74,48 @@ interface Entries {
 	type: UIListType;
 	entries: any[] | [any, any][] | TypedArray;
 	isKV: boolean;
+	v: object;
 }
 
-export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[]] {
+type TypeOverride = (k: any, v: any, obj: any) => [Typed.Any | undefined, Typed.Any | undefined] | undefined;
+const paramTypeOverride: TypeOverride = (k, v, obj: Param) => {
+	if (k === "defaultInt" || k === "defaultString") {
+		return [undefined, ScriptVarType.forChar(obj.type)?.asTyped()];
+	}
+};
+
+const PARAMID_TYPE: Typed.Named = {
+	type: "named",
+	name: "ParamID",
+	default: -1,
+};
+
+const PARAM_TYPES_EMPTY: Promise<Map<ParamID, Typed.Named>> = Promise.resolve(new Map());
+let paramTypesPromise = PARAM_TYPES_EMPTY;
+
+async function loadParams(cache: Promise<CacheProvider>): Promise<Map<ParamID, Typed.Named>> {
+	let out = new Map<ParamID, Typed.Named>();
+	for (let param of await Param.all(cache)) {
+		let type = ScriptVarType.forChar(param.type)?.asTyped();
+		if (type) {
+			out.set(param.id, type);
+		}
+	}
+	return out;
+}
+
+export async function serialize(
+	v: any,
+	hideDefaults: boolean,
+	cache: Promise<CacheProvider>,
+): Promise<[UIData, Transferable[]]> {
 	let references = new Map<any, UIPartialList | null>();
 	let types: Map<string, UITypeRef> = new Map();
 	let partials: { v: any; rType: Typed.Any | undefined; }[] = [];
 
 	{
 		let seen = new Set<any>();
+		let hasParams = false;
 		function see(v: any) {
 			if (typeof v !== "object" || !v) {
 				return;
@@ -95,14 +128,25 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 			seen.add(v);
 
 			if (!Array.isArray(v)) {
-				v = Object.values(v);
+				if (v instanceof Params && v.size > 0) {
+					hasParams = true;
+				}
+				if (!(v instanceof Map || v instanceof Set)) {
+					v = Object.values(v);
+				}
 			}
 			for (let va of v) {
 				see(va);
 			}
 		}
 		see(v);
+
+		if (hasParams && paramTypesPromise === PARAM_TYPES_EMPTY) {
+			paramTypesPromise = loadParams(cache);
+		}
 	}
+
+	let paramTypes = await paramTypesPromise;
 
 	const ROOT_ROWS = 50;
 	const COLUMNS = 200;
@@ -236,7 +280,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 		}
 
 		*serEntries(
-			{ entries, isKV }: Entries,
+			{ entries, isKV, v }: Entries,
 			perLimit: number,
 			uiEntries: UIAny[],
 			rType: Typed.Any | undefined,
@@ -248,12 +292,27 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 			let objType = rType?.type === "obj" ? rType : undefined;
 			let listType = rType?.type === "list" ? rType : undefined;
 			let tupType = rType?.type === "tuple" ? rType : undefined;
+			let mapType = rType?.type === "map" ? rType : undefined;
+			let typeOverride: TypeOverride | undefined;
+			if (v instanceof Params) {
+				typeOverride = k => [PARAMID_TYPE, paramTypes.get(k)];
+			} else if (v instanceof Param) {
+				typeOverride = paramTypeOverride;
+			}
 
 			for (let i = start; i < end; i++) {
 				let entry = entries[i];
 				if (isKV) {
-					let [kv, ks] = this.serAny(entry[0], perLimit, undefined);
-					let [vv, vs] = this.serAny(entry[1], perLimit, objType?.entries[entry[0]] ?? objType?.defaultEntry);
+					let [ktOver, vtOver] = typeOverride?.(entry[0], entry[1], v) ?? [undefined, undefined];
+					let [kv, ks] = this.serAny(entry[0], perLimit, ktOver ?? mapType?.key);
+					let [vv, vs] = this.serAny(
+						entry[1],
+						perLimit,
+						vtOver
+							?? objType?.entries[entry[0]]
+							?? objType?.defaultEntry
+							?? mapType?.value,
+					);
 					uiEntries.push(kv, vv);
 					yield ks + vs;
 				} else {
@@ -270,12 +329,14 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 					type: UIType.Array,
 					entries: v,
 					isKV: false,
+					v,
 				};
 			} else if (v instanceof Set) {
 				return {
 					type: UIType.Set,
 					entries: [...v.values()],
 					isKV: false,
+					v,
 				};
 			} else if (v instanceof ArrayBuffer || v instanceof DataView) {
 				return {
@@ -284,18 +345,21 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 						? new Uint8Array(v.buffer, v.byteOffset, v.byteLength)
 						: new Uint8Array(v),
 					isKV: false,
+					v,
 				};
 			} else if (ArrayBuffer.isView(v) && TypedArrays.some(c => v instanceof c)) {
 				return {
 					type: v.constructor.name as any,
 					entries: v as TypedArray,
 					isKV: false,
+					v,
 				};
 			} else if (v instanceof Map) {
 				return {
 					type: UIType.Map,
 					entries: [...v.entries()],
 					isKV: true,
+					v,
 				};
 			} else {
 				let entries = Object.entries(v);
@@ -309,6 +373,7 @@ export function serialize(v: any, hideDefaults: boolean): [UIData, Transferable[
 					type: UIType.Object,
 					entries,
 					isKV: true,
+					v,
 				};
 			}
 		}

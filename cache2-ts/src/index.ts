@@ -7,4 +7,5 @@ export * from "./generated";
 export * from "./manual";
 export * from "./Reader";
 export { Typed } from "./reflect";
+export * from "./ScriptVarType";
 export * from "./types";

@@ -1,7 +1,7 @@
 import * as def from "./def";
 import { ParamID, Params } from "./types";
 
-const cp1252CharMap: string[] = (() => {
+export const cp1252CharMap: string[] = (() => {
 	const ext = "€?‚ƒ„…†‡ˆ‰Š‹Œ?Ž??‘’“”•–—˜™š›œ?žŸ";
 	let out = new Array(256);
 	for (let i = 0; i < out.length; i++) {
