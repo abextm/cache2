@@ -54,7 +54,7 @@ export async function lookupUI<T extends LookupType>(
 		let sprites = await runner.spriteMetadata("" + filter);
 		return patchProps(Sprites, { sprites, runner });
 	}
-	let uiobj = await runner.lookup(type, "" + filter);
+	let uiobj = await runner.lookup(type, filter);
 	if (uiobj) {
 		return patchProps(JSObject, {
 			expanded: true,
@@ -623,7 +623,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			if (e) {
 				e.dataset.type = type;
 
-				if (typeof val === "number" && type in lookupTypes) {
+				if (typeof val === "number" && val >= 0 && type in lookupTypes) {
 					let ty2 = lookupTypes[type as keyof typeof lookupTypes];
 					let a = document.createElement("a");
 					a.href = `#/viewer/${ty2}/${val}`;

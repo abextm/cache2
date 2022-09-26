@@ -22,7 +22,7 @@ export function uiType(t: LookupType): string {
 }
 
 export interface IRunner {
-	lookup(type: LookupType, filter: string): Promise<UIData | undefined>;
+	lookup(type: LookupType, filter: string | number): Promise<UIData | undefined>;
 	spriteMetadata(filter: string): Promise<Sprites[]>;
 	spriteImageData(id: number): Promise<ImageData[]>;
 }

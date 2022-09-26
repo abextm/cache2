@@ -256,14 +256,20 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	sprite: c2.Sprites,
 };
 
-async function loadAndFilter<T>(typ: Filterable<T>, filter: string): Promise<T[]> {
+async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Promise<T[]> {
 	let v: T[];
+	if (typeof filter === "number") {
+		return [await typ.load(ctx.cache, filter)];
+	}
 	if (/^[0-9, -]+$/.test(filter)) {
 		v = await Promise.all(
 			filter.split(",")
 				.map(v => v.trim())
 				.filter(v => v)
 				.flatMap(v => {
+					if (v.startsWith("-")) {
+						return Number.parseInt(v);
+					}
 					let d = v.split("-");
 					if (d.length == 1) {
 						return [~~d[0]];
