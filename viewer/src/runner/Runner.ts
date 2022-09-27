@@ -249,6 +249,7 @@ interface Filterable<T> {
 
 let types: Record<LookupType, Filterable<unknown>> = {
 	index,
+	enum: c2.Enum,
 	item: c2.Item,
 	hitsplat: c2.Hitsplat,
 	npc: c2.NPC,

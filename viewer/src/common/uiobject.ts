@@ -1,4 +1,4 @@
-import { CacheProvider, NewType, Param, ParamID, Params, ScriptVarType, Typed } from "cache2";
+import { CacheProvider, Enum, EnumValueMap, NewType, Param, ParamID, Params, ScriptVarType, Typed } from "cache2";
 import * as _ from "lodash";
 import { isEqual } from "lodash";
 
@@ -82,6 +82,12 @@ const paramTypeOverride: TypeOverride = (k, v, obj: Param) => {
 	if (k === "defaultInt" || k === "defaultString") {
 		return [undefined, ScriptVarType.forChar(obj.type)?.asTyped()];
 	}
+};
+const enumValueMapOverride: TypeOverride = (k, v, obj: EnumValueMap) => {
+	return [
+		ScriptVarType.forChar(obj.parent.keyTypeChar)?.asTyped(),
+		ScriptVarType.forChar(obj.parent.valueTypeChar)?.asTyped(),
+	];
 };
 
 const PARAMID_TYPE: Typed.Named = {
@@ -298,6 +304,8 @@ export async function serialize(
 				typeOverride = k => [PARAMID_TYPE, paramTypes.get(k)];
 			} else if (v instanceof Param) {
 				typeOverride = paramTypeOverride;
+			} else if (v instanceof Enum.EnumValueMap) {
+				typeOverride = enumValueMapOverride;
 			}
 
 			for (let i = start; i < end; i++) {

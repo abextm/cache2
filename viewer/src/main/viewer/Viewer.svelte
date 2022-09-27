@@ -31,6 +31,7 @@
 	<div slot=1>
 		<ViewType name="index" bind:key={$key} index={255}>All Indexes</ViewType>
 		<Section name="Config" index={2}>
+			<ViewType name="enum" bind:key={$key} index={8}/>
 			<ViewType name="item" bind:key={$key} index={10}/>
 			<ViewType name="hitsplat" bind:key={$key} index={32}/>
 			<ViewType name="npc" bind:key={$key} index={9}/>

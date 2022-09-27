@@ -13,7 +13,7 @@ export const lookupTypes = {
 	SpriteID: "sprite",
 	StructID: "struct",
 } as const;
-export type LookupType = "index" | "item" | "hitsplat" | "npc" | "param" | "sprite" | "struct";
+export type LookupType = "enum" | "index" | "item" | "hitsplat" | "npc" | "param" | "sprite" | "struct";
 
 export function uiType(t: LookupType): string {
 	if (t === "npc") {

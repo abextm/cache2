@@ -10,6 +10,7 @@ export enum PType {
 
 	AnimationID = "AnimationID",
 	CategoryID = "CategoryID",
+	EnumID = "EnumID",
 	FontID = "FontID",
 	HitsplatID = "HitsplatID",
 	ItemID = "ItemID",

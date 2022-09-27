@@ -75,7 +75,7 @@ export class ScriptVarType {
 	static readonly coord = t({ id: 22, char: "c", jag: "coordgrid" });
 	static readonly sprite = t({ id: 23, char: "d", jag: "graphic", type: "SpriteID" });
 	static readonly font = t({ id: 25, char: "f", jag: "fontmetrics", type: "FontID" });
-	static readonly enum = t({ id: 26, char: "g", jag: "enum" });
+	static readonly enum = t({ id: 26, char: "g", jag: "enum", type: "EnumID" });
 	static readonly jingle = t({ id: 28, char: "j", jag: "jingle" });
 	static readonly object = t({ id: 30, char: "l", jag: "loc" });
 	static readonly model = t({ id: 31, char: "m", jag: "model", type: "ModelID" });
