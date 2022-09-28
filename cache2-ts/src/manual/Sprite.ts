@@ -1,4 +1,4 @@
-import { PerArchiveLoadable } from "../Loadable";
+import { NamedPerArchiveLoadable } from "../Loadable";
 import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import * as types from "../types";
@@ -54,7 +54,7 @@ export class Sprite {
 }
 
 @Typed
-export class Sprites extends PerArchiveLoadable {
+export class Sprites extends NamedPerArchiveLoadable {
 	constructor(public id: types.SpriteID, count: number) {
 		super();
 		this.sprites = new Array(count);

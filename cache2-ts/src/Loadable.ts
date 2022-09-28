@@ -75,3 +75,24 @@ export abstract class PerArchiveLoadable extends Loadable {
 			});
 	}
 }
+
+export abstract class NamedPerArchiveLoadable extends PerArchiveLoadable {
+	public static async loadByName<
+		I extends PerArchiveLoadable,
+		ID extends number,
+	>(
+		this: {
+			index: number;
+			decode(reader: Reader, id: ID): I;
+		},
+		cache0: CacheProvider | Promise<CacheProvider>,
+		name: string | number,
+	): Promise<I | undefined> {
+		let cache = await cache0;
+		let ar = await cache.getArchiveByName(this.index, name);
+		let data = ar?.getFile(0)?.data;
+		if (data) {
+			return this.decode(new Reader(data), ar!.archive as ID);
+		}
+	}
+}
