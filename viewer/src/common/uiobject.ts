@@ -78,7 +78,7 @@ interface Entries {
 }
 
 type TypeOverride = (k: any, v: any, obj: any) => [Typed.Any | undefined, Typed.Any | undefined] | undefined;
-const paramTypeOverride: TypeOverride = (k, v, obj: Param) => {
+const paramTypeOverride: TypeOverride = (k: keyof Param, v, obj: Param) => {
 	if (k === "defaultInt" || k === "defaultString") {
 		return [undefined, ScriptVarType.forChar(obj.type)?.asTyped()];
 	}
@@ -88,6 +88,11 @@ const enumValueMapOverride: TypeOverride = (k, v, obj: EnumValueMap) => {
 		ScriptVarType.forChar(obj.parent.keyTypeChar)?.asTyped(),
 		ScriptVarType.forChar(obj.parent.valueTypeChar)?.asTyped(),
 	];
+};
+const enumOverride: TypeOverride = (k: keyof Enum, v, obj: Enum) => {
+	if (k === "defaultValue") {
+		return [undefined, ScriptVarType.forChar(obj.valueTypeChar)?.asTyped()];
+	}
 };
 
 const PARAMID_TYPE: Typed.Named = {
@@ -306,6 +311,8 @@ export async function serialize(
 				typeOverride = paramTypeOverride;
 			} else if (v instanceof Enum.EnumValueMap) {
 				typeOverride = enumValueMapOverride;
+			} else if (v instanceof Enum) {
+				typeOverride = enumOverride;
 			}
 
 			for (let i = start; i < end; i++) {
