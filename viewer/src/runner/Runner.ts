@@ -344,6 +344,10 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		}
 		return sprite.sprites.map(v => v.asImageData(true));
 	},
+	async namedSprite(name, index) {
+		let sprites = await c2.Sprites.loadByName(ctx.cache, name);
+		return sprites?.sprites?.[index]?.asImageData();
+	},
 });
 
 postMessage({ type: "ready" });

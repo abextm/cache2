@@ -26,6 +26,7 @@ export interface IRunner {
 	lookup(type: LookupType, filter: string | number): Promise<UIData | undefined>;
 	spriteMetadata(filter: string): Promise<Sprites[]>;
 	spriteImageData(id: number): Promise<ImageData[]>;
+	namedSprite(name: string, index: number): Promise<ImageData | undefined>;
 }
 
 export interface IRunnerPrivate extends IRunner {
@@ -98,6 +99,7 @@ export class Runner implements IRunner {
 	lookup = proxy("lookup");
 	spriteMetadata = proxy("spriteMetadata");
 	spriteImageData = proxy("spriteImageData");
+	namedSprite = proxy("namedSprite");
 }
 
 defaultCache.subscribe(() => runner?.terminate());

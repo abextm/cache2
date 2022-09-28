@@ -175,6 +175,19 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		return e;
 	}
 
+	function linkTyped(e: HTMLElement, clickParent: HTMLElement | undefined, ty2: LookupType, val: number): HTMLElement {
+		let a = document.createElement("a");
+		a.href = `#/viewer/${ty2}/${val}`;
+		a.classList.add("number");
+		a.appendChild(e);
+		a.addEventListener("click", ev => ev.stopPropagation());
+		addTooltipAsync(clickParent ?? a, async () => {
+			let ctor = await lookupUI(getRunner(), ty2, "" + val, "default");
+			return target => new ReferenceTooltip({ target, props: { ctor, type: ty2 } });
+		});
+		return a;
+	}
+
 	function openBlob(v: Blob) {
 		if (activeBlob) {
 			URL.revokeObjectURL(activeBlob);
@@ -498,7 +511,37 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				return sp(v, "identstr");
 			}
 
-			let e = sp(`"${escape(v)}"`, "string");
+			escaped = `"${escaped}"`;
+			let bits: (string | Node)[] = [];
+			let re = /(?:(<img=)([0-9]+)(>))|(?:(<col=)([0-9a-fA-F]+)(>))|<[^>]+>|[^<]+/g;
+			for (let m: RegExpExecArray; (m = re.exec(escaped)!) != null;) {
+				let str = m[0];
+				if (m[1] !== undefined) {
+					let val = Number.parseInt(m[2], 10);
+					let icon = document.createElement("canvas");
+					getRunner().namedSprite("mod_icons", val)
+						.then(img => {
+							if (img) {
+								icon.style.width = (icon.width = img.width) + "px";
+								icon.style.height = (icon.height = img.height) + "px";
+								icon.getContext("2d")!.putImageData(img, 0, 0);
+							}
+						});
+					bits.push(sp([m[1], icon, m[2] + m[3]], "tag"));
+				} else if (m[4] !== undefined) {
+					let val = Number.parseInt(m[5], 16);
+					let color = `rgb(${val >> 16 & 0xFF}, ${val >> 8 & 0xFF}, ${val & 0xFF})`;
+					let swatch = sp([], "swatch");
+					swatch.style.backgroundColor = color;
+					bits.push(sp([m[4], swatch, m[5] + m[6]], "tag"));
+				} else if (str.startsWith("<")) {
+					bits.push(sp(str, "tag"));
+				} else {
+					bits.push(str);
+				}
+			}
+
+			let e = sp(bits, "string");
 			addTooltip(clickParent ?? e, p => {
 				let el = document.createElement("pre");
 				el.textContent = v;
@@ -625,16 +668,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 				if (typeof val === "number" && val >= 0 && type in lookupTypes) {
 					let ty2 = lookupTypes[type as keyof typeof lookupTypes];
-					let a = document.createElement("a");
-					a.href = `#/viewer/${ty2}/${val}`;
-					a.classList.add("number");
-					a.appendChild(e);
-					a.addEventListener("click", ev => ev.stopPropagation());
-					e = a;
-					addTooltipAsync(clickParent ?? e, async () => {
-						let ctor = await lookupUI(getRunner(), ty2, "" + val, "default");
-						return target => new ReferenceTooltip({ target, props: { ctor, type: ty2 } });
-					});
+					e = linkTyped(e, clickParent, ty2, val);
 				}
 			}
 			return e;

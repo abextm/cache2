@@ -12,6 +12,9 @@
 		.type {
 			color: #008080;
 		}
+		.tag {
+			color: #ee0000;
+		}
 	}
 }
 .dark {
@@ -27,6 +30,9 @@
 		}
 		.type {
 			color: #3dc9b0;
+		}
+		.tag {
+			color: #d7ba7d;
 		}
 	}
 }
@@ -123,6 +129,16 @@
 		display: inline-block;
 		border: 1px solid #8888;
 		vertical-align: middle;
+	}
+
+	.string {
+		.swatch {
+			margin-right: 0;
+		}
+		canvas {
+			width: 0px;
+			height: 0px;
+		}
 	}
 
 	a:link {
