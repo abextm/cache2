@@ -208,7 +208,8 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		if (type == UIType.Object || type == UIType.Map) {
 			for (let i = 0; i < es.length; i += 2) {
 				let line = sp([]);
-				let val = renderAny(es[i + 1], { clickParent: line });
+				let useClickParent = !Array.isArray(es[i]);
+				let val = renderAny(es[i + 1], { clickParent: useClickParent ? line : undefined });
 				if (val) {
 					line.append(
 						renderAny(es[i], { unwrap: true }),
