@@ -6,6 +6,7 @@ import { ServiceClient } from "./ServiceClient";
 import { UIData } from "./uiobject";
 
 export const lookupTypes = {
+	EnumID: "enum",
 	ItemID: "item",
 	HitsplatID: "hitsplat",
 	NPCID: "npc",
