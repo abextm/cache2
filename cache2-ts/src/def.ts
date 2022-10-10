@@ -6,6 +6,7 @@ export enum PType {
 	HSL = "HSL",
 	RGB = "RGB",
 
+	WearPos = "WearPos",
 	ScriptVarChar = "ScriptVarChar",
 
 	AnimationID = "AnimationID",

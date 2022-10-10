@@ -1,5 +1,5 @@
 import { mdiRepeatVariant } from "@mdi/js";
-import { ScriptVarChar, ScriptVarID, ScriptVarType } from "cache2";
+import { ScriptVarChar, ScriptVarID, ScriptVarType, WearPos } from "cache2";
 import { ComponentConstructorOptions, SvelteComponentTyped } from "svelte";
 import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
 import {
@@ -661,6 +661,12 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					: ScriptVarType.forID(val as ScriptVarID);
 				if (svt) {
 					return sp([svt.name], "type");
+				}
+			}
+			if (typeof val === "number" && type === "WearPos") {
+				let name = WearPos.byID[val];
+				if (name) {
+					return sp([name], "type");
 				}
 			}
 			let e = renderAny(v[2], { unwrap, clickParent });

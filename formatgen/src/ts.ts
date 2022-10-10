@@ -67,6 +67,8 @@ const defaultForType = (t: Type): any => {
 			case PType.HSL:
 			case PType.RGB:
 				return 0;
+			case PType.WearPos:
+				return -1;
 			case PType.Boolean:
 				return false;
 			case PType.String:

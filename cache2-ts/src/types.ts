@@ -28,6 +28,8 @@ export enum CompressionType {
 
 export type XTEAKey = [number, number, number, number];
 
+export type WearPos = NewType<number>;
+
 export type ScriptVarChar = NewType<number>;
 export type ScriptVarID = NewType<number>;
 
@@ -50,4 +52,31 @@ export type HSL = AliasType<number>;
 export type RGB = AliasType<number>;
 
 export class Params extends Map<ParamID, string | number> {
+}
+
+export namespace WearPos {
+	export const HEAD = 0;
+	export const CAPE = 1;
+	export const AMULET = 2;
+	export const WEAPON = 3;
+	export const TORSO = 4;
+	export const SHIELD = 5;
+	export const ARMS = 6;
+	export const LEGS = 7;
+	export const HAIR = 8;
+	export const HANDS = 9;
+	export const BOOTS = 10;
+	export const JAW = 11;
+	export const RING = 12;
+	export const AMMO = 13;
+
+	export const byID: string[] = (() => {
+		let out: string[] = [];
+		for (let [k, v] of Object.entries(WearPos)) {
+			if (typeof v === "number") {
+				out[v] = k;
+			}
+		}
+		return out;
+	})();
 }

@@ -88,6 +88,34 @@ export const config = buildConfig({
 				coder: Coder.True,
 			},
 		},
+		wearpos1: {
+			type: PType.WearPos,
+			coder: {
+				op: 13,
+				coder: Coder.U8,
+			},
+		},
+		wearpos2: {
+			type: PType.WearPos,
+			coder: {
+				op: 14,
+				coder: Coder.U8,
+			},
+		},
+		wearpos3: {
+			type: PType.WearPos,
+			coder: {
+				op: 27,
+				coder: Coder.U8,
+			},
+		},
+		weight: {
+			type: PType.Int,
+			coder: {
+				op: 75,
+				coder: Coder.I16,
+			},
+		},
 		maleModel: {
 			type: PType.ModelID,
 		},
