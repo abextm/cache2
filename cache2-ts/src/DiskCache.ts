@@ -1,4 +1,4 @@
-import { ArchiveData, CacheProvider, FileProvider, IndexData } from "./Cache";
+import { ArchiveData, CacheProvider, FileProvider, hash, IndexData } from "./Cache";
 import { Reader } from "./Reader";
 
 export class DiskIndexData implements IndexData {
@@ -194,6 +194,24 @@ export class DiskCacheProvider implements CacheProvider {
 	}
 
 	public async getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined> {
-		throw new Error("Method not implemented.");
+		let namehash = hash(name);
+
+		let idx = await this.getIndex(index);
+		if (!idx) {
+			return;
+		}
+
+		for (let ar of idx.archives.values()) {
+			if (ar.namehash === namehash) {
+				if (!ar.compressedData) {
+					let d = await this.getArchiveRaw(index, ar.archive);
+					if (!d) {
+						return;
+					}
+					ar.compressedData = d;
+				}
+				return ar;
+			}
+		}
 	}
 }
