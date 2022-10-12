@@ -180,7 +180,7 @@ export async function serialize(
 		transferables: Transferable[] = [];
 
 		serStringed(v: any): [UIToStringed, number] {
-			let str = "" + v;
+			let str = typeof v === "symbol" ? v.toString() : "" + v;
 			let proto = v.constructor?.name ?? typeof v;
 			return [[UIType.ToStringed, proto, str], proto.length + str.length];
 		}
