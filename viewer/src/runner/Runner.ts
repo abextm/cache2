@@ -328,7 +328,9 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	},
 	async spriteMetadata(filter) {
 		let sprites = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);
-		return <c2.Sprites[]> <any> sprites.map(s => ({
+		return <c2.Sprites[]> <any> sprites.filter(s => {
+			return filter || !(s.sprites.length == 1 && s.sprites[0].pixelsWidth === 0 && s.sprites[0].pixelsHeight === 0);
+		}).map(s => ({
 			...s,
 			palette: undefined!,
 			sprites: s.sprites.map(sp => ({
