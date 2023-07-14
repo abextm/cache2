@@ -6,8 +6,7 @@
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha -require ts-node/register \"test/**/*.ts\"",
-		"generate": "rm -rf src/generated && ts-node ../formatgen/src/ts.ts src/generated/",
-		"prepare": "npm run generate && rm -rf dist && tsc"
+		"prepare": "rm -rf dist && tsc"
 	},
 	"author": "Abex",
 	"license": "BSD-2-Clause",

@@ -96,3 +96,42 @@ export abstract class NamedPerArchiveLoadable extends PerArchiveLoadable {
 		}
 	}
 }
+
+export class PerFileLoadable extends Loadable {
+	public static loadData(
+		this: { index: number; archive: number; },
+		cache: CacheProvider,
+		id: number,
+	): Promise<Uint8Array | undefined> {
+		return cache.getArchive(this.index, this.archive).then(v => v?.getFile(id)?.data);
+	}
+
+	public static async all<
+		I extends PerFileLoadable,
+		ID extends number,
+	>(this: {
+		index: number;
+		archive: number;
+		decode(reader: Reader, id: ID): I;
+	}, cache0: CacheProvider | Promise<CacheProvider>): Promise<I[]> {
+		let cache = await cache0;
+		let ad = await cache.getArchive(this.index, this.archive);
+		if (!ad) {
+			return [];
+		}
+
+		return [...ad.getFiles().values()]
+			.filter(v => v.data.length > 1 && v.data[0] != 0)
+			.map(v => {
+				try {
+					return this.decode(new Reader(v.data), v.id as ID);
+				} catch (e) {
+					if (typeof e === "object" && e && "message" in e) {
+						let ea = e as any;
+						ea.message = v.id + ": " + ea.message;
+					}
+					throw e;
+				}
+			});
+	}
+}

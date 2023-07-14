@@ -1,4 +1,3 @@
-import * as def from "./def";
 import { ParamID, Params } from "./types";
 
 export const cp1252CharMap: string[] = (() => {
@@ -46,10 +45,6 @@ export class Reader {
 		}
 	}
 
-	public fixmeclone(offset = 0) {
-		return new Reader(new DataView(this.view.buffer, this.view.byteOffset + offset, this.view.byteLength - offset));
-	}
-
 	private bump(delta: number): number {
 		let r = this.offset;
 		this.offset += delta;
@@ -66,69 +61,60 @@ export class Reader {
 		return new Uint8Array(this.view.buffer, this.view.byteOffset + start, length);
 	}
 
-	public [def.Coder.U8](): number {
+	public u8(): number {
 		return this.view.getUint8(this.bump(1));
 	}
-	public [def.Coder.U8p1](): number {
+	public u8p1(): number {
 		return this.u8() + 1;
 	}
-	public [def.Coder.I8](): number {
+	public i8(): number {
 		return this.view.getInt8(this.bump(1));
 	}
-	public [def.Coder.U16](): number {
+	public u16(): number {
 		return this.view.getUint16(this.bump(2));
 	}
-	public [def.Coder.U16n](): number {
+	public u16n(): number {
 		let v = this.view.getUint16(this.bump(2));
 		return v == 0xFFFF ? -1 : v;
 	}
-	public [def.Coder.I16](): number {
+	public i16(): number {
 		return this.view.getInt16(this.bump(2));
 	}
-	public [def.Coder.U24](): number {
+	public u24(): number {
 		let off = this.bump(3);
 		return (this.view.getUint8(off) << 16) | this.view.getUint16(off + 1);
 	}
-	public [def.Coder.I32](): number {
+	public i32(): number {
 		return this.view.getInt32(this.bump(4));
 	}
-	public [def.Coder.S2o4n](): number {
+	public s2o4n(): number {
 		if (this.view.getUint8(this.offset) & 0x80) {
 			return this.i32() & (-1 >>> 1);
 		} else {
 			return this.u16n();
 		}
 	}
-	public [def.Coder.True](): boolean {
-		return true;
-	}
-	public [def.Coder.False](): boolean {
-		return false;
-	}
-	public [def.Coder.Zero](): number {
-		return 0;
-	}
-	public [def.Coder.String](): string {
+	public string(): string {
 		let s = "";
 		for (let c: number; (c = this.u8()) != 0;) {
 			s += cp1252CharMap[c];
 		}
 		return s;
 	}
-	public [def.Coder.VString](): string {
+	public vString(): string {
 		if (this.u8() != 0) {
 			throw new Error("invalid string");
 		}
 		return this.string();
 	}
-	public [def.Coder.StringNullHidden](): string | null {
+	public stringNullHidden(): string | null {
 		let s = this.string();
 		if (s == "hidden") {
 			return null;
 		}
 		return s;
 	}
-	public [def.Coder.Params](): Params {
+	public params(): Params {
 		let count = this.u8();
 		let out = new Params();
 

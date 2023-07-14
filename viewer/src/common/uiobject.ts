@@ -309,7 +309,7 @@ export async function serialize(
 				typeOverride = k => [PARAMID_TYPE, paramTypes.get(k)];
 			} else if (v instanceof Param) {
 				typeOverride = paramTypeOverride;
-			} else if (v instanceof Enum.EnumValueMap) {
+			} else if (v instanceof EnumValueMap) {
 				typeOverride = enumValueMapOverride;
 			} else if (v instanceof Enum) {
 				typeOverride = enumOverride;

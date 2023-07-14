@@ -1,7 +1,6 @@
 {
 	"name": "cache2-parent",
 	"workspaces": [
-		"formatgen",
 		"cache2-ts",
 		"viewer"
 	],
