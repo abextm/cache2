@@ -1,3 +1,4 @@
+import { CacheVersion } from "./Cache";
 import { ParamID, Params } from "./types";
 
 export const cp1252CharMap: string[] = (() => {
@@ -35,7 +36,7 @@ export class Reader {
 		this.offset = this.length - v;
 	}
 
-	public constructor(view: ArrayBufferView | ArrayBuffer) {
+	public constructor(view: ArrayBufferView | ArrayBuffer, public version?: CacheVersion | undefined) {
 		if (view instanceof DataView) {
 			this.view = view;
 		} else if (ArrayBuffer.isView(view)) {
@@ -53,12 +54,16 @@ export class Reader {
 
 	public subreader(length: number): Reader {
 		let start = this.bump(length);
-		return new Reader(new DataView(this.view.buffer, this.view.byteOffset + start, length));
+		return new Reader(new DataView(this.view.buffer, this.view.byteOffset + start, length), this.version);
 	}
 
 	public array(length: number): Uint8Array {
 		let start = this.bump(length);
 		return new Uint8Array(this.view.buffer, this.view.byteOffset + start, length);
+	}
+
+	public isAfter(ver: CacheVersion): boolean {
+		return CacheVersion.isAfter(this.version, ver);
 	}
 
 	public u8(): number {
@@ -80,6 +85,13 @@ export class Reader {
 	public i16(): number {
 		return this.view.getInt16(this.bump(2));
 	}
+	public u8o16m1(): number { // rl readUnsignedShortSmartMinusOne
+		if (this.view.getUint8(this.offset) < 128) {
+			return this.u8() - 1;
+		} else {
+			return this.u16() - 0x8001;
+		}
+	}
 	public u24(): number {
 		let off = this.bump(3);
 		return (this.view.getUint8(off) << 16) | this.view.getUint16(off + 1);
@@ -87,7 +99,7 @@ export class Reader {
 	public i32(): number {
 		return this.view.getInt32(this.bump(4));
 	}
-	public s2o4n(): number {
+	public s2o4n(): number { // rl BigSmart2
 		if (this.view.getUint8(this.offset) & 0x80) {
 			return this.i32() & (-1 >>> 1);
 		} else {
@@ -135,7 +147,7 @@ export class Reader {
 
 		return out;
 	}
-	public u32o16(): number {
+	public u32o16(): number { // rl BigSmart
 		if (this.view.getUint8(this.offset) & 0x80) {
 			return this.u16();
 		} else {

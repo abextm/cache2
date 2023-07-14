@@ -8,6 +8,7 @@ export interface CacheProvider {
 	getArchive(index: number, archive: number): Promise<ArchiveData | undefined>;
 	getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined>;
 	getArchives(index: number): Promise<number[] | undefined>;
+	getVersion(index: number): Promise<CacheVersion>;
 }
 
 export interface FileProvider {
@@ -161,4 +162,20 @@ export function hash(name: string | number): number {
 		h = ~~((31 * h) + (v & 0xFF));
 	}
 	return h;
+}
+
+export interface CacheVersion {
+	era: "osrs";
+	indexRevision: number;
+}
+export namespace CacheVersion {
+	export function isAfter(prev: CacheVersion | undefined, after: CacheVersion): boolean {
+		if (prev === undefined) {
+			return true;
+		}
+		if (prev.era == after.era) {
+			return prev.indexRevision <= after.indexRevision;
+		}
+		return false;
+	}
 }

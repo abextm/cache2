@@ -1,4 +1,4 @@
-import { ArchiveData, CacheProvider, FileProvider, hash, IndexData } from "./Cache";
+import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache";
 import { Reader } from "./Reader";
 
 export class DiskIndexData implements IndexData {
@@ -213,5 +213,12 @@ export class DiskCacheProvider implements CacheProvider {
 				return ar;
 			}
 		}
+	}
+
+	public async getVersion(index: number): Promise<CacheVersion> {
+		return {
+			era: "osrs",
+			indexRevision: (await this.getIndex(index))?.revision ?? 0,
+		};
 	}
 }

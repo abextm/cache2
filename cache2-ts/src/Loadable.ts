@@ -3,7 +3,7 @@ import { Reader } from "./Reader";
 
 type LoadableType<I extends Loadable, ARGS extends unknown[]> = {
 	decode(reader: Reader, ...args: ARGS): I;
-	loadData(cache: CacheProvider, ...args: ARGS): Promise<Uint8Array | undefined>;
+	loadData(cache: CacheProvider, ...args: ARGS): Promise<Reader | undefined>;
 };
 
 type OrNumber<T extends unknown[]> = T;
@@ -33,7 +33,7 @@ export abstract class Loadable {
 			return (async () => {
 				let data = await this.loadData(await reader, ...args);
 				if (data) {
-					return this.decode(new Reader(data), ...args);
+					return this.decode(data, ...args);
 				}
 			})();
 		}
@@ -41,8 +41,15 @@ export abstract class Loadable {
 }
 
 export abstract class PerArchiveLoadable extends Loadable {
-	public static loadData(this: { index: number; }, cache: CacheProvider, id: number): Promise<Uint8Array | undefined> {
-		return cache.getArchive(this.index, id as number).then(v => v?.getFile(0)?.data);
+	public static async loadData(
+		this: { index: number; },
+		cache: CacheProvider,
+		id: number,
+	): Promise<Reader | undefined> {
+		let archive = await cache.getArchive(this.index, id as number);
+		let version = await cache.getVersion(this.index);
+		let data = archive?.getFile(0)?.data;
+		return data ? new Reader(data, version) : undefined;
 	}
 
 	public static async all<
@@ -59,12 +66,13 @@ export abstract class PerArchiveLoadable extends Loadable {
 		}
 
 		let archives = await Promise.all(ids.map(id => cache.getArchive(this.index, id)));
+		let version = await cache.getVersion(this.index);
 
 		return archives
 			.filter(v => v)
 			.map(v => {
 				try {
-					return this.decode(new Reader(v!.getFile(0)!.data), v!.archive as ID);
+					return this.decode(new Reader(v!.getFile(0)!.data, version), v!.archive as ID);
 				} catch (e) {
 					if (typeof e === "object" && e && "message" in e) {
 						let ea = e as any;
@@ -90,20 +98,24 @@ export abstract class NamedPerArchiveLoadable extends PerArchiveLoadable {
 	): Promise<I | undefined> {
 		let cache = await cache0;
 		let ar = await cache.getArchiveByName(this.index, name);
+		let version = await cache.getVersion(this.index);
 		let data = ar?.getFile(0)?.data;
 		if (data) {
-			return this.decode(new Reader(data), ar!.archive as ID);
+			return this.decode(new Reader(data, version), ar!.archive as ID);
 		}
 	}
 }
 
 export class PerFileLoadable extends Loadable {
-	public static loadData(
+	public static async loadData(
 		this: { index: number; archive: number; },
 		cache: CacheProvider,
 		id: number,
-	): Promise<Uint8Array | undefined> {
-		return cache.getArchive(this.index, this.archive).then(v => v?.getFile(id)?.data);
+	): Promise<Reader | undefined> {
+		let archive = await cache.getArchive(this.index, this.archive);
+		let version = await cache.getVersion(this.index);
+		let data = archive?.getFile(id)?.data;
+		return data ? new Reader(data, version) : undefined;
 	}
 
 	public static async all<
@@ -120,11 +132,13 @@ export class PerFileLoadable extends Loadable {
 			return [];
 		}
 
+		let version = await cache.getVersion(this.index);
+
 		return [...ad.getFiles().values()]
 			.filter(v => v.data.length > 1 && v.data[0] != 0)
 			.map(v => {
 				try {
-					return this.decode(new Reader(v.data), v.id as ID);
+					return this.decode(new Reader(v.data, version), v.id as ID);
 				} catch (e) {
 					if (typeof e === "object" && e && "message" in e) {
 						let ea = e as any;

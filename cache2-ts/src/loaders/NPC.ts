@@ -1,7 +1,7 @@
 import { PerFileLoadable } from "../Loadable";
 import { Reader } from "../Reader";
 import { Typed } from "../reflect";
-import { AnimationID, CategoryID, HSL, ModelID, NPCID, Params, TextureID, VarbitID, VarPID } from "../types";
+import { AnimationID, CategoryID, HSL, ModelID, NPCID, Params, SpriteID, TextureID, VarbitID, VarPID } from "../types";
 
 @Typed
 export class NPC extends PerFileLoadable {
@@ -36,7 +36,8 @@ export class NPC extends PerFileLoadable {
 	public isVisible = false;
 	public ambient = 0;
 	public contrast = 0;
-	public headIcon = -1;
+	public headIconArchive: SpriteID[] = [];
+	public headIconSpriteIndex: number[] = [];
 	public rotationSpeed = 32;
 	public varbit = <VarbitID> -1;
 	public varp = <VarPID> -1;
@@ -151,7 +152,23 @@ export class NPC extends PerFileLoadable {
 					v.contrast = r.i8();
 					break;
 				case 102:
-					v.headIcon = r.u16();
+					if (r.isAfter({ era: "osrs", indexRevision: 3642 })) {
+						v.headIconArchive = [-1 as SpriteID];
+						v.headIconSpriteIndex = [r.u16()];
+					} else {
+						let bitfield = r.u8();
+						v.headIconArchive = [];
+						v.headIconSpriteIndex = [];
+						for (let bits = bitfield; bits != 0; bits >>= 1) {
+							if ((bits & 1) == 0) {
+								v.headIconArchive.push(-1 as SpriteID);
+								v.headIconSpriteIndex.push(-1);
+							} else {
+								v.headIconArchive.push(r.s2o4n() as SpriteID);
+								v.headIconSpriteIndex.push(r.u8o16m1());
+							}
+						}
+					}
 					break;
 				case 103:
 					v.rotationSpeed = r.u16();

@@ -1,4 +1,4 @@
-import { ArchiveData, CacheProvider, FileProvider, hash, IndexData } from "./Cache";
+import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache";
 
 export class FlatIndexData implements IndexData {
 	public revision!: number;
@@ -119,5 +119,12 @@ export class FlatCacheProvider implements CacheProvider {
 	public async getArchiveByName(index: number, name: string | number): Promise<ArchiveData | undefined> {
 		let idx = await this.getIndex(index);
 		return idx?.getArchiveByName(name);
+	}
+
+	public async getVersion(index: number): Promise<CacheVersion> {
+		return {
+			era: "osrs",
+			indexRevision: (await this.getIndex(index))?.revision ?? 0,
+		};
 	}
 }
