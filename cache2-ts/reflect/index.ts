@@ -236,7 +236,10 @@ export const addTypeInfo =
 
 					if (
 						!isTypedDecleration
-						&& t2.symbol.declarations?.some(decl => decl.decorators?.some(deco => isTypedAccess(deco.expression)))
+						&& t2.symbol.declarations?.some(decl =>
+							(ts.isClassDeclaration(decl) || ts.isClassExpression(decl))
+							&& ts.getDecorators(decl)?.some(deco => isTypedAccess(deco.expression))
+						)
 					) {
 						// will be handled with the runtime type info
 						return undefined;
