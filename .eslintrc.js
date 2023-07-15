@@ -45,5 +45,8 @@ module.exports = {
 			allow: ["constructors"],
 		}],
 		"no-self-assign": "off", // svelte requires this
+		"svelte/valid-compile": ["error", {
+			ignoreWarnings: true,
+		}],
 	},
 };

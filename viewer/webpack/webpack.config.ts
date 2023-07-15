@@ -95,6 +95,11 @@ let config: webpack.Configuration = {
 						},
 						babel: false,
 					}),
+					onwarn(warning, handle) {
+						if (!warning.code.startsWith("a11y-")) {
+							handle(warning);
+						}
+					},
 				},
 			},
 			{

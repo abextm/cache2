@@ -1,6 +1,6 @@
 import { mdiRepeatVariant } from "@mdi/js";
 import { ScriptVarChar, ScriptVarID, ScriptVarType, WearPos } from "cache2";
-import { ComponentConstructorOptions, SvelteComponentTyped } from "svelte";
+import { ComponentConstructorOptions, SvelteComponent } from "svelte";
 import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
 import {
 	PartialListID,
@@ -30,9 +30,9 @@ export interface RenderedObject {
 }
 
 function patchProps<A extends object, B extends object>(
-	ctor: typeof SvelteComponentTyped<A>,
+	ctor: typeof SvelteComponent<A>,
 	props: Omit<A, keyof B>,
-): typeof SvelteComponentTyped<B> {
+): typeof SvelteComponent<B> {
 	return <any> function(opts: ComponentConstructorOptions<B>) {
 		return new ctor({
 			...opts,
@@ -49,7 +49,7 @@ export async function lookupUI<T extends LookupType>(
 	type: T,
 	filter: string | number,
 	style: string,
-): Promise<typeof SvelteComponentTyped<{ context: "viewer" | "tooltip"; }> | undefined> {
+): Promise<typeof SvelteComponent<{ context: "viewer" | "tooltip"; }> | undefined> {
 	if (type === "sprite" && style === "default") {
 		let sprites = await runner.spriteMetadata("" + filter);
 		return patchProps(Sprites, { sprites, runner });
