@@ -5,12 +5,11 @@
 		"target": "ES2020",
 		"moduleResolution": "node",
 		"module": "ES2022",
-		"declaration": true,
+		"declaration": false,
 		"outDir": "build",
-		"stripInternal": true,
+		"stripInternal": false, // breaks NewType
 		"importsNotUsedAsValues": "remove",
 		"rootDir": "../",
-		"experimentalDecorators": true,
 		"paths": {
 			"cache2": [
 				"../cache2-ts/src"

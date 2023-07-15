@@ -1,4 +1,4 @@
-import * as ts from "typescript";
+import type * as ts from "typescript";
 import { Typed } from "../src/reflect";
 
 const UNDEFINED_SENTINAL: unique symbol = Symbol("undefined");
@@ -7,13 +7,26 @@ export const addTypeInfo =
 	(ts: typeof import("typescript"), program: ts.Program, convertConsoleLog = false) =>
 	(ctx: ts.TransformationContext) =>
 	(sf: ts.SourceFile): ts.SourceFile => {
+		type Transformer<T extends ts.Node> = <O extends T | ts.NodeArray<T>>(o: O) => O;
+		function transformer<T extends ts.Node>(
+			transform: (node: T) => T | undefined,
+		): Transformer<T> {
+			return o => {
+				if (Array.isArray(o)) {
+					return ts.visitNodes(o as ts.NodeArray<T>, transform) as any;
+				} else {
+					return ts.visitNode(o as T, transform) as any ?? o;
+				}
+			};
+		}
+
 		const checker = program.getTypeChecker();
 
 		function isNode(v: any): v is ts.Expression {
 			return typeof v === "object" && v && "getSourceFile" in v;
 		}
 
-		const cloneVisitor: ts.Visitor = node => {
+		const cloneTransformer: Transformer<ts.Node> = transformer(node => {
 			return ts.visitEachChild(
 				{
 					...node,
@@ -21,10 +34,10 @@ export const addTypeInfo =
 					pos: -1,
 					end: -1,
 				},
-				cloneVisitor,
+				cloneTransformer,
 				ctx,
 			);
-		};
+		});
 
 		function pojoToAST(entryValue: any): ts.Expression {
 			// obj -> count
@@ -108,7 +121,7 @@ export const addTypeInfo =
 								return ts.factory.createNull();
 							}
 							if (isNode(v)) {
-								return ts.visitNode(v as ts.Expression, cloneVisitor);
+								return cloneTransformer(v);
 							}
 							if (Array.isArray(v)) {
 								return ts.factory.createArrayLiteralExpression(
@@ -184,7 +197,8 @@ export const addTypeInfo =
 			| ts.TypeFlags.Unknown
 			| ts.TypeFlags.Any
 			| ts.TypeFlags.ESSymbol
-			| ts.TypeFlags.Union;
+			| ts.TypeFlags.Union
+			| ts.TypeFlags.TypeVariable;
 
 		let typeCache = new Map<ts.Type, Typed.Any>();
 
@@ -348,7 +362,7 @@ export const addTypeInfo =
 				&& ["log", "info", "warn", "debug", "error", "trace"].indexOf(expr.name.escapedText.toString()) !== -1;
 		}
 
-		let visitor: ts.Visitor = node => {
+		let visitor: Transformer<ts.Node> = transformer<ts.Node>(node => {
 			if (ts.isDecorator(node) && isTypedAccess(node.expression)) {
 				let p = node.parent;
 
@@ -364,7 +378,7 @@ export const addTypeInfo =
 						node,
 						updateTypedExpr(node.expression, type),
 						node.typeArguments,
-						ts.visitNodes(node.arguments, visitor),
+						visitor(node.arguments),
 					);
 				}
 			}
@@ -376,7 +390,7 @@ export const addTypeInfo =
 					node.arguments.map(arg => {
 						let type = typeToTyped(checker.getTypeAtLocation(arg)!, node);
 						if (!type) {
-							return ts.visitNode(arg, visitor);
+							return visitor(arg);
 						}
 
 						return ts.factory.createCallExpression(
@@ -386,12 +400,12 @@ export const addTypeInfo =
 								[pojoToAST(type)],
 							),
 							undefined,
-							[ts.visitNode(arg, visitor)],
+							[visitor(arg)],
 						);
 					}),
 				);
 			}
 			return ts.visitEachChild(node, visitor, ctx);
-		};
-		return ts.visitNode(sf, visitor);
+		});
+		return visitor(sf);
 	};

@@ -73,8 +73,6 @@ for (let lang of langs) {
 		inlineSourceMap: true,
 		inlineSources: true,
 
-		experimentalDecorators: true,
-
 		allowUmdGlobalAccess: true,
 		moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
 

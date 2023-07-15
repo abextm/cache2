@@ -12,7 +12,6 @@
 		"declarationMap": true,
 		"moduleResolution": "node",
 		"composite": true,
-		"lib": ["ES2017", "DOM"],
-		"experimentalDecorators": true
+		"lib": ["ES2017", "DOM"]
 	}
 }

@@ -1,4 +1,4 @@
-export function Typed<T>(v: T): T | Typed.Value<T> {
+export function Typed<T>(v: T, _ctx?: any): T | Typed.Value<T> {
 	return v;
 }
 
@@ -42,7 +42,7 @@ export namespace Typed {
 		v: T;
 	};
 
-	export function _<T>(type: Any): (v: T) => T | Typed.Value<T> {
+	export function _<T>(type: Any): (v: T, _ctx?: any) => T | Typed.Value<T> {
 		return (v: any) => {
 			let onto: any;
 			if (typeof v === "function") {

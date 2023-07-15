@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
 	import { defaultCache, altCache } from "../../common/db";
 	import { IndexedDBNoPerms, IndexedDBCacheEntry, cacheIDEquals, GithubCacheID } from "../../common/CacheDirectory";
 	import MDIToggleButton from "../util/MDIToggleButton.svelte";

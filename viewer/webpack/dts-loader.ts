@@ -131,6 +131,8 @@ const dtsjsLoader = async function(this: webpack.LoaderContext<any>, instance: T
 				{
 					afterDeclarations: [declarationTransformer],
 				},
+				// @ts-expect-error forceDtsEmit
+				true,
 			);
 		}
 	}

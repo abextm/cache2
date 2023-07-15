@@ -21,11 +21,10 @@ function testCompile(
 		let sys = tvfs.createFSBackedSystem(map, __dirname, ts);
 		sys.getCurrentDirectory = () => __dirname;
 		let env = tvfs.createVirtualTypeScriptEnvironment(sys, [fileName], ts, {
-			experimentalDecorators: true,
 			module: ts.ModuleKind.Node16,
 			target: ts.ScriptTarget.ES2020,
 			strict: true,
-			importHelpers: true,
+			importHelpers: false,
 		}, {
 			before: [
 				sf => addTypeInfo(ts, env.languageService.getProgram()!, convertConsoleLog)(sf),
