@@ -17,6 +17,8 @@
 
 	const editorDefault = `import * as c2 from "cache2";
 import * as context from "viewer/context";
+
+console.log(await c2.Item.load(context.cache, 4151));
 `;
 
 	const EDITOR_CONTENTS = "editorContents";
