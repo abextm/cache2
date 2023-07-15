@@ -11,7 +11,7 @@
 	"author": "Abex",
 	"license": "BSD-2-Clause",
 	"dependencies": {
-		"fflate": "^0.7.1"
+		"fflate": "^0.8.0"
 	},
 	"devDependencies": {
 		"@typescript/vfs": "^1.4.0"

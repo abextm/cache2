@@ -14,7 +14,8 @@
 		"build",
 		"**/node_modules",
 		"**/*-lock.json",
-		"*.out.js"
+		"*.out.js",
+		".vscode"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.73.2.wasm",

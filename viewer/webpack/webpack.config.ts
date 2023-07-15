@@ -182,7 +182,7 @@ let config: webpack.Configuration = {
 	devServer: {
 		compress: true,
 		port: 9000,
-		https: true,
+		server: "https",
 	},
 	ignoreWarnings: [{
 		module: /Runner.ts/,
