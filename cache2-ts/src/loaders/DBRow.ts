@@ -1,8 +1,9 @@
-import { PerFileLoadable } from "../Loadable";
+import { CacheProvider } from "../Cache";
+import { Loadable, PerFileLoadable } from "../Loadable";
 import { Reader } from "../Reader";
 import { Typed } from "../reflect";
-import { ScriptVarType } from "../ScriptVarType";
-import { DBRowID, DBTableID, ScriptVarID } from "../types";
+import { BaseVarType, ScriptVarType } from "../ScriptVarType";
+import { DBColumnID, DBRowID, DBTableID, ScriptVarID } from "../types";
 
 function readTypes(r: Reader): ScriptVarID[] {
 	let size = r.u8();
@@ -11,6 +12,22 @@ function readTypes(r: Reader): ScriptVarID[] {
 		types[i] = r.u8o16();
 	}
 	return types;
+}
+
+function readVarType(r: Reader, type: BaseVarType): string | number | bigint {
+	switch (type) {
+		case "int":
+			return r.i32();
+			break;
+		case "string":
+			return r.string();
+			break;
+		case "long":
+			return r.i64();
+			break;
+		default:
+			throw new Error(`unknown BaseVarType ${type}`);
+	}
 }
 
 function readValues(r: Reader, types: ScriptVarID[]): (string | number | bigint)[] {
@@ -22,19 +39,7 @@ function readValues(r: Reader, types: ScriptVarID[]): (string | number | bigint)
 			if (type === undefined) {
 				throw new Error(`unknown type ${types[i]}`);
 			}
-			let v: string | number | bigint;
-			switch (type.baseType) {
-				case "int":
-					v = r.i32();
-					break;
-				case "string":
-					v = r.string();
-					break;
-				case "long":
-					v = r.i64();
-					break;
-			}
-			values[stride * types.length + i] = v;
+			values[stride * types.length + i] = readVarType(r, type.baseType);
 		}
 	}
 	return values;
@@ -122,6 +127,84 @@ export class DBTable extends PerFileLoadable {
 					throw new Error(`unknown opcode ${opcode}`);
 			}
 		}
+		return v;
+	}
+
+	public static async loadRowIDs(
+		cache: CacheProvider | Promise<CacheProvider>,
+		table: DBTableID | number,
+	): Promise<DBRowID[] | undefined> {
+		let idx = await DBTableIndex.load(cache, table, DBTableIndex.MASTER_COLUMN);
+		return idx?.values[0].get(0);
+	}
+
+	public static async loadRows(
+		cache: CacheProvider | Promise<CacheProvider>,
+		table: DBTableID | number,
+	): Promise<DBRow[] | undefined> {
+		let rows = await this.loadRowIDs(cache, table);
+		if (!rows) {
+			return undefined;
+		}
+		return await Promise.all(rows.map(id => DBRow.load(cache, id))) as DBRow[];
+	}
+}
+
+@Typed
+export class DBTableIndex extends Loadable {
+	constructor(public id: DBTableID, public column: number) {
+		super();
+	}
+
+	public static readonly index = 21;
+	public static readonly MASTER_COLUMN = -1;
+
+	public types: BaseVarType[] = [];
+	public values: Map<string | number | bigint, DBRowID[]>[] = [];
+
+	public static loadData(cache: CacheProvider, id: DBColumnID): Promise<Reader | undefined>;
+	public static loadData(cache: CacheProvider, id: DBTableID, column: number): Promise<Reader | undefined>;
+	public static async loadData(cache: CacheProvider, ...args: number[]): Promise<Reader | undefined> {
+		if (args.length == 1) {
+			args = DBColumnID.unpack(args[0] as DBColumnID);
+		}
+
+		let archive = await cache.getArchive(this.index, args[0]);
+		let version = await cache.getVersion(this.index);
+		let data = archive?.getFile(args[1] + 1)?.data;
+		return data ? new Reader(data, version) : undefined;
+	}
+
+	public static decode(reader: Reader, id: DBColumnID): DBTableIndex;
+	public static decode(reader: Reader, id: DBTableID, column: number): DBTableIndex;
+	public static decode(r: Reader, ...args: number[]): DBTableIndex {
+		if (args.length == 1) {
+			args = DBColumnID.unpack(args[0] as DBColumnID);
+		}
+
+		const v = new DBTableIndex(args[0] as DBTableID, args[1]);
+
+		let len = r.leVarInt();
+		v.types = new Array(len);
+		v.values = new Array(len);
+
+		for (let tupleIndex = 0; tupleIndex < len; tupleIndex++) {
+			let type = v.types[tupleIndex] = BaseVarType.forOrdinal(r.u8());
+			let map = v.values[tupleIndex] = new Map();
+
+			let numKeys = r.leVarInt();
+			for (let i = 0; i < numKeys; i++) {
+				let key = readVarType(r, type);
+				let numRows = r.leVarInt();
+				let rows = new Array(numRows);
+				map.set(key, rows);
+
+				for (let i = 0; i < numRows; i++) {
+					rows[i] = r.leVarInt();
+				}
+			}
+		}
+
 		return v;
 	}
 }

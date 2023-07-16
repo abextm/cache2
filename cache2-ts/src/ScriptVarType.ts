@@ -38,6 +38,23 @@ function t(k: {
 	return svt;
 }
 
+export type BaseVarType = "int" | "string" | "long";
+
+export namespace BaseVarType {
+	export function forOrdinal(ordinal: number): BaseVarType {
+		switch (ordinal) {
+			case 0:
+				return "int";
+			case 1:
+				return "long";
+			case 2:
+				return "string";
+			default:
+				throw new Error(`unknown BaseVarType ordinal ${ordinal}`);
+		}
+	}
+}
+
 export class ScriptVarType {
 	public static forChar(c: ScriptVarChar): ScriptVarType | undefined {
 		return byChar.get(c);
@@ -52,7 +69,7 @@ export class ScriptVarType {
 		public readonly char: ScriptVarChar | undefined,
 		public readonly jagexName: string | undefined,
 		public readonly typeName: string | undefined,
-		public readonly baseType: "int" | "string" | "long",
+		public readonly baseType: BaseVarType,
 	) {
 	}
 

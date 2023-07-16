@@ -42,6 +42,7 @@ export type AnimationID = NewType<number, "AnimationID">;
 export type CategoryID = NewType<number, "CategoryID">;
 export type DBRowID = NewType<number, "DBRowID">;
 export type DBTableID = NewType<number, "DBTableID">;
+export type DBColumnID = NewType<number, "DBColumnID">;
 export type EnumID = NewType<number, "EnumID">;
 export type FontID = NewType<number, "FontID">;
 export type HitsplatID = NewType<number, "HitsplatID">;
@@ -88,4 +89,13 @@ export namespace WearPos {
 		}
 		return out;
 	})();
+}
+
+export namespace DBColumnID {
+	export function pack(table: DBTableID, column: number, tupleIndex: number = 0): DBColumnID {
+		return ((table << 12) | ((column & 0xFF) << 4) | (tupleIndex & 0xF)) as DBColumnID;
+	}
+	export function unpack(c: DBColumnID): [table: DBTableID, column: number, tupleIndex: number] {
+		return [c >>> 12 as DBTableID, c >>> 4 & 0xFF, c & 0xF];
+	}
 }
