@@ -239,6 +239,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		startBrace: string,
 		endBrace: string,
 		clickParent: HTMLElement | undefined,
+		showLen?: boolean | undefined,
 	): HTMLElement {
 		let thisPartialLoaded = 0;
 		if (v.length === 5) {
@@ -469,7 +470,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 		let expander = sp([
 			name && sp(name, "type"),
-			v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
+			showLen ?? v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
 			startBrace,
 			cycle,
 			entries,
@@ -668,6 +669,10 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				if (name) {
 					return sp([name], "type");
 				}
+			}
+			if (typeof val === "number" && type === "WorldPoint") {
+				let pt = [(val >> 14) & 0x3FFF, val & 0x3FFF, (val >> 28) & 3];
+				return renderList([UIType.Array, pt], "WorldPoint", "(", ")", clickParent, false);
 			}
 			let e = renderAny(v[2], { unwrap, clickParent });
 			if (e) {

@@ -53,6 +53,8 @@ export type VarPID = NewType<number>;
 export type HSL = AliasType<number>;
 export type RGB = AliasType<number>;
 
+export type WorldPoint = AliasType<number>;
+
 export class Params extends Map<ParamID, string | number> {
 }
 
