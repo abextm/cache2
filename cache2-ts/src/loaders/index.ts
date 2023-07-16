@@ -1,3 +1,4 @@
+export * from "./DBRow";
 export * from "./Enum";
 export * from "./Hitsplat";
 export * from "./Item";

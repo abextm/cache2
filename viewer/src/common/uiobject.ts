@@ -1,4 +1,15 @@
-import { CacheProvider, Enum, EnumValueMap, NewType, Param, ParamID, Params, ScriptVarType, Typed } from "cache2";
+import {
+	CacheProvider,
+	DBRow,
+	Enum,
+	EnumValueMap,
+	NewType,
+	Param,
+	ParamID,
+	Params,
+	ScriptVarType,
+	Typed,
+} from "cache2";
 import * as _ from "lodash";
 import { isEqual } from "lodash";
 
@@ -92,6 +103,25 @@ const enumValueMapOverride: TypeOverride = (k, v, obj: EnumValueMap) => {
 const enumOverride: TypeOverride = (k: keyof Enum, v, obj: Enum) => {
 	if (k === "defaultValue") {
 		return [undefined, ScriptVarType.forChar(obj.valueTypeChar)?.asTyped()];
+	}
+};
+const dbRowOverride: TypeOverride = (k: keyof DBRow, _v, obj: DBRow) => {
+	if (k === "values") {
+		return [undefined, {
+			type: "tuple",
+			entries: obj.types.map((t, column) => ({
+				type: "tuple",
+				entries: t.map((type, index) => {
+					if (type) {
+						let typed = ScriptVarType.forID(type)?.asTyped();
+						if (typed) {
+							return typed;
+						}
+					}
+					return undefined;
+				}),
+			})),
+		}];
 	}
 };
 
@@ -313,6 +343,8 @@ export async function serialize(
 				typeOverride = enumValueMapOverride;
 			} else if (v instanceof Enum) {
 				typeOverride = enumOverride;
+			} else if (v instanceof DBRow) {
+				typeOverride = dbRowOverride;
 			}
 
 			for (let i = start; i < end; i++) {

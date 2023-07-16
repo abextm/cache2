@@ -10,6 +10,7 @@ function t(k: {
 	char?: string;
 	jag?: string;
 	type?: string;
+	base?: "string" | "long";
 }): ScriptVarType {
 	let char: number | undefined = undefined;
 	if (k.char) {
@@ -24,6 +25,7 @@ function t(k: {
 		char as ScriptVarChar,
 		k.jag,
 		k.type,
+		k.base ?? "int",
 	);
 
 	if (svt.char !== undefined) {
@@ -50,6 +52,7 @@ export class ScriptVarType {
 		public readonly char: ScriptVarChar | undefined,
 		public readonly jagexName: string | undefined,
 		public readonly typeName: string | undefined,
+		public readonly baseType: "int" | "string" | "long",
 	) {
 	}
 
@@ -81,7 +84,7 @@ export class ScriptVarType {
 	static readonly model = t({ id: 31, char: "m", jag: "model", type: "ModelID" });
 	static readonly npc = t({ id: 32, char: "n", jag: "npc", type: "NPCID" });
 	static readonly item = t({ id: 33, char: "o", jag: "obj", type: "ItemID" });
-	static readonly string = t({ id: 36, char: "s", jag: "string" });
+	static readonly string = t({ id: 36, char: "s", jag: "string", base: "string" });
 	static readonly spotAnim = t({ id: 37, char: "t", jag: "spotanim" });
 	static readonly inventory = t({ id: 39, char: "v", jag: "inv" });
 	static readonly texture = t({ id: 40, char: "x", jag: "texture", type: "TextureID" });
@@ -90,7 +93,9 @@ export class ScriptVarType {
 	static readonly mapElement = t({ id: 59, char: "µ", jag: "mapelement" });
 	static readonly hitsplat = t({ id: 62, char: "×", jag: "hitmark", type: "HitsplatID" });
 	static readonly struct = t({ id: 73, char: "J", jag: "struct", type: "StructID" });
-	static readonly dbRow = t({ id: 74, char: "Ð", jag: "dbrow" });
+	static readonly dbRow = t({ id: 74, char: "Ð", jag: "dbrow", type: "DBRowID" });
+
+	// 49, 56, 71, 110, 115, 116 are base long
 }
 
 for (let [name, v] of Object.entries(ScriptVarType)) {

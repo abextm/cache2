@@ -6,6 +6,8 @@ import { ServiceClient } from "./ServiceClient";
 import { UIData } from "./uiobject";
 
 export const lookupTypes = {
+	DBRowID: "dbrow",
+	DBTableID: "dbtable",
 	EnumID: "enum",
 	ItemID: "item",
 	HitsplatID: "hitsplat",
@@ -14,13 +16,25 @@ export const lookupTypes = {
 	SpriteID: "sprite",
 	StructID: "struct",
 } as const;
-export type LookupType = "enum" | "index" | "item" | "hitsplat" | "npc" | "param" | "sprite" | "struct";
+export type LookupType =
+	| "dbrow"
+	| "dbtable"
+	| "enum"
+	| "index"
+	| "item"
+	| "hitsplat"
+	| "npc"
+	| "param"
+	| "sprite"
+	| "struct";
 
+const uiNameOverride = {
+	dbrow: "DBRow",
+	dbtable: "DBTable",
+	npc: "NPC",
+} satisfies Partial<Record<LookupType, string>>;
 export function uiType(t: LookupType): string {
-	if (t === "npc") {
-		return "NPC";
-	}
-	return capitalize(t);
+	return uiNameOverride[t as keyof typeof uiNameOverride] ?? capitalize(t);
 }
 
 export interface IRunner {

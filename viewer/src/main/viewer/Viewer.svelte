@@ -36,7 +36,9 @@
 			<ViewType name="hitsplat" bind:key={$key} index={32}/>
 			<ViewType name="npc" bind:key={$key} index={9}/>
 			<ViewType name="param" bind:key={$key} index={11}/>
-			<ViewType name="struct" bind:key={$key} index={39}/>
+			<ViewType name="struct" bind:key={$key} index={34}/>
+			<ViewType name="dbrow" bind:key={$key} index={38}/>
+			<ViewType name="dbtable" bind:key={$key} index={39}/>
 		</Section>
 		<ViewType name="sprite" bind:key={$key} index={8}>Sprites</ViewType>
 	</div>

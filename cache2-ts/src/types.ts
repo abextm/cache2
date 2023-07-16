@@ -35,6 +35,8 @@ export type ScriptVarID = NewType<number>;
 
 export type AnimationID = NewType<number>;
 export type CategoryID = NewType<number>;
+export type DBRowID = NewType<number>;
+export type DBTableID = NewType<number>;
 export type EnumID = NewType<number>;
 export type FontID = NewType<number>;
 export type HitsplatID = NewType<number>;

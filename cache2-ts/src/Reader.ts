@@ -85,6 +85,13 @@ export class Reader {
 	public i16(): number {
 		return this.view.getInt16(this.bump(2));
 	}
+	public u8o16(): number { // rl getUSmart
+		if (this.view.getUint8(this.offset) < 128) {
+			return this.u8();
+		} else {
+			return this.u16() - 0x8000;
+		}
+	}
 	public u8o16m1(): number { // rl readUnsignedShortSmartMinusOne
 		if (this.view.getUint8(this.offset) < 128) {
 			return this.u8() - 1;
@@ -105,6 +112,9 @@ export class Reader {
 		} else {
 			return this.u16n();
 		}
+	}
+	public i64(): bigint {
+		return this.view.getBigInt64(this.bump(8));
 	}
 	public string(): string {
 		let s = "";
@@ -153,5 +163,17 @@ export class Reader {
 		} else {
 			return this.i32() & (-1 >>> 1);
 		}
+	}
+	public leVarInt(): number { // rl LEVarInt
+		let v = 0;
+		let shift = 0;
+		let octet;
+		do {
+			octet = this.u8();
+			v |= (octet & 127) << shift;
+			shift += 7;
+		} while (octet > 127);
+
+		return v;
 	}
 }
