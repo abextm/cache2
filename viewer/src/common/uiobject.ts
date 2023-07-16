@@ -58,7 +58,7 @@ export type UIPartialList<T extends UIListType = UIListType> = [
 	PartialListID,
 	boolean,
 ];
-export type PartialListID = NewType<number>;
+export type PartialListID = NewType<number, "PartialListID">;
 
 export type UIToStringed = [UIType.ToStringed, string, string];
 export type UIError = [UIType.Error, string, string?, string?];

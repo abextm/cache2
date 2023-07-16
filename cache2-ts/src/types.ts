@@ -1,8 +1,13 @@
-export type NewType<T> = T & {
-	// @internal
-	readonly __tag: unique symbol;
-};
-export type AliasType<T> = T | NewType<T>;
+const NewTypeType: unique symbol = undefined!;
+export type NewType<T, Name extends string> =
+	& T
+	& {
+		readonly [
+			// @internal
+			Tag in `~tag ${Name}`
+		]: typeof NewTypeType;
+	};
+export type AliasType<T, Name extends string> = T | NewType<T, Name>;
 
 type TypedArray =
 	| Uint8Array
@@ -28,32 +33,32 @@ export enum CompressionType {
 
 export type XTEAKey = [number, number, number, number];
 
-export type WearPos = NewType<number>;
+export type WearPos = NewType<number, "WearPos">;
 
-export type ScriptVarChar = NewType<number>;
-export type ScriptVarID = NewType<number>;
+export type ScriptVarChar = NewType<number, "ScriptVarChar">;
+export type ScriptVarID = NewType<number, "ScriptVarID">;
 
-export type AnimationID = NewType<number>;
-export type CategoryID = NewType<number>;
-export type DBRowID = NewType<number>;
-export type DBTableID = NewType<number>;
-export type EnumID = NewType<number>;
-export type FontID = NewType<number>;
-export type HitsplatID = NewType<number>;
-export type ItemID = NewType<number>;
-export type ModelID = NewType<number>;
-export type NPCID = NewType<number>;
-export type ParamID = NewType<number>;
-export type SpriteID = NewType<number>;
-export type StructID = NewType<number>;
-export type TextureID = NewType<number>;
-export type VarbitID = NewType<number>;
-export type VarPID = NewType<number>;
+export type AnimationID = NewType<number, "AnimationID">;
+export type CategoryID = NewType<number, "CategoryID">;
+export type DBRowID = NewType<number, "DBRowID">;
+export type DBTableID = NewType<number, "DBTableID">;
+export type EnumID = NewType<number, "EnumID">;
+export type FontID = NewType<number, "FontID">;
+export type HitsplatID = NewType<number, "HitsplatID">;
+export type ItemID = NewType<number, "ItemID">;
+export type ModelID = NewType<number, "ModelID">;
+export type NPCID = NewType<number, "NPCID">;
+export type ParamID = NewType<number, "ParamID">;
+export type SpriteID = NewType<number, "SpriteID">;
+export type StructID = NewType<number, "StructID">;
+export type TextureID = NewType<number, "TextureID">;
+export type VarbitID = NewType<number, "VarbitID">;
+export type VarPID = NewType<number, "VarPID">;
 
-export type HSL = AliasType<number>;
-export type RGB = AliasType<number>;
+export type HSL = AliasType<number, "HSL">;
+export type RGB = AliasType<number, "RGB">;
 
-export type WorldPoint = AliasType<number>;
+export type WorldPoint = AliasType<number, "WorldPoint">;
 
 export class Params extends Map<ParamID, string | number> {
 }
