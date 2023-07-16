@@ -1,6 +1,7 @@
 import {
 	CacheProvider,
 	DBRow,
+	DBTable,
 	Enum,
 	EnumValueMap,
 	NewType,
@@ -105,8 +106,8 @@ const enumOverride: TypeOverride = (k: keyof Enum, v, obj: Enum) => {
 		return [undefined, ScriptVarType.forChar(obj.valueTypeChar)?.asTyped()];
 	}
 };
-const dbRowOverride: TypeOverride = (k: keyof DBRow, _v, obj: DBRow) => {
-	if (k === "values") {
+const dbRowOverride: TypeOverride = (k: keyof DBRow | keyof DBTable, _v, obj: DBRow) => {
+	if (k === "values" || k === "defaultValues") {
 		return [undefined, {
 			type: "tuple",
 			entries: obj.types.map((t, column) => ({
@@ -343,7 +344,7 @@ export async function serialize(
 				typeOverride = enumValueMapOverride;
 			} else if (v instanceof Enum) {
 				typeOverride = enumOverride;
-			} else if (v instanceof DBRow) {
+			} else if (v instanceof DBRow || v instanceof DBTable) {
 				typeOverride = dbRowOverride;
 			}
 
