@@ -9,6 +9,7 @@
 	import { Writable } from "svelte/store";
 	import { mdiGithub } from "@mdi/js";
   import MDI from "./util/MDI.svelte";
+	import { status } from "../common/status";
 
 	let tab: Writable<string> = historyStore("tab", "config");
 
@@ -41,6 +42,12 @@
 		<Tab bind:tab={$tab} key="viewer">Viewer</Tab
 		><Tab bind:tab={$tab} key="editor">Editor</Tab
 		><Tab bind:tab={$tab} key="config">Config</Tab>
+		<span class="status">
+			{#if $status}
+				<div class="spinner"></div>
+				{$status}
+			{/if}
+		</span>
 		<span class="links">
 			<a href="https://github.com/abextm/cache2/"><MDI icon={mdiGithub} alt="Github"/></a>
 		</span>
@@ -100,8 +107,53 @@
 		}
 	}
 
-	.links {
+	.spinner {
+		position: relative;
+		display: inline-grid;
+		place-items: center;
+		width: 1em;
+		padding-bottom: .5em;
+	}
+	.spinner::before, .spinner::after {
+		content: '';
+		box-sizing: border-box;
+		position: absolute;
+		width: .4em;
+		height: .4em;
+		background-color: var(--color-inactive);
+		animation: spinner 2s cubic-bezier(0, 0, 0.24, 1.21) infinite;
+		top: 50%;
+		left: 50%;
+	}
+	.spinner::after {
+		animation-delay: -1s;
+	}
+
+	@keyframes spinner {
+		0%, 100% {
+			transform: none;
+		}
+		25% {
+			transform: translateX(-120%);
+		}
+		50% {
+			transform: translateX(-120%) translateY(-120%);
+		}
+		75% {
+			transform: translateY(-120%);
+		}
+	}
+
+	.status {
 		margin-left: auto;
+		flex-shrink: 10;
+		padding: 0 4px;
+		font-size: 90%;
+		line-height: 2em;
+		font-variant-caps: all-small-caps;
+		color: var(--color-inactive);
+	}
+	.links {
 		padding: 0 2px;
 		:global(svg) {
 			width: 1.8em;

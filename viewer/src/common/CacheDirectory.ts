@@ -3,6 +3,7 @@ import { isEqual } from "lodash";
 import { cacheShare } from "./CacheShare";
 import { altCache as altCacheID, defaultCache as defaultCacheID } from "./db";
 import { LazyPromise } from "./LazyPromise";
+import { wrapWithStatus } from "./status";
 
 export interface IndexedDBCacheID {
 	type: "idb";
@@ -84,10 +85,17 @@ export async function loadCache(key: CacheID | "default" | "alt" = "default"): P
 	} else {
 		throw new Error(`unknown type "${(key as any).type}"`);
 	}
+
+	let statusFs = {
+		getFile(name) {
+			return wrapWithStatus(`Loading ${name}`, fs.getFile(name));
+		},
+	} satisfies FileProvider;
+
 	if (style === "disk") {
-		return new DiskCacheProvider(fs);
+		return new DiskCacheProvider(statusFs);
 	} else if (style === "flat") {
-		return new FlatCacheProvider(fs);
+		return new FlatCacheProvider(statusFs);
 	} else {
 		throw new Error(`unknown style "${style}"`);
 	}

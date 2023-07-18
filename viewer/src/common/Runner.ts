@@ -3,6 +3,7 @@ import { capitalize } from "lodash";
 import { getCacheSharePort } from "./CacheShare";
 import { altCache, defaultCache } from "./db";
 import { ServiceClient } from "./ServiceClient";
+import { wrapWithStatus } from "./status";
 import { UIData } from "./uiobject";
 
 export const lookupTypes = {
@@ -64,13 +65,13 @@ export class Runner implements IRunner {
 	private client: Promise<ServiceClient & IRunnerPrivate>;
 
 	constructor() {
-		this.worker = new Worker("Runner.js");
+		this.worker = new Worker("Runner.js", { name: "runner" });
 		this.client = new Promise(resolve => {
 			let onMsg = (ev: MessageEvent<Ready>) => {
 				if (ev.data.type === "ready") {
 					this.worker.removeEventListener("message", onMsg);
 					let port = getCacheSharePort();
-					let client = ServiceClient.create<IRunnerPrivate>(this.worker);
+					let client = ServiceClient.create<IRunnerPrivate>(this.worker, "runner");
 					client.prepare(port);
 					resolve(client);
 				}
@@ -99,7 +100,7 @@ export class Runner implements IRunner {
 		let chan = new MessageChannel();
 		chan.port1.onmessage = (ev: MessageEvent<ScriptResponse>) => listener(ev.data);
 
-		await c.executeScript(text, chan.port2);
+		await wrapWithStatus("Running script", c.executeScript(text, chan.port2));
 
 		scriptRunner = undefined;
 		if (poolRunner) {

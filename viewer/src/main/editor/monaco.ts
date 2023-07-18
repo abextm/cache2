@@ -18,19 +18,37 @@ import { files as viewerContextDTS } from "../../context?dts";
 import { files as fshDTS } from "@types/wicg-file-system-access/index.d.ts?dts";
 // @ts-ignore
 import { files as lodashDTS } from "@types/lodash/index.d.ts?dts";
+import { StatusWorkerMessageHandler } from "../../common/status";
 
 const env: monaco_t.Environment = {
 	getWorkerUrl(id, label) {
+		return `mw/${label}.js`;
+	},
+	getWorker(id, label) {
+		let path: string;
+		let name: string = label;
 		switch (label) {
 			case "typescript":
 			case "javascript":
-				label = "ts";
+				path = "ts";
 				break;
 			case "editorWorkerService":
-				label = "editor";
+				path = name = "editor";
 				break;
+			default:
+				throw new Error(`Unsupported worker ${label}`);
 		}
-		return `mw/${label}.js`;
+		let worker = new class extends Worker {
+			override terminate(): void {
+				super.terminate();
+				handler.stop();
+			}
+		}(`mw/${path}.js`, {
+			name: label,
+		});
+		let handler = new StatusWorkerMessageHandler(name + " worker");
+		worker.addEventListener("message", ev => handler.onMessage(ev));
+		return worker;
 	},
 };
 (<any> self).MonacoEnvironment = env;
@@ -89,7 +107,8 @@ for (let lang of langs) {
 	});
 }
 monaco.languages.typescript.typescriptDefaults.setWorkerOptions({
-	customWorkerPath: "../tspatch.js",
+	// webpack loads tspatch in with the worker, but we still need to set this
+	customWorkerPath: "data:application/javascript,void 0",
 });
 
 for (let [name, content] of Object.entries(extraLibs)) {

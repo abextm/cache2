@@ -8,6 +8,7 @@ import StartupChunkDependenciesPlugin from "webpack/lib/runtime/StartupChunkDepe
 import "webpack-dev-server";
 import * as ts from "typescript";
 import { addTypeInfo } from "../../cache2-ts/reflect";
+import { StatusPlugin } from "./status";
 
 const tsLoader = path.resolve(__dirname, "dts-loader.ts");
 let dist = path.resolve(__dirname, "../dist");
@@ -36,6 +37,10 @@ let config: webpack.Configuration = {
 						import: worker,
 					};
 				}
+				if (typeof worker.import === "string") {
+					worker.import = [worker.import];
+				}
+				worker.import.push("./src/common/status.ts");
 				workers[key] = {
 					chunkLoading: "import-scripts",
 					...worker,
@@ -44,14 +49,14 @@ let config: webpack.Configuration = {
 			return workers;
 		})({
 			Runner: "./src/runner/Runner.ts",
-			tspatch: {
-				import: "./src/tspatch/tspatch.ts",
-				dependOn: "mw/ts",
-			},
-
 			"mw/editor": "monaco-editor/esm/vs/editor/editor.worker.js",
 			"mw/json": "monaco-editor/esm/vs/language/json/json.worker",
-			"mw/ts": "monaco-editor/esm/vs/language/typescript/ts.worker",
+			"mw/ts": {
+				import: [
+					"monaco-editor/esm/vs/language/typescript/ts.worker",
+					"./src/tspatch/tspatch.ts",
+				],
+			},
 		})),
 		main: {
 			import: [
@@ -163,6 +168,7 @@ let config: webpack.Configuration = {
 		new StartupChunkDependenciesPlugin({
 			chunkLoading: "jsonp",
 		}),
+		new StatusPlugin(),
 	],
 	optimization: {
 		minimize: !dev,
