@@ -87,7 +87,7 @@ let config: webpack.Configuration = {
 				loader: "svelte-loader",
 				options: {
 					compilerOptions: {
-						dev,
+						dev: false, // very slow event dispatching
 					},
 					emitCss: true,
 					preprocess: sveltePreprocess({
