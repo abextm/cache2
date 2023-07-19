@@ -84,7 +84,7 @@ export class Runner implements IRunner {
 		if (runner === this) {
 			runner = undefined;
 		}
-		this.worker.terminate();
+		this.client.then(c => c.close());
 	}
 
 	async executeScript(text: string, listener: (ev: ScriptResponse) => void): Promise<void> {

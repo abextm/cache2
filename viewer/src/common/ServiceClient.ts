@@ -6,6 +6,25 @@ interface Resolver {
 	reject: (v: any) => void;
 }
 
+let isFirefox = navigator.userAgent.indexOf("Gecko") !== -1;
+export const ServiceClientClosedError = isFirefox
+	// due to FireFox bug 1642147, we cannot prevent these messages
+	// from going to the console, so try to make them as small as possible
+	// by not extending Error - and therefore not getting a stack trace
+	? class ServiceClientClosedError extends Object {
+		message = "Ignore this unhandled rejection - Service client closed";
+	}
+	: class ServiceClientClosedError extends Error {
+		constructor() {
+			super("Service client closed");
+		}
+	};
+self.addEventListener("unhandledrejection", ev => {
+	if (ev.reason instanceof ServiceClientClosedError) {
+		ev.preventDefault();
+	}
+});
+
 type Port = Worker | MessagePort;
 
 export class ServiceClient {
@@ -55,6 +74,10 @@ export class ServiceClient {
 		}
 
 		this._statusListener?.stop();
+
+		for (let { reject } of this._requests.values()) {
+			reject(new ServiceClientClosedError());
+		}
 	}
 
 	public readonly then: never = undefined!;

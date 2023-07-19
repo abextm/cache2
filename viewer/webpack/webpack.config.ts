@@ -198,6 +198,14 @@ let config: webpack.Configuration = {
 		compress: true,
 		port: 9000,
 		server: "https",
+		client: {
+			logging: "none",
+			overlay: {
+				errors: true,
+				runtimeErrors: false,
+				warnings: false,
+			},
+		},
 	},
 	ignoreWarnings: [{
 		module: /Runner.ts/,
