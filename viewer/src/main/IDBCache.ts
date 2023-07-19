@@ -1,7 +1,7 @@
 import { IndexedDBCacheEntry, IndexedDBNoPerms } from "../common/CacheDirectory";
 import { db } from "../common/db";
 
-export const idbCacheSupported = "FileSystemHandle" in self;
+export const idbCacheSupported = "getAsFileSystemHandle" in DataTransferItem.prototype;
 
 // keep handles from IDB so that chrome doesn't forget that we have permission
 const fshRefs: Map<number, FileSystemHandle> = new Map();
