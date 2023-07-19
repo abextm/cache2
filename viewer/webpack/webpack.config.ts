@@ -190,6 +190,10 @@ let config: webpack.Configuration = {
 			new CssMinimizerPlugin(),
 		],
 	},
+	performance: {
+		maxEntrypointSize: 10_000_000,
+		maxAssetSize: 10_000_000,
+	},
 	devServer: {
 		compress: true,
 		port: 9000,
