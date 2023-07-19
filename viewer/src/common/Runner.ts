@@ -53,10 +53,14 @@ export interface IRunnerPrivate extends IRunner {
 let runner: Runner | undefined;
 export let scriptRunner: Runner | undefined;
 
-function proxy<K extends keyof T, T = IRunner>(name: K): T[K] {
+function proxy<K extends keyof T, T = IRunner>(name: K, status?: string): T[K] {
 	return function(...args: any[]) {
 		// @ts-ignore
-		return this.client.then(v => v[name](...args));
+		let p = this.client.then(v => v[name](...args));
+		if (status) {
+			wrapWithStatus(status, p);
+		}
+		return p;
 	} as any;
 }
 
@@ -112,8 +116,8 @@ export class Runner implements IRunner {
 		}
 	}
 
-	lookup = proxy("lookup");
-	spriteMetadata = proxy("spriteMetadata");
+	lookup = proxy("lookup", "Loading");
+	spriteMetadata = proxy("spriteMetadata", "Loading sprites");
 	spriteImageData = proxy("spriteImageData");
 	namedSprite = proxy("namedSprite");
 }

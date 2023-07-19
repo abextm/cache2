@@ -82,6 +82,7 @@ export class StatusWorkerMessageHandler {
 	public stop(): void {
 		this.activeStatuses.forEach(removeStatus);
 		this.activeStatuses = [];
+		this.onLoaded();
 	}
 }
 
