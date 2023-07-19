@@ -108,7 +108,7 @@ for (let lang of langs) {
 }
 monaco.languages.typescript.typescriptDefaults.setWorkerOptions({
 	// webpack loads tspatch in with the worker, but we still need to set this
-	customWorkerPath: "data:application/javascript,void 0",
+	customWorkerPath: "data:application/javascript,0",
 });
 
 for (let [name, content] of Object.entries(extraLibs)) {
