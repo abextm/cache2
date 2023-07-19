@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { ComponentType, SvelteComponent } from "svelte";
+
 	export let key: string;
 	export let tab: string;
+	export let async: undefined | (() => Promise<{default: ComponentType<SvelteComponent>}>) = undefined;
 
 	let mounted = false;
 	$: mounted = mounted || key === tab;
@@ -8,7 +11,15 @@
 
 {#if mounted}
 	<div style:display={key === tab ? "block" : "none"} class="tab-contents">
-		<slot/>
+		{#if async}
+			{#await async()}
+				Loading...
+			{:then module}
+				<svelte:component this={module.default} />
+			{/await}
+		{:else}
+			<slot/>
+		{/if}
 	</div>
 {/if}
 

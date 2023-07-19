@@ -1,9 +1,6 @@
 <script lang="ts">
 	import Tab from "./Tab.svelte";
 	import TabContents from "./TabContents.svelte";
-	import Editor from "./editor/Editor.svelte";
-	import Config from "./config/Config.svelte";
-	import Viewer from "./viewer/Viewer.svelte";
 	import { historyStore } from "./HistoryStore";
 	import { darkMode } from "../common/db";
 	import { Writable } from "svelte/store";
@@ -52,15 +49,9 @@
 			<a href="https://github.com/abextm/cache2/"><MDI icon={mdiGithub} alt="Github"/></a>
 		</span>
 	</div>
-	<TabContents tab={$tab} key="viewer">
-		<Viewer/>
-	</TabContents>
-	<TabContents tab={$tab} key="editor">
-		<Editor/>
-	</TabContents>
-	<TabContents tab={$tab} key="config">
-		<Config/>
-	</TabContents>
+	<TabContents tab={$tab} key="viewer" async={() => import("./viewer/Viewer.svelte")} />
+	<TabContents tab={$tab} key="editor" async={() => import("./editor/Editor.svelte")} />
+	<TabContents tab={$tab} key="config" async={() => import("./config/Config.svelte")} />
 </div>
 {#if interaction}
 	<div class="toplevel popup-container" on:click|preventDefault={onInteract}>
