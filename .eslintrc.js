@@ -41,9 +41,7 @@ module.exports = {
 		"no-inner-declarations": "off",
 		"svelte/no-inner-declarations": "off",
 		"@typescript-eslint/no-this-alias": "off",
-		"@typescript-eslint/no-empty-function": ["error", {
-			allow: ["constructors"],
-		}],
+		"@typescript-eslint/no-empty-function": "off",
 		"no-self-assign": "off", // svelte requires this
 		"svelte/valid-compile": ["error", {
 			ignoreWarnings: true,
