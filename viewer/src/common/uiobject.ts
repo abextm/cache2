@@ -20,7 +20,7 @@ import { isEqual } from "lodash";
 
 export type UIPrimitive = string | number | boolean | undefined | bigint | null | Blob | ImageData;
 export type UIAny = UIPrimitive | UITyped | UIList | UIPartialList | UIToStringed | UIError;
-export type UITyped = [UIType.Typed, UITypeRef, UIPrimitive];
+export type UITyped = [tag: UIType.Typed, type: UITypeRef, val: UIPrimitive];
 export type UITypeRef = [string];
 
 export enum UIType {
@@ -51,18 +51,18 @@ const TypedArrays = [
 ] as const;
 export type TypedArray = InstanceType<typeof TypedArrays[number]>;
 export type UIListType = UIType.Object | UIType.Map | UIType.Array | UIType.Set | UIType.ArrayBuffer | `${string}Array`;
-export type UIList<T extends UIListType = UIListType> = [T, UIAny[] | TypedArray];
+export type UIList<T extends UIListType = UIListType> = [tag: T, values: UIAny[] | TypedArray];
 export type UIPartialList<T extends UIListType = UIListType> = [
-	T,
-	UIAny[] | TypedArray,
-	number,
-	PartialListID,
-	boolean,
+	tag: T,
+	values: UIAny[] | TypedArray,
+	totalLength: number,
+	id: PartialListID,
+	isCycle: boolean,
 ];
 export type PartialListID = NewType<number, "PartialListID">;
 
-export type UIToStringed = [UIType.ToStringed, string, string];
-export type UIError = [UIType.Error, string, string?, string?];
+export type UIToStringed = [tag: UIType.ToStringed, typeName: string, str: string];
+export type UIError = [tag: UIType.Error, name: string, message?: string, stack?: string];
 
 export interface UIData {
 	value: UIAny;
