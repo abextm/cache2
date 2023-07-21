@@ -8,6 +8,6 @@
 		"src/tspatch/**/*.ts"
 	],
 	"compilerOptions": {
-		"lib": ["ES2020", "WebWorker"]
+		"lib": ["ES2022", "WebWorker"]
 	}
 }

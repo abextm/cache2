@@ -5,7 +5,7 @@
 		"../main/**/*"
 	],
 	"compilerOptions": {
-		"lib": ["ES2020", "WebWorker", "DOM"],
+		"lib": ["ES2022", "WebWorker", "DOM"],
 		"types": [
 			"svelte",
 			"svelte/store",

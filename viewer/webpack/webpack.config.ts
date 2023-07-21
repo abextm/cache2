@@ -95,7 +95,7 @@ let config: webpack.Configuration = {
 							tsconfigFile: path.resolve(__dirname, "../src/main/tsconfig.json"),
 							compilerOptions: {
 								// should match tsconfig.base.json
-								target: "ES2020",
+								target: "ES2022",
 							},
 						},
 						babel: false,
