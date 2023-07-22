@@ -162,4 +162,26 @@ export class Px {
 			assert.equal(typ.entries.p.entries.name, "RGB");
 		},
 	);
+
+	testCompile(
+		"TypedCall",
+		true,
+		`
+import * as c2 from "../src";
+const $_typed_ = c2.Typed._;
+
+interface Foo {
+	/* @TypedCall */ fn(...v: any[]): void;
+}
+export const foo = (v: Foo) => v.fn(123 as c2.RGB, 456 as c2.HSL);
+		`,
+		({ foo }) => {
+			foo({
+				fn: (...args: any[]) => {
+					assert.equal(args[0][Typed.type].name, "RGB");
+					assert.equal(args[1][Typed.type].name, "HSL");
+				},
+			});
+		},
+	);
 });

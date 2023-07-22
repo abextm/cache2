@@ -61,12 +61,12 @@ const langs = [
 // so typescript retains types data to console.log
 const genericConsole = `
 interface Console {
-	debug<T extends any[]>(...data: T): void;
-	error<T extends any[]>(...data: T): void;
-	info<T extends any[]>(...data: T): void;
-	log<T extends any[]>(...data: T): void;
-	trace<T extends any[]>(...data: T): void;
-	warn<T extends any[]>(...data: T): void;
+	/* @TypedCall */ debug<T extends any[]>(...data: T): void;
+	/* @TypedCall */ error<T extends any[]>(...data: T): void;
+	/* @TypedCall */ info<T extends any[]>(...data: T): void;
+	/* @TypedCall */ log<T extends any[]>(...data: T): void;
+	/* @TypedCall */ trace<T extends any[]>(...data: T): void;
+	/* @TypedCall */ warn<T extends any[]>(...data: T): void;
 }
 
 declare var console: Console;

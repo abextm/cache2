@@ -4,7 +4,7 @@ import { Typed } from "../src/reflect";
 const UNDEFINED_SENTINAL: unique symbol = Symbol("undefined");
 
 export const addTypeInfo =
-	(ts: typeof import("typescript"), program: ts.Program, convertConsoleLog = false) =>
+	(ts: typeof import("typescript"), program: ts.Program, convertTypedCall = false) =>
 	(ctx: ts.TransformationContext) =>
 	(sf: ts.SourceFile): ts.SourceFile => {
 		type Transformer<T extends ts.Node> = <O extends T | ts.NodeArray<T>>(o: O) => O;
@@ -250,7 +250,7 @@ export const addTypeInfo =
 
 					if (
 						!isTypedDecleration
-						&& t2.symbol.declarations?.some(decl =>
+						&& t2.symbol?.declarations?.some(decl =>
 							(ts.isClassDeclaration(decl) || ts.isClassExpression(decl))
 							&& ts.getDecorators(decl)?.some(deco => isTypedAccess(deco.expression))
 						)
@@ -355,11 +355,24 @@ export const addTypeInfo =
 			return ts.isIdentifier(expr) && expr.text === "Typed";
 		}
 
-		function isConsoleLog(expr: ts.Expression): boolean {
-			return ts.isPropertyAccessExpression(expr)
-				&& ts.isIdentifier(expr.expression)
-				&& expr.expression.escapedText === "console"
-				&& ["log", "info", "warn", "debug", "error", "trace"].indexOf(expr.name.escapedText.toString()) !== -1;
+		function isTypedCall(expr: ts.Expression): boolean {
+			return exprDeclCommentMatches(expr, comment => comment.indexOf("@TypedCall") !== -1);
+		}
+
+		function exprDeclCommentMatches(expr: ts.Expression, test: (comment: string) => boolean): boolean {
+			if (!ts.isPropertyAccessExpression(expr)) {
+				return false;
+			}
+			let sym = checker.getSymbolAtLocation(expr);
+			return sym?.declarations?.some(decl => {
+				let fullText = decl.getSourceFile().text;
+				return ts.forEachLeadingCommentRange(
+					fullText,
+					decl.pos,
+					(pos, end, _kind, v) => v || test(fullText.substring(pos, end)),
+					false,
+				);
+			}) ?? false;
 		}
 
 		let visitor: Transformer<ts.Node> = transformer<ts.Node>(node => {
@@ -382,10 +395,10 @@ export const addTypeInfo =
 					);
 				}
 			}
-			if (convertConsoleLog && ts.isCallExpression(node) && isConsoleLog(node.expression)) {
+			if (convertTypedCall && ts.isCallExpression(node) && isTypedCall(node.expression)) {
 				return ts.factory.updateCallExpression(
 					node,
-					node.expression,
+					visitor(node.expression),
 					node.typeArguments,
 					node.arguments.map(arg => {
 						let type = typeToTyped(checker.getTypeAtLocation(arg)!, node);
