@@ -7,7 +7,7 @@ import { DBColumnID, DBRowID, DBTableID, ScriptVarID } from "../types";
 
 function readTypes(r: Reader): ScriptVarID[] {
 	let size = r.u8();
-	let types = new Array(size);
+	let types = new Array(size).fill(undefined);
 	for (let i = 0; i < size; i++) {
 		types[i] = r.u8o16();
 	}
@@ -32,7 +32,7 @@ function readVarType(r: Reader, type: BaseVarType): string | number | bigint {
 
 function readValues(r: Reader, types: ScriptVarID[]): (string | number | bigint)[] {
 	let strides = r.u8o16();
-	let values = new Array(types.length * strides);
+	let values = new Array(types.length * strides).fill(undefined);
 	for (let stride = 0; stride < strides; stride++) {
 		for (let i = 0; i < types.length; i++) {
 			let type = ScriptVarType.forID(types[i]);
@@ -64,8 +64,8 @@ export class DBRow extends PerFileLoadable {
 			switch (opcode) {
 				case 3: {
 					let len = r.u8();
-					v.values = new Array(len);
-					v.types = new Array(len);
+					v.values = new Array(len).fill(undefined);
+					v.types = new Array(len).fill(undefined);
 
 					for (;;) {
 						let column = r.u8();
@@ -107,8 +107,8 @@ export class DBTable extends PerFileLoadable {
 			switch (opcode) {
 				case 1: {
 					let len = r.u8();
-					v.defaultValues = new Array(len);
-					v.types = new Array(len);
+					v.defaultValues = new Array(len).fill(undefined);
+					v.types = new Array(len).fill(undefined);
 
 					for (;;) {
 						let bits = r.u8();
@@ -185,8 +185,8 @@ export class DBTableIndex extends Loadable {
 		const v = new DBTableIndex(args[0] as DBTableID, args[1]);
 
 		let len = r.leVarInt();
-		v.types = new Array(len);
-		v.values = new Array(len);
+		v.types = new Array(len).fill(undefined);
+		v.values = new Array(len).fill(undefined);
 
 		for (let tupleIndex = 0; tupleIndex < len; tupleIndex++) {
 			let type = v.types[tupleIndex] = BaseVarType.forOrdinal(r.u8());
@@ -196,7 +196,7 @@ export class DBTableIndex extends Loadable {
 			for (let i = 0; i < numKeys; i++) {
 				let key = readVarType(r, type);
 				let numRows = r.leVarInt();
-				let rows = new Array(numRows);
+				let rows = new Array(numRows).fill(undefined);
 				map.set(key, rows);
 
 				for (let i = 0; i < numRows; i++) {
