@@ -290,7 +290,7 @@ export const addTypeInfo =
 					let entries: Typed.Object["entries"] = {};
 					let hasEntries = false;
 					let defaultEntry: Typed.Any;
-					t.symbol.members?.forEach((v, k) => {
+					t.symbol?.members?.forEach((v, k) => {
 						let defaultValue = v.valueDeclaration
 							&& ts.isPropertyDeclaration(v.valueDeclaration)
 							&& v.valueDeclaration.initializer;
