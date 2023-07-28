@@ -269,7 +269,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		name: string | undefined,
 		startBrace: string | undefined,
 		endBrace: string | undefined,
-		clickParent: HTMLElement | undefined,
+		clickParent: "static" | HTMLElement | undefined,
 		showLen: boolean | undefined,
 	): HTMLElement {
 		let thisPartialLoaded = 0;
@@ -348,7 +348,11 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			cycle && "cycle",
 		);
 
-		expandable(expander, clickParent, v[0] === UIType.Table ? "table-expandable" : "expandable");
+		if (clickParent !== "static") {
+			expandable(expander, clickParent, v[0] === UIType.Table ? "table-expandable" : "expandable");
+		} else {
+			expander.classList.add("static");
+		}
 
 		if ("id" in v) {
 			const partial = v.id;
@@ -769,7 +773,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			}
 			if (typeof val === "number" && type === "WorldPoint") {
 				let pt = [(val >> 14) & 0x3FFF, val & 0x3FFF, (val >> 28) & 3];
-				return renderList([UIType.Array, pt], "WorldPoint", "(", ")", clickParent, false);
+				return renderList([UIType.Array, pt], "WorldPoint", "(", ")", "static", false);
 			}
 			let e = renderAny(v[2], { unwrap, clickParent, undAsBlank });
 			if (e) {
@@ -783,11 +787,21 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			return e;
 		}
 
+		if (type === UIType.ToStringed) {
+			if (v[2].startsWith("[object ")) {
+				return renderList([UIType.Array, []], v[1], "(", ")", "static", false);
+			}
+			return sp(v[2], "identstr");
+		}
+
 		console.log(v);
 		return createEl(tag, "unknown type " + type);
 	}
 
 	function setExpanded(e: HTMLElement, value?: boolean) {
+		if (!e.classList.contains("expandable")) {
+			return;
+		}
 		if (value === undefined) {
 			value = e.classList.contains("collapsed");
 		}
