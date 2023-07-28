@@ -5,6 +5,7 @@
 		"../main/**/*"
 	],
 	"compilerOptions": {
+		"importHelpers": true,
 		"lib": ["ES2022", "WebWorker", "DOM"],
 		"types": [
 			"svelte",

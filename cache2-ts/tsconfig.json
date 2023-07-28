@@ -3,6 +3,7 @@
 		"src/**/*"
 	],
 	"compilerOptions": {
+		"importHelpers": true,
 		"outDir": "dist/",
 		"rootDir": "src/",
 		"module": "ES2015",
