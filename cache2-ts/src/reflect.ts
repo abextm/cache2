@@ -42,26 +42,55 @@ export namespace Typed {
 		v: T;
 	};
 
-	export function _<T>(type: Any): (v: T, _ctx?: any) => T | Typed.Value<T> {
-		return (v: any) => {
-			let onto: any;
-			if (typeof v === "function") {
-				onto = v.prototype;
-			} else if (typeof v === "object" && v) {
-				onto = v;
-			} else {
-				onto = v = {
-					[Typed.wrapped]: true,
-					v,
-				};
-			}
-			if (!onto[Typed.type]) {
-				Object.defineProperty(onto, Typed.type, {
-					enumerable: false,
-					value: type,
-				});
-			}
+	export function withType<T>(type: Any | undefined, v: T): T | Typed.Value<T> {
+		if (!type) {
 			return v;
-		};
+		}
+		let onto: any;
+		if (typeof v === "function") {
+			onto = v.prototype;
+		} else if (typeof v === "object" && v) {
+			onto = v;
+		} else {
+			onto = v = {
+				[Typed.wrapped]: true,
+				v,
+			} as any;
+		}
+		if (!onto[Typed.type]) {
+			Object.defineProperty(onto, Typed.type, {
+				enumerable: false,
+				value: type,
+			});
+		}
+		return v;
+	}
+
+	export function getType(v: any): Any | undefined {
+		return v[type];
+	}
+
+	// injected decorator or value wrapper for c2.Typed(value) calls
+	/** @internal */
+	export function d(type: Any): <T>(v: T, _ctx?: any) => T | Typed.Value<T> {
+		return (v: any) => withType(type, v);
+	}
+
+	// injected value wrapper for typedCall
+	/** @internal */
+	export function v(type: Any, value: any): any {
+		return withType(type, value);
+	}
+
+	// injected value wrapper for typedCall with a spread argument
+	/** @internal */
+	export function s(type: Any, value: any[]): any[] {
+		if (type?.type === "list") {
+			return value.map(v => withType(type.entries, v));
+		} else if (type?.type === "tuple") {
+			return value.map((v, i) => withType(type.entries[i], v));
+		} else {
+			return value;
+		}
 	}
 }

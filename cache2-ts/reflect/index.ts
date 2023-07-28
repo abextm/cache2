@@ -341,7 +341,7 @@ export const addTypeInfo =
 			return ts.factory.createCallExpression(
 				ts.factory.createPropertyAccessExpression(
 					typed,
-					"_",
+					"d",
 				),
 				undefined,
 				[pojoToAST(arg)],
@@ -401,20 +401,30 @@ export const addTypeInfo =
 					visitor(node.expression),
 					node.typeArguments,
 					node.arguments.map(arg => {
+						let isSpread = false;
+						if (ts.isSpreadElement(arg)) {
+							isSpread = true;
+							arg = arg.expression;
+						}
 						let type = typeToTyped(checker.getTypeAtLocation(arg)!, node);
 						if (!type) {
 							return visitor(arg);
 						}
 
-						return ts.factory.createCallExpression(
-							ts.factory.createCallExpression(
+						let call = ts.factory.createCallExpression(
+							ts.factory.createPropertyAccessExpression(
 								ts.factory.createIdentifier("$_typed_"),
-								undefined,
-								[pojoToAST(type)],
+								isSpread ? "s" : "v",
 							),
 							undefined,
-							[visitor(arg)],
+							[pojoToAST(type), visitor(arg)],
 						);
+
+						if (isSpread) {
+							return ts.factory.createSpreadElement(call);
+						}
+
+						return call;
 					}),
 				);
 			}

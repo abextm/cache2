@@ -168,18 +168,30 @@ export class Px {
 		true,
 		`
 import * as c2 from "../src";
-const $_typed_ = c2.Typed._;
+const $_typed_ = c2.Typed;
 
 interface Foo {
 	/* @TypedCall */ fn(...v: any[]): void;
 }
-export const foo = (v: Foo) => v.fn(123 as c2.RGB, 456 as c2.HSL);
+export const foo = (v: Foo) => {
+	v.fn(123 as c2.RGB, 456 as c2.HSL);
+	v.fn(...[123, 456] as [c2.RGB, c2.HSL]);
+};
+export const foo2 = (v: Foo) => v.fn(...[123, 456, 789] as c2.RGB[]);
 		`,
-		({ foo }) => {
+		({ foo, foo2 }) => {
 			foo({
 				fn: (...args: any[]) => {
 					assert.equal(args[0][Typed.type].name, "RGB");
 					assert.equal(args[1][Typed.type].name, "HSL");
+				},
+			});
+			foo2({
+				fn: (...args: any[]) => {
+					assert.equal(args.length, 3);
+					for (let arg of args) {
+						assert.equal(arg[Typed.type].name, "RGB");
+					}
 				},
 			});
 		},
