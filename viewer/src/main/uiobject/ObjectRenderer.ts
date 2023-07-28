@@ -12,6 +12,7 @@ import {
 	UIPartialList,
 	UIPartialRequest,
 	UIPartialResponse,
+	UITable,
 	UIType,
 } from "../../common/uiobject";
 import { measure, mutate } from "../util/DOMTiming";
@@ -54,7 +55,13 @@ export async function lookupUI<T extends LookupType>(
 		let sprites = await runner.spriteMetadata("" + filter);
 		return patchProps(Sprites, { sprites, runner });
 	}
-	let uiobj = await runner.lookup(type, filter);
+	let uiobj: UIData | undefined;
+	if (type === "dbtable" && style === "default") {
+		uiobj = await runner.dbTables(filter);
+	}
+	if (!uiobj) {
+		uiobj = await runner.lookup(type, filter);
+	}
 	if (uiobj) {
 		return patchProps(JSObject, {
 			expanded: true,
@@ -147,6 +154,16 @@ function addVerticalPadding(r: DOMRect, dh: number): DOMRect {
 	);
 }
 
+function isUndefined(v: UIAny) {
+	if (v === undefined) {
+		return true;
+	}
+	if (Array.isArray(v) && v[0] === UIType.Typed && v[2] === undefined) {
+		return true;
+	}
+	return false;
+}
+
 export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean): RenderedObject {
 	let port = data.port;
 	port?.start();
@@ -154,8 +171,8 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	let loadedPartials = new Map<PartialListID, number>();
 	(<any> window).ll = loadedPartials;
 
-	function expandable<T extends HTMLElement>(e: T, clickParent: HTMLElement = e): T {
-		e.classList.add("expandable", "collapsed");
+	function expandable<T extends HTMLElement>(e: T, clickParent: HTMLElement = e, clazz: string = "expandable"): T {
+		e.classList.add(clazz, "collapsed");
 		onClick(clickParent, () => setExpanded(e), ev => {
 			let el = (ev.currentTarget as HTMLElement).parentElement!;
 			return el.closest(".collapsed") === null;
@@ -163,16 +180,27 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		return e;
 	}
 
-	function sp(contents: string | (string | Node | undefined | null)[], ...classes: string[]): HTMLSpanElement {
-		let e = document.createElement("span");
+	function createEl<T extends string>(
+		tag: T,
+		contents: string | (string | Node | undefined | null)[],
+		...classes: (string | null | undefined)[]
+	): HTMLElement {
+		let e = document.createElement(tag);
 		if (typeof contents === "string") {
 			contents = [contents];
 		}
 		e.append(...contents.filter(v => v) as any);
 		if (classes.length > 0) {
-			e.classList.add(...classes);
+			e.classList.add(...(classes.filter(v => v) as any));
 		}
 		return e;
+	}
+
+	function sp(
+		contents: string | (string | Node | undefined | null)[],
+		...classes: (string | undefined)[]
+	): HTMLSpanElement {
+		return createEl("span", contents, ...classes);
 	}
 
 	function linkTyped(e: HTMLElement, clickParent: HTMLElement | undefined, ty2: LookupType, val: number): HTMLElement {
@@ -201,10 +229,11 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	function constructEntries(
 		type: UIListType,
 		es: UIAny[] | TypedArray,
+		undAsBlank?: boolean | undefined,
 		start = 0,
 		end: number = start + es.length,
 	): HTMLElement {
-		let element = sp([], "inner");
+		let element = createEl(type === UIType.Table ? "tbody" : "span", [], "inner", "entries");
 		if (type == UIType.Object || type == UIType.Map) {
 			for (let i = 0; i < es.length; i += 2) {
 				let line = sp([]);
@@ -221,7 +250,9 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			}
 		} else {
 			for (let i = 0; i < es.length; i++) {
-				element.append(renderAny(es[i], { unwrap: false }));
+				element.append(
+					renderAny(es[i], { unwrap: false, tableType: type === UIType.Table ? "tr" : undefined, undAsBlank }),
+				);
 			}
 		}
 		element.dataset.start = "" + start;
@@ -236,30 +267,97 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	function renderList(
 		v: UIList | UIPartialList,
 		name: string | undefined,
-		startBrace: string,
-		endBrace: string,
+		startBrace: string | undefined,
+		endBrace: string | undefined,
 		clickParent: HTMLElement | undefined,
-		showLen?: boolean | undefined,
+		showLen: boolean | undefined,
 	): HTMLElement {
 		let thisPartialLoaded = 0;
-		if (v.length === 5) {
-			const partial = v[3];
+		if ("id" in v) {
+			const partial = v.id;
 			thisPartialLoaded = loadedPartials.get(partial) ?? 0;
 			loadedPartials.set(partial, thisPartialLoaded + 1);
 		}
 
-		let entries = constructEntries(v[0], v[1]);
+		let len = "tlen" in v && v.tlen;
+		if (!len) {
+			len = v[1].length;
+			if (v[0] === UIType.Object || v[0] === UIType.Map) {
+				len /= 2;
+			}
+		}
 
-		if (v.length === 5) {
-			const partial = v[3];
+		let firstEntries = constructEntries(v[0], v[1], (v as UITable).undAsBlank);
+		let entryContainer = firstEntries;
 
-			let firstEntry = entries;
-			entries = sp([v[1].length > 0 ? firstEntry : null]);
-			entries.dataset.partial = "" + partial;
+		// if we are not a table we need exactly 1 element to hold all entries
+		// but if we are a table we need exactly table(expander) > tbody > tr(entry)
+		if ("id" in v && v[0] !== UIType.Table) {
+			entryContainer = sp([firstEntries], "entries");
+		}
+
+		let cycle: Element | undefined;
+		if ("isCycle" in v && v.isCycle && thisPartialLoaded > 0) {
+			const svgns = "http://www.w3.org/2000/svg";
+			cycle = document.createElementNS(svgns, "svg");
+			cycle.classList.add("mdi", "cycle-icon");
+			cycle.setAttribute("viewBox", "0 0 24 24");
+			let p = document.createElementNS(svgns, "path");
+			p.setAttribute("d", mdiRepeatVariant);
+			cycle.appendChild(p);
+		}
+
+		if (v[0] === UIType.Table) {
+			let tab = v as UITable;
+			let header = createEl(
+				"thead",
+				tab.header.map(row =>
+					createEl(
+						"tr",
+						row.map(col => {
+							let el: HTMLElement;
+							if (tab.undAsBlank && isUndefined(col[0])) {
+								el = createEl("th", []);
+							} else {
+								el = renderAny(col[0], { tableType: "th" });
+							}
+							if (el.tagName !== "TH") {
+								el = createEl("th", [el]);
+							}
+							if (col[1]) {
+								(el as HTMLTableCellElement).colSpan = col[1];
+							}
+							return el;
+						}),
+					)
+				),
+			);
+			entryContainer = createEl("table", [header, entryContainer]);
+		}
+
+		let expander = sp(
+			[
+				name && sp(name, "type"),
+				showLen ?? v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
+				startBrace,
+				cycle,
+				entryContainer,
+				endBrace,
+			],
+			"list",
+			cycle && "cycle",
+		);
+
+		expandable(expander, clickParent, v[0] === UIType.Table ? "table-expandable" : "expandable");
+
+		if ("id" in v) {
+			const partial = v.id;
+
+			expander.dataset.partial = "" + partial;
 
 			let detached = new Map<HTMLElement, HTMLElement>();
 
-			let allocated: HTMLElement[] = [firstEntry];
+			let allocated: HTMLElement[] = [firstEntries];
 			let numLinesAllocated = 0;
 
 			async function attachVisibleElements(sentinals: HTMLElement[], parentScreen = visibleScreenArea(parent)) {
@@ -349,7 +447,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 						await measure();
 
-						let el = constructEntries(v[0], ev.data.entries, ev.data.start, ev.data.end);
+						let el = constructEntries(v[0], ev.data.entries, (v as UITable).undAsBlank, ev.data.start, ev.data.end);
 
 						numLinesAllocated += el.children.length;
 						let free: { el: HTMLElement; height: number; }[] = [];
@@ -443,47 +541,25 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			if (v[0] === UIType.Object || v[0] === UIType.Map) {
 				end /= 2;
 			}
-			entries.appendChild(createBlank(end, v[2], false));
-		}
-
-		let len = v[2];
-		if (!len) {
-			len = v[1].length;
-			if (v[0] === UIType.Object || v[0] === UIType.Map) {
-				len /= 2;
+			firstEntries.insertAdjacentElement("afterend", createBlank(end, v.tlen, false));
+			if (v[1].length <= 0) {
+				firstEntries.remove();
 			}
 		}
 
-		let cycle: Element | undefined;
-		entries.classList.add("entries");
-		if (v[4] && thisPartialLoaded > 0) {
-			entries.classList.add("cycle");
-
-			const svgns = "http://www.w3.org/2000/svg";
-			cycle = document.createElementNS(svgns, "svg");
-			cycle.classList.add("mdi", "cycle-icon");
-			cycle.setAttribute("viewBox", "0 0 24 24");
-			let p = document.createElementNS(svgns, "path");
-			p.setAttribute("d", mdiRepeatVariant);
-			cycle.appendChild(p);
-		}
-
-		let expander = sp([
-			name && sp(name, "type"),
-			showLen ?? v[0] !== UIType.Object ? sp(`(${len})`, "length") : null,
-			startBrace,
-			cycle,
-			entries,
-			endBrace,
-		], "list");
-		expandable(expander, clickParent);
 		return expander;
 	}
 
 	function renderAny(
 		v: UIAny,
-		{ unwrap = false, clickParent }: { unwrap?: boolean; clickParent?: HTMLElement; } = {},
+		{ unwrap = false, clickParent, tableType, undAsBlank }: {
+			unwrap?: boolean;
+			clickParent?: HTMLElement;
+			tableType?: "tr" | "td" | "th";
+			undAsBlank?: boolean;
+		} = {},
 	): HTMLElement {
+		let tag = tableType ?? "span";
 		if (typeof v === "string") {
 			const escapes: { [key: string]: string; } = {
 				"\0": "0",
@@ -510,7 +586,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 
 			let escaped = escape(v);
 			if (unwrap && !/[^a-z0-9$_]/i.test(escaped)) {
-				return sp(v, "identstr");
+				return createEl(tag, v, "identstr");
 			}
 
 			escaped = `"${escaped}"`;
@@ -543,7 +619,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				}
 			}
 
-			let e = sp(bits, "string");
+			let e = createEl(tag, bits, "string");
 			addTooltip(clickParent ?? e, p => {
 				let el = document.createElement("pre");
 				el.textContent = v;
@@ -557,13 +633,16 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			return e;
 		}
 		if (typeof v !== "object" || v === null) {
+			if (v === undefined && undAsBlank) {
+				return createEl(tag, []);
+			}
 			let type = v === null ? "null" : typeof v;
-			return sp("" + v, type);
+			return createEl(tag, "" + v, type);
 		}
 
 		if (!Array.isArray(v)) {
 			if (v instanceof Blob) {
-				let e = sp(["Blob(", renderAny(v.size), ")"], "blob");
+				let e = createEl(tag, ["Blob(", renderAny(v.size), ")"], "blob");
 				e.addEventListener("click", _ev => openBlob(v));
 				return e;
 			} else if (v instanceof ImageData) {
@@ -586,7 +665,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				});
 				return c;
 			} else {
-				return sp("unknown");
+				return createEl(tag, "unknown");
 			}
 		}
 
@@ -597,10 +676,12 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			|| type === UIType.Array
 			|| type === UIType.Set
 			|| type === UIType.ArrayBuffer
+			|| type === UIType.Table
 			|| anyIsTypedArray(v)
 		) {
 			let name = "";
-			let brace: "[" | "{" | "" = "[";
+			let showLen = true;
+			let brace: "[" | "{" | undefined = "[";
 			if (type === UIType.Object) {
 				brace = "{";
 			} else if (type === UIType.Map) {
@@ -610,13 +691,16 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				name = "Set";
 			} else if (type === UIType.ArrayBuffer) {
 				name = "ArrayBuffer";
+			} else if (type === UIType.Table) {
+				showLen = false;
+				brace = undefined;
 			}
 			if (anyIsTypedArray(v)) {
 				name = v[0];
 			}
 
 			if (unwrap) {
-				brace = "";
+				brace = undefined;
 			}
 
 			if (unwrap && type === UIType.Array) {
@@ -628,10 +712,23 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			let otherBrace = {
 				"{": "}",
 				"[": "]",
-				"": "",
 			};
 
-			return renderList(v, name, brace, otherBrace[brace], clickParent);
+			if (tableType === "tr") {
+				let cols = (v[1] as UIAny[]).map(v => {
+					let el = renderAny(v, {
+						tableType: "td",
+						undAsBlank,
+					});
+					if (el.tagName !== "TD") {
+						el = createEl("td", [el]);
+					}
+					return el;
+				});
+				return createEl(tag, cols);
+			}
+
+			return renderList(v, name, brace, otherBrace[brace!], clickParent, showLen);
 		}
 
 		if (type === UIType.Typed) {
@@ -654,27 +751,27 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 				}
 				let swatch = sp([], "swatch");
 				swatch.style.backgroundColor = color;
-				return sp([swatch, str]);
+				return createEl(tag, [swatch, str]);
 			}
 			if (typeof val === "number" && (type === "ScriptVarChar" || type === "ScriptVarID")) {
 				let svt = type === "ScriptVarChar"
 					? ScriptVarType.forChar(val as ScriptVarChar)
 					: ScriptVarType.forID(val as ScriptVarID);
 				if (svt) {
-					return sp([svt.name], "type");
+					return createEl(tag, [svt.name], "type");
 				}
 			}
 			if (typeof val === "number" && type === "WearPos") {
 				let name = WearPos.byID[val];
 				if (name) {
-					return sp([name], "type");
+					return createEl(tag, [name], "type");
 				}
 			}
 			if (typeof val === "number" && type === "WorldPoint") {
 				let pt = [(val >> 14) & 0x3FFF, val & 0x3FFF, (val >> 28) & 3];
 				return renderList([UIType.Array, pt], "WorldPoint", "(", ")", clickParent, false);
 			}
-			let e = renderAny(v[2], { unwrap, clickParent });
+			let e = renderAny(v[2], { unwrap, clickParent, undAsBlank });
 			if (e) {
 				e.dataset.type = type;
 
@@ -686,7 +783,8 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 			return e;
 		}
 
-		return sp("unknown");
+		console.log(v);
+		return createEl(tag, "unknown type " + type);
 	}
 
 	function setExpanded(e: HTMLElement, value?: boolean) {

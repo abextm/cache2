@@ -13,6 +13,7 @@ import {
 } from "cache2";
 import * as _ from "lodash";
 import { isEqual } from "lodash";
+import { AbstractTable } from "./Table";
 
 // we use a bunch of tagged arrays as our intermediate format as they all get
 // posted via structured clone which seems to be faster with arrays since it doesn't
@@ -34,6 +35,7 @@ export enum UIType {
 	ArrayBuffer = 8,
 	DefaultValue = 9,
 	Instance = 10,
+	Table = 11,
 }
 
 const TypedArrays = [
@@ -50,16 +52,25 @@ const TypedArrays = [
 	Float64Array,
 ] as const;
 export type TypedArray = InstanceType<typeof TypedArrays[number]>;
-export type UIListType = UIType.Object | UIType.Map | UIType.Array | UIType.Set | UIType.ArrayBuffer | `${string}Array`;
+export type UIListType =
+	| UIType.Table
+	| UIType.Object
+	| UIType.Map
+	| UIType.Array
+	| UIType.Set
+	| UIType.ArrayBuffer
+	| `${string}Array`;
 export type UIList<T extends UIListType = UIListType> = [tag: T, values: UIAny[] | TypedArray];
-export type UIPartialList<T extends UIListType = UIListType> = [
-	tag: T,
-	values: UIAny[] | TypedArray,
-	totalLength: number,
-	id: PartialListID,
-	isCycle: boolean,
-];
+export type UIPartialList<T extends UIListType = UIListType> = UIList<T> & {
+	tlen: number;
+	id: PartialListID;
+	isCycle?: true;
+};
 export type PartialListID = NewType<number, "PartialListID">;
+export type UITable = UIList<UIType.Table> & {
+	header: [value: UIAny, columns: number][][];
+	undAsBlank?: boolean;
+};
 
 export type UIToStringed = [tag: UIType.ToStringed, typeName: string, str: string];
 export type UIError = [tag: UIType.Error, name: string, message?: string, stack?: string];
@@ -84,9 +95,10 @@ export interface UIPartialResponse {
 
 interface Entries {
 	type: UIListType;
-	entries: any[] | [any, any][] | TypedArray;
+	entries: any[] | [any, any][] | TypedArray | { at(index: number): any; length: number; };
 	isKV: boolean;
 	v: object;
+	forceFull?: true;
 }
 
 type TypeOverride = (k: any, v: any, obj: any) => [Typed.Any | undefined, Typed.Any | undefined] | undefined;
@@ -110,7 +122,7 @@ const dbRowOverride: TypeOverride = (k: keyof DBRow | keyof DBTable, _v, obj: DB
 	if (k === "values" || k === "defaultValues") {
 		return [undefined, {
 			type: "tuple",
-			entries: obj.types.map((t, column) => ({
+			entries: obj.types.map((t, column) => (t && {
 				type: "tuple",
 				entries: t.map((type, index) => {
 					if (type) {
@@ -216,7 +228,7 @@ export async function serialize(
 			return [[UIType.ToStringed, proto, str], proto.length + str.length];
 		}
 
-		serAny(v: any, limit: number, rType: Typed.Any | undefined): [UIAny, number] {
+		serAny(v: any, limit: number, rType: Typed.Any | undefined, forceFull?: boolean | undefined): [UIAny, number] {
 			switch (typeof v) {
 				case "string":
 					return [wrapType(rType, v), v.length];
@@ -269,8 +281,10 @@ export async function serialize(
 			if (ref === null) {
 				isPartial = true;
 				size = 8;
-				ref = [entries.type, [], entries.entries.length, undefined!, true];
-				references.set(v, ref);
+				ref = [entries.type, []] as any;
+				ref!.tlen = entries.entries.length;
+				ref!.isCycle = true;
+				references.set(v, ref!);
 			}
 
 			if (ArrayBuffer.isView(entries.entries) && !rType) {
@@ -292,29 +306,48 @@ export async function serialize(
 				for (let s of ctx.serEntries(entries, perLimit, uiEntries, rType)) {
 					size += s;
 
-					if (limit == -1) {
-						if (uiEntries.length > ROOT_ROWS) {
-							isPartial = true;
-							break;
-						}
-					} else {
-						if (size > limit && uiEntries.length > 3) {
-							isPartial = true;
-							break;
+					if (!forceFull) {
+						if (limit == -1) {
+							if (uiEntries.length > ROOT_ROWS) {
+								isPartial = true;
+								break;
+							}
+						} else {
+							if (size > limit && uiEntries.length > 3) {
+								isPartial = true;
+								break;
+							}
 						}
 					}
 				}
 			}
 
 			let list: UIList = [entries.type, uiEntries];
+			if (v instanceof AbstractTable) {
+				let tab = list as UITable;
+				tab.header = v.getHeader().map(row =>
+					row.map(col => {
+						if (!Array.isArray(col)) {
+							col = [col, 1];
+						}
+						return [this.serAny(col[0], Infinity, undefined)[0], col[1]];
+					})
+				);
+				if (v.undefinedAsBlank) {
+					tab.undAsBlank = true;
+				}
+			}
 
 			if (isPartial) {
 				let id = partials.length as PartialListID;
 				partials.push({ v, rType });
+				let partialList = list as UIPartialList;
+				partialList.tlen = entries.entries.length;
+				partialList.id = id;
 				if (ref) {
-					ref[3] = id;
+					ref.id = id;
+					partialList.isCycle = true;
 				}
-				let partialList: UIPartialList = [...list, entries.entries.length, id, ref !== undefined];
 				return [partialList, size];
 			}
 
@@ -322,7 +355,7 @@ export async function serialize(
 		}
 
 		*serEntries(
-			{ entries, isKV, v }: Entries,
+			{ entries, isKV, v, forceFull }: Entries,
 			perLimit: number,
 			uiEntries: UIAny[],
 			rType: Typed.Any | undefined,
@@ -349,7 +382,7 @@ export async function serialize(
 			}
 
 			for (let i = start; i < end; i++) {
-				let entry = entries[i];
+				let entry = entries.at(i);
 				if (isKV) {
 					let [ktOver, vtOver] = typeOverride?.(entry[0], entry[1], v) ?? [undefined, undefined];
 					let [kv, ks] = this.serAny(entry[0], perLimit, ktOver ?? mapType?.key);
@@ -364,7 +397,7 @@ export async function serialize(
 					uiEntries.push(kv, vv);
 					yield ks + vs;
 				} else {
-					let [v, s] = this.serAny(entry, perLimit, listType?.entries || tupType?.entries?.[i]);
+					let [v, s] = this.serAny(entry, perLimit, listType?.entries || tupType?.entries?.[i], forceFull);
 					uiEntries.push(v);
 					yield s;
 				}
@@ -408,6 +441,19 @@ export async function serialize(
 					entries: [...v.entries()],
 					isKV: true,
 					v,
+				};
+			} else if (v instanceof AbstractTable) {
+				return {
+					type: UIType.Table,
+					entries: {
+						length: v.getNumRows(),
+						at(i) {
+							return v.getRow(i);
+						},
+					},
+					isKV: false,
+					v,
+					forceFull: true,
 				};
 			} else {
 				let entries = Object.entries(v);
