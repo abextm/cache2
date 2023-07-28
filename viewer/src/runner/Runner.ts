@@ -264,7 +264,8 @@ let types: Record<LookupType, Filterable<unknown>> = {
 async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Promise<T[]> {
 	let v: T[];
 	if (typeof filter === "number") {
-		return [await typ.load(ctx.cache, filter)];
+		return [await typ.load(ctx.cache, filter)]
+			.filter(v => v !== undefined);
 	}
 	if (/^[0-9, -]+$/.test(filter)) {
 		v = await Promise.all(
@@ -288,7 +289,7 @@ async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Pr
 		v = (await typ.all(ctx.cache))
 			.filter(v => re.test((v as any)?.name));
 	}
-	return v;
+	return v.filter(v => v !== undefined);
 }
 
 new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
