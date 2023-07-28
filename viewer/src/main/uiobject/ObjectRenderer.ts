@@ -799,7 +799,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	}
 
 	function setExpanded(e: HTMLElement, value?: boolean) {
-		if (!e.classList.contains("expandable")) {
+		if (!(e.classList.contains("expandable") || e.classList.contains("table-expandable"))) {
 			return;
 		}
 		if (value === undefined) {
