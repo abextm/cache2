@@ -34,6 +34,7 @@ console.log(await c2.Item.load(context.cache, 4151));
 			automaticLayout: true,
 			autoDetectHighContrast: false,
 			accessibilitySupport: "off",
+			fixedOverflowWidgets: true,
 			fontFamily,
 			renderWhitespace: "boundary",
 			insertSpaces: false,
