@@ -40,9 +40,12 @@ export function uiType(t: LookupType): string {
 
 export interface IRunner {
 	lookup(type: LookupType, filter: string | number): Promise<UIData | undefined>;
+
 	spriteMetadata(filter: string): Promise<Sprites[]>;
 	spriteImageData(id: number): Promise<ImageData[]>;
 	namedSprite(name: string, index: number): Promise<ImageData | undefined>;
+
+	dbTables(filter: string | number): Promise<UIData | undefined>;
 }
 
 export interface IRunnerPrivate extends IRunner {
@@ -120,6 +123,7 @@ export class Runner implements IRunner {
 	spriteMetadata = proxy("spriteMetadata", "Loading sprites");
 	spriteImageData = proxy("spriteImageData");
 	namedSprite = proxy("namedSprite");
+	dbTables = proxy("dbTables", "Loading DBTables");
 }
 
 defaultCache.subscribe(() => runner?.terminate());

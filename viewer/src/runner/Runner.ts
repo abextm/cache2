@@ -5,6 +5,7 @@ import { setCacheShare } from "../common/CacheShare";
 import { ClearConsole, IRunnerPrivate, Log, LogLevel, LookupType, ScriptResponse } from "../common/Runner";
 import { ServiceClient } from "../common/ServiceClient";
 import { ServiceServer } from "../common/ServiceServer";
+import { type AbstractTable } from "../common/Table";
 import { serialize } from "../common/uiobject";
 import * as ctx from "../context";
 
@@ -135,7 +136,7 @@ class ScriptRunner {
 		this.context = {
 			console,
 			System: system,
-			$_typed_: c2.Typed._,
+			$_typed_: c2.Typed,
 			_,
 		};
 	}
@@ -351,6 +352,78 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	async namedSprite(name, index) {
 		let sprites = await c2.Sprites.loadByName(ctx.cache, name);
 		return sprites?.sprites?.[index]?.asImageData();
+	},
+	async dbTables(filter) {
+		let v = <c2.DBTable[]> await loadAndFilter(c2.DBTable, filter);
+		let tabs = new Map<c2.DBTableID, any>(
+			await Promise.all(v.map(async (tab) => {
+				let rows = await c2.DBTable.loadRows(ctx.cache, tab.id);
+				if (!rows) {
+					return [tab.id, `Broken table ${tab.id}`] as const;
+				}
+				let at = new class extends ctx.AbstractTable {
+					undefinedAsBlank = true;
+					override getHeader() {
+						let header: AbstractTable.ColumnHeader[][] = [
+							[[undefined, 1]], // col id
+							[[c2.Typed(c2.ScriptVarType.dbRow.id), 1]], // col type
+							[[undefined, 1]], // col default value
+						];
+						for (let i = 0; i < tab.types.length; i++) {
+							let types = tab.types[i];
+							let dvs = tab.defaultValues[i];
+							if (types === undefined) {
+								continue;
+							}
+							header[0].push([i, types.length]);
+							for (let ti = 0; ti < types.length; ti++) {
+								let type = types[ti];
+								header[1].push([c2.Typed(type), 1]);
+								header[2].push([c2.ScriptVarType.withType(dvs?.[ti], type), 1]);
+							}
+						}
+						if (tab.defaultValues.every(v => v === undefined)) {
+							header.pop();
+						}
+						return header;
+					}
+					override getNumRows() {
+						return rows!.length;
+					}
+					override getRow(i: number) {
+						let row = rows![i];
+						let vals = row.values.flatMap((col, i) => {
+							let types = tab.types[i];
+							if (!types) {
+								return [];
+							}
+							if (!col) {
+								return types.map(_v => undefined);
+							}
+							let out = types.map(_v => [] as any[]);
+							for (let i = 0; i < col.length;) {
+								for (let tup = 0; tup < types.length; tup++, i++) {
+									let v = col[i];
+									out[tup].push(
+										v === undefined
+											? undefined
+											: c2.ScriptVarType.withType(v, types[tup]),
+									);
+								}
+							}
+							return out.map(v => v.length == 1 ? v[0] : v);
+						});
+
+						return [
+							c2.ScriptVarType.dbRow.withType(row.id),
+							...vals,
+						];
+					}
+				}();
+				return [tab.id, at] as const;
+			})),
+		);
+		return ServiceServer.return(...await serialize(tabs, false, ctx.cache));
 	},
 });
 

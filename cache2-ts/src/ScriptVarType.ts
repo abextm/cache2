@@ -29,6 +29,15 @@ export class ScriptVarType {
 	public static forID(i: ScriptVarID): ScriptVarType | undefined {
 		return byID.get(i);
 	}
+	public static withType<T>(v: T, type: ScriptVarID | ScriptVarType | undefined): Typed.Value<T> {
+		if (typeof type === "number") {
+			type = ScriptVarType.forID(type);
+		}
+		if (!type) {
+			return v;
+		}
+		return type.withType(v);
+	}
 
 	constructor(
 		public readonly name: string,
@@ -47,6 +56,15 @@ export class ScriptVarType {
 				name: this.typeName,
 			};
 		}
+	}
+
+	public withType<T>(v: T): Typed.Value<T> {
+		let typed = this.asTyped();
+		if (!typed) {
+			return v;
+		}
+
+		return Typed.withType(typed, v);
 	}
 
 	private static t(k: {

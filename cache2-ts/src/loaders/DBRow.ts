@@ -135,7 +135,11 @@ export class DBTable extends PerFileLoadable {
 		table: DBTableID | number,
 	): Promise<DBRowID[] | undefined> {
 		let idx = await DBTableIndex.load(cache, table, DBTableIndex.MASTER_COLUMN);
-		return idx?.values[0].get(0);
+		let vs = idx?.values[0];
+		if (!vs) {
+			return undefined;
+		}
+		return vs.get(0) ?? [];
 	}
 
 	public static async loadRows(

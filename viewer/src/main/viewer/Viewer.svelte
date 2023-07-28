@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mdiCodeBraces, mdiImage } from "@mdi/js";
+  import { mdiCodeBraces, mdiImage, mdiTable } from "@mdi/js";
 	import { Writable } from "svelte/store";
 	import { altCache, defaultCache } from "../../common/db";
 	import { getRunner, LookupType } from "../../common/Runner";
@@ -15,6 +15,10 @@
 	const styleTable: Partial<Record<LookupType, Record<string, string>>> = {
 		sprite: {
 			default: mdiImage,
+			json: mdiCodeBraces,
+		},
+		dbtable: {
+			default: mdiTable,
 			json: mdiCodeBraces,
 		},
 	};
