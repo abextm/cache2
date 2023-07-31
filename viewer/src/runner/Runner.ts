@@ -424,6 +424,10 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 				return [tab.id, at] as const;
 			})),
 		);
+
+		if (tabs.size === 1) {
+			return ServiceServer.return(...await serialize(tabs.values().next().value, false, ctx.cache));
+		}
 		return ServiceServer.return(...await serialize(tabs, false, ctx.cache));
 	},
 });
