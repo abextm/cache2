@@ -108,14 +108,14 @@ export class ScriptVarType {
 	static readonly kit = this.t({ id: 10, char: "K", jag: "idkit" });
 	static readonly midi = this.t({ id: 11, char: "M", jag: "midi" });
 	static readonly namedItem = this.t({ id: 13, char: "O", jag: "namedobj", type: "ItemID" });
-	static readonly synth = this.t({ id: 14, char: "P", jag: "synth" });
+	static readonly synth = this.t({ id: 14, char: "P", jag: "synth", type: "SoundEffectID" });
 	static readonly stat = this.t({ id: 17, char: "S", jag: "stat" });
 	static readonly coord = this.t({ id: 22, char: "c", jag: "coordgrid", type: "WorldPoint" });
 	static readonly sprite = this.t({ id: 23, char: "d", jag: "graphic", type: "SpriteID" });
 	static readonly font = this.t({ id: 25, char: "f", jag: "fontmetrics", type: "FontID" });
 	static readonly enum = this.t({ id: 26, char: "g", jag: "enum", type: "EnumID" });
 	static readonly jingle = this.t({ id: 28, char: "j", jag: "jingle" });
-	static readonly object = this.t({ id: 30, char: "l", jag: "loc" });
+	static readonly obj = this.t({ id: 30, char: "l", jag: "loc", type: "ObjID" });
 	static readonly model = this.t({ id: 31, char: "m", jag: "model", type: "ModelID" });
 	static readonly npc = this.t({ id: 32, char: "n", jag: "npc", type: "NPCID" });
 	static readonly item = this.t({ id: 33, char: "o", jag: "obj", type: "ItemID" });
@@ -124,8 +124,8 @@ export class ScriptVarType {
 	static readonly inventory = this.t({ id: 39, char: "v", jag: "inv" });
 	static readonly texture = this.t({ id: 40, char: "x", jag: "texture", type: "TextureID" });
 	static readonly char = this.t({ id: 42, char: "z", jag: "char" });
-	static readonly mapSceneIcon = this.t({ id: 55, char: "£", jag: "mapsceneicon" });
-	static readonly mapElement = this.t({ id: 59, char: "µ", jag: "mapelement" });
+	static readonly mapSceneIcon = this.t({ id: 55, char: "£", jag: "mapsceneicon", type: "MapSceneIconID" });
+	static readonly mapElement = this.t({ id: 59, char: "µ", jag: "mapelement", type: "MapElementID" });
 	static readonly hitsplat = this.t({ id: 62, char: "×", jag: "hitmark", type: "HitsplatID" });
 	static readonly struct = this.t({ id: 73, char: "J", jag: "struct", type: "StructID" });
 	static readonly dbRow = this.t({ id: 74, char: "Ð", jag: "dbrow", type: "DBRowID" });

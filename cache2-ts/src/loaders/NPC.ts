@@ -13,7 +13,7 @@ export class NPC extends PerFileLoadable {
 	public static readonly archive = 9;
 
 	public models: ModelID[] = <ModelID[]> [];
-	public name: string | null = "null";
+	public name = "null";
 	public size = 1;
 	public standingAnimation = <AnimationID> -1;
 	public walkingAnimation = <AnimationID> -1;

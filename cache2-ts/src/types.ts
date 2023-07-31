@@ -47,9 +47,13 @@ export type EnumID = NewType<number, "EnumID">;
 export type FontID = NewType<number, "FontID">;
 export type HitsplatID = NewType<number, "HitsplatID">;
 export type ItemID = NewType<number, "ItemID">;
+export type MapElementID = NewType<number, "MapElementID">;
+export type MapSceneIconID = NewType<number, "MapSceneIconID">;
 export type ModelID = NewType<number, "ModelID">;
 export type NPCID = NewType<number, "NPCID">;
+export type ObjID = NewType<number, "ObjID">;
 export type ParamID = NewType<number, "ParamID">;
+export type SoundEffectID = NewType<number, "SoundEffectID">;
 export type SpriteID = NewType<number, "SpriteID">;
 export type StructID = NewType<number, "StructID">;
 export type TextureID = NewType<number, "TextureID">;
@@ -59,36 +63,72 @@ export type VarPID = NewType<number, "VarPID">;
 export type HSL = AliasType<number, "HSL">;
 export type RGB = AliasType<number, "RGB">;
 
-export type WorldPoint = AliasType<number, "WorldPoint">;
+export type WorldPoint = NewType<number, "WorldPoint">;
+export type ObjType = NewType<number, "ObjType">;
 
 export class Params extends Map<ParamID, string | number> {
 }
 
-export namespace WearPos {
-	export const HEAD = 0;
-	export const CAPE = 1;
-	export const AMULET = 2;
-	export const WEAPON = 3;
-	export const TORSO = 4;
-	export const SHIELD = 5;
-	export const ARMS = 6;
-	export const LEGS = 7;
-	export const HAIR = 8;
-	export const HANDS = 9;
-	export const BOOTS = 10;
-	export const JAW = 11;
-	export const RING = 12;
-	export const AMMO = 13;
-
-	export const byID: string[] = (() => {
-		let out: string[] = [];
-		for (let [k, v] of Object.entries(WearPos)) {
-			if (typeof v === "number") {
-				out[v] = k;
+function makeByID<T extends number>(): (this: object, id: T) => string | undefined {
+	let byID: string[] | undefined;
+	return function(id: T) {
+		if (byID === undefined) {
+			byID = [];
+			for (let [k, v] of Object.entries(this)) {
+				if (typeof v === "number") {
+					byID[v] = k;
+				}
 			}
 		}
-		return out;
-	})();
+		return byID[id];
+	};
+}
+
+export namespace WearPos {
+	export const Head = <WearPos> 0;
+	export const Cape = <WearPos> 1;
+	export const Amulet = <WearPos> 2;
+	export const Weapon = <WearPos> 3;
+	export const Torso = <WearPos> 4;
+	export const Shield = <WearPos> 5;
+	export const Arms = <WearPos> 6;
+	export const Legs = <WearPos> 7;
+	export const Hair = <WearPos> 8;
+	export const Hands = <WearPos> 9;
+	export const Boots = <WearPos> 10;
+	export const Jaw = <WearPos> 11;
+	export const Ring = <WearPos> 12;
+	export const Ammo = <WearPos> 13;
+
+	export const byID = makeByID<WearPos>();
+}
+
+export namespace ObjType {
+	export const WallStraight = <ObjType> 0;
+	export const WallDiagonalCorner = <ObjType> 1;
+	export const WallCorner = <ObjType> 2;
+	export const WallSquareCorner = <ObjType> 3;
+	export const WallDecorStraightNoOffset = <ObjType> 4;
+	export const WallDecorStraightOffset = <ObjType> 5;
+	export const WallDecorDiagonalOffset = <ObjType> 6;
+	export const WallDecorDiagonalNoOffset = <ObjType> 7;
+	export const WallDecorDiagonalBoth = <ObjType> 8;
+	export const WallDiagonal = <ObjType> 9;
+	export const CentrepieceStraight = <ObjType> 10;
+	export const CentrepieceDiagonal = <ObjType> 11;
+	export const RoofStraight = <ObjType> 12;
+	export const RoofDiagonalWithRoofEdge = <ObjType> 13;
+	export const RoofDiagonal = <ObjType> 14;
+	export const RoofCornerConcave = <ObjType> 15;
+	export const RoofCornerConvex = <ObjType> 16;
+	export const RoofFlat = <ObjType> 17;
+	export const RoofEdgeStraight = <ObjType> 18;
+	export const RoofEdgeDiagonalCorner = <ObjType> 19;
+	export const RoofEdgeCorner = <ObjType> 20;
+	export const RoofEdgeSquarecorner = <ObjType> 21;
+	export const GroundDecor = <ObjType> 22;
+
+	export const byID = makeByID<ObjType>();
 }
 
 export namespace DBColumnID {

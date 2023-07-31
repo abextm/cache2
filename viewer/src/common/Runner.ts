@@ -13,6 +13,7 @@ export const lookupTypes = {
 	ItemID: "item",
 	HitsplatID: "hitsplat",
 	NPCID: "npc",
+	ObjID: "obj",
 	ParamID: "param",
 	SpriteID: "sprite",
 	StructID: "struct",
@@ -25,6 +26,7 @@ export type LookupType =
 	| "item"
 	| "hitsplat"
 	| "npc"
+	| "obj"
 	| "param"
 	| "sprite"
 	| "struct";
