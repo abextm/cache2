@@ -314,7 +314,9 @@ export async function serialize(
 							}
 						} else {
 							if (size > limit && uiEntries.length > 3) {
-								isPartial = true;
+								if (uiEntries.length !== (entries.entries.length * (entries.isKV ? 2 : 1))) {
+									isPartial = true;
+								}
 								break;
 							}
 						}
