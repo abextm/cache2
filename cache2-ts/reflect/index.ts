@@ -369,8 +369,7 @@ export const addTypeInfo =
 				return ts.forEachLeadingCommentRange(
 					fullText,
 					decl.pos,
-					(pos, end, _kind, v) => v || test(fullText.substring(pos, end)),
-					false,
+					(pos, end, _kind) => test(fullText.substring(pos, end)),
 				);
 			}) ?? false;
 		}

@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import { inspect } from "node:util";
 import * as ts from "typescript";
 import { addTypeInfo } from "../reflect";
-import { Typed } from "../src";
+import { ParamID, Params, Typed } from "../src";
 
 inspect.defaultOptions.depth = 5;
 
@@ -178,8 +178,10 @@ export const foo = (v: Foo) => {
 	v.fn(...[123, 456] as [c2.RGB, c2.HSL]);
 };
 export const foo2 = (v: Foo) => v.fn(...[123, 456, 789] as c2.RGB[]);
+// should not generate typed wrapper
+export const foo3 = (v: c2.Params) => v.has(123 as c2.ParamID);
 		`,
-		({ foo, foo2 }) => {
+		({ foo, foo2, foo3 }) => {
 			foo({
 				fn: (...args: any[]) => {
 					assert.equal(args[0][Typed.type].name, "RGB");
@@ -194,6 +196,9 @@ export const foo2 = (v: Foo) => v.fn(...[123, 456, 789] as c2.RGB[]);
 					}
 				},
 			});
+			let params = new Params();
+			params.set(123 as ParamID, "hello");
+			assert.isTrue(foo3(params));
 		},
 	);
 });
