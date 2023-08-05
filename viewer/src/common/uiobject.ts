@@ -8,6 +8,7 @@ import {
 	Param,
 	ParamID,
 	Params,
+	Reader,
 	ScriptVarType,
 	Typed,
 } from "cache2";
@@ -425,7 +426,7 @@ export async function serialize(
 				return {
 					type: UIType.ArrayBuffer,
 					entries: v instanceof DataView
-						? new Uint8Array(v.buffer, v.byteOffset, v.byteLength)
+						? Reader.makeViewOf(Uint8Array, v)
 						: new Uint8Array(v),
 					isKV: false,
 					v,

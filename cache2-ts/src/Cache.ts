@@ -2,6 +2,7 @@ import { gunzipSync } from "fflate";
 import * as bz2 from "./bz2";
 import { CompressionType, XTEAKey } from "./types";
 import { decryptXTEA } from "./xtea";
+import { Reader } from "./Reader";
 
 export interface CacheProvider {
 	getIndex(index: number): Promise<IndexData | undefined>;
@@ -73,7 +74,7 @@ export class ArchiveData {
 		if (mode == CompressionType.NONE) {
 			// noop
 		} else if (mode == CompressionType.BZ2) {
-			let outLen = new DataView(data.buffer, data.byteOffset, data.byteLength).getUint32(0);
+			let outLen = Reader.makeViewOf(DataView, data).getUint32(0);
 			let inData = data.subarray(4);
 			data = bz2.decompress(inData, 1, outLen);
 		} else if (mode == CompressionType.GZIP) {
@@ -89,7 +90,7 @@ export class ArchiveData {
 			this.files.get(0)!.data = data;
 		} else {
 			let fileCount = this.files.size;
-			let dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+			let dv = Reader.makeViewOf(DataView, data);
 			let numChunks = dv.getUint8(dv.byteLength - 1);
 
 			let off = dv.byteLength - 1 - numChunks * fileCount * 4;

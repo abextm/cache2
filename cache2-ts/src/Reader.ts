@@ -36,14 +36,21 @@ export class Reader {
 		this.offset = this.length - v;
 	}
 
-	public constructor(view: ArrayBufferView | ArrayBuffer, public version?: CacheVersion | undefined) {
-		if (view instanceof DataView) {
-			this.view = view;
-		} else if (ArrayBuffer.isView(view)) {
-			this.view = new DataView(view.buffer, view.byteOffset, view.byteLength);
-		} else {
-			this.view = new DataView(view);
+	public static makeViewOf<V>(
+		typ: new(buffer: ArrayBuffer, byteOffset: number, byteLength: number) => V,
+		view: ArrayBufferView | ArrayBuffer | DataView,
+	): V {
+		if (view instanceof typ) {
+			return view;
 		}
+		if (view instanceof ArrayBuffer) {
+			return new typ(view, 0, view.byteLength);
+		}
+		return new typ(view.buffer, view.byteOffset, view.byteLength);
+	}
+
+	public constructor(view: ArrayBufferView | ArrayBuffer, public version?: CacheVersion | undefined) {
+		this.view = Reader.makeViewOf(DataView, view);
 	}
 
 	private bump(delta: number): number {
