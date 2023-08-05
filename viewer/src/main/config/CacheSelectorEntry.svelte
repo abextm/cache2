@@ -48,6 +48,10 @@
 			on:off={() => $altCache = undefined}/>
 			{name || any(entry).name}
 			<slot/>
+	{:else if entry.type === "idbxtea"}
+		{@const entry0 = entry}
+		{name || entry0.name}
+		<slot></slot>
 	{/if}
 </div>
 

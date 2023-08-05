@@ -1,4 +1,4 @@
-import { IndexedDBCacheEntry, IndexedDBNoPerms } from "../common/CacheDirectory";
+import { IndexedDBCacheEntry, IndexedDBCacheID, IndexedDBNoPerms, IndexedDBXTEAID } from "../common/CacheDirectory";
 import { db } from "../common/db";
 
 export const idbCacheSupported = "getAsFileSystemHandle" in DataTransferItem.prototype;
@@ -47,17 +47,24 @@ async function getIDBEntry(
 	path: string[],
 ): Promise<IndexedDBCacheEntry | undefined> {
 	if (fsh.kind === "file") {
+		if (fsh.name.endsWith(".json") && /xtea/i.test(fsh.name)) {
+			return {
+				type: "idbxtea",
+				key,
+				name: fsh.name,
+				path,
+			} satisfies IndexedDBXTEAID;
+		}
 		return undefined;
 	}
 	let dir = fsh as FileSystemDirectoryHandle;
 	let files: Map<string, FileSystemFileHandle> = new Map();
-	let dirs: FileSystemDirectoryHandle[] = [];
+	let fentries: FileSystemHandle[] = [];
 	for await (let [name, file] of dir) {
 		if (file.kind === "file") {
 			files.set(name, file);
-		} else {
-			dirs.push(file);
 		}
+		fentries.push(file);
 	}
 	let style: "disk" | "flat" | undefined;
 	if (files.has("main_file_cache.dat2")) {
@@ -65,8 +72,9 @@ async function getIDBEntry(
 	} else if (files.has("0.flatcache")) {
 		style = "flat";
 	}
+	let selfEntry: IndexedDBCacheID | undefined;
 	if (style) {
-		return {
+		selfEntry = {
 			type: "idb",
 			key,
 			name: fsh.name,
@@ -74,12 +82,12 @@ async function getIDBEntry(
 			path,
 		};
 	}
-	let entries = (await Promise.all(dirs.map(dir => getIDBEntry(dir, key, [...path, dir.name]))))
+	let entries = (await Promise.all(fentries.map(entry => getIDBEntry(entry, key, [...path, entry.name]))))
 		.filter(v => v)
 		.map(v => v!);
 
 	if (entries.length <= 0) {
-		return undefined;
+		return selfEntry;
 	}
 
 	let cmp = new Intl.Collator(undefined, {
@@ -88,6 +96,10 @@ async function getIDBEntry(
 		sensitivity: "variant",
 	}).compare;
 	entries.sort((a, b) => cmp(a.name, b.name));
+
+	if (selfEntry) {
+		entries.unshift(selfEntry);
+	}
 
 	return {
 		type: "idbdir" as const,

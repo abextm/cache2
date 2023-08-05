@@ -1,4 +1,4 @@
-import { CacheID, IndexedDBCacheID } from "./CacheDirectory";
+import { CacheID, IndexedDBCacheID, IndexedDBXTEAID } from "./CacheDirectory";
 import { ServiceClient } from "./ServiceClient";
 import { ServiceServer } from "./ServiceServer";
 
@@ -11,6 +11,7 @@ export interface CacheDirectory {
 
 export interface CacheShare {
 	loadCacheDirectory(key: IndexedDBCacheID): Promise<CacheDirectory>;
+	loadXTEA(key: IndexedDBXTEAID): Promise<Blob>;
 }
 
 export let cacheShare: CacheShare;

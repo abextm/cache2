@@ -1,7 +1,7 @@
-import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider } from "cache2";
+import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider, XTEAKeyManager } from "cache2";
 import { isEqual } from "lodash";
 import { cacheShare } from "./CacheShare";
-import { altCache as altCacheID, defaultCache as defaultCacheID } from "./db";
+import { altCache as altCacheID, dbAllEntries, defaultCache as defaultCacheID } from "./db";
 import { LazyPromise } from "./LazyPromise";
 import { wrapWithStatus } from "./status";
 
@@ -10,6 +10,13 @@ export interface IndexedDBCacheID {
 	key: number;
 	name: string;
 	style: "disk" | "flat";
+	path: string[];
+}
+
+export interface IndexedDBXTEAID {
+	type: "idbxtea";
+	key: number;
+	name: string;
 	path: string[];
 }
 
@@ -25,7 +32,7 @@ export interface IndexedDBNoPerms {
 	key: number;
 }
 
-export type IndexedDBCacheEntry = IndexedDBCacheDirectory | IndexedDBCacheID;
+export type IndexedDBCacheEntry = IndexedDBCacheDirectory | IndexedDBCacheID | IndexedDBXTEAID;
 
 export interface GithubCacheID {
 	type: "github";
@@ -92,13 +99,84 @@ export async function loadCache(key: CacheID | "default" | "alt" = "default"): P
 		},
 	} satisfies FileProvider;
 
+	let prov: CacheProvider;
 	if (style === "disk") {
-		return new DiskCacheProvider(statusFs);
+		prov = new DiskCacheProvider(statusFs);
 	} else if (style === "flat") {
-		return new FlatCacheProvider(statusFs);
+		prov = new FlatCacheProvider(statusFs);
 	} else {
 		throw new Error(`unknown style "${style}"`);
 	}
+
+	let keys: Promise<XTEAKeyManager> | undefined;
+	prov.getKeys ??= async () => {
+		if (keys) {
+			return await keys;
+		}
+
+		keys = wrapWithStatus(
+			"Loading XTEA Keys",
+			(async () => {
+				let km = new XTEAKeyManager();
+
+				let ok = 0;
+				let error: any;
+				let done: any;
+				function addLoad(fn: () => Promise<void>) {
+					let lastDone = done;
+					done = (async () => {
+						try {
+							await fn();
+						} catch (e) {
+							console.warn("unable to load xteas", e);
+							error = e;
+						}
+						await lastDone;
+					})();
+				}
+				addLoad(async () => {
+					let req = await fetch("https://archive.openrs2.org/keys/valid.json");
+					let res = await req.json();
+					ok += km.loadKeys(res);
+				});
+				addLoad(async () => {
+					function searchEnt(ent: IndexedDBCacheEntry) {
+						if (ent.type === "idbxtea") {
+							addLoad(async () => {
+								let blob = await cacheShare.loadXTEA(ent);
+								let text = await blob.text();
+								let json = JSON.parse(text);
+								let count = km.loadKeys(json);
+								console.info(`loaded ${count} new keys from ${ent.path}`);
+								ok += count;
+							});
+						} else if (ent.type === "idbdir") {
+							ent.entries.forEach(searchEnt);
+						}
+					}
+					for (let [_, ent] of await dbAllEntries("fileCache")) {
+						searchEnt(ent);
+					}
+				});
+				for (;;) {
+					let v = done;
+					await v;
+					if (done == v) {
+						break;
+					}
+				}
+
+				if (!ok && error) {
+					throw error;
+				}
+
+				return km;
+			})(),
+		);
+		return await keys;
+	};
+
+	return prov;
 }
 
 export const cache = new LazyPromise(() => loadCache("default")).asPromise();

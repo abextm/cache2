@@ -8,11 +8,11 @@
 		"rootDir": "src/",
 		"module": "ES2015",
 		"strict": true,
-		"target": "ES2017",
+		"target": "ES2022",
 		"declaration": true,
 		"declarationMap": true,
 		"moduleResolution": "node",
 		"composite": true,
-		"lib": ["ES2017", "DOM"]
+		"lib": ["ES2022", "DOM"]
 	}
 }

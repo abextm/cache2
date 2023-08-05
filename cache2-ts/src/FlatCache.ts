@@ -62,8 +62,9 @@ export class FlatIndexData implements IndexData {
 					case "namehash":
 					case "revision":
 					case "crc":
-					case "compression":
 						ar[key] = ~~value;
+						break;
+					case "compression":
 						break;
 				}
 			}
