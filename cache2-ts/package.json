@@ -11,6 +11,7 @@
 	"author": "Abex",
 	"license": "BSD-2-Clause",
 	"dependencies": {
+		"base64-arraybuffer-es6": "^3.0.1",
 		"fflate": "^0.8.0"
 	},
 	"devDependencies": {

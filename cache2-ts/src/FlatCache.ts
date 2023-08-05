@@ -1,5 +1,7 @@
 import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache";
 
+import { decode as fastAtob } from "base64-arraybuffer-es6";
+
 export class FlatIndexData implements IndexData {
 	public revision!: number;
 	public compression!: number;
@@ -49,9 +51,7 @@ export class FlatIndexData implements IndexData {
 			} else {
 				switch (key) {
 					case "contents": {
-						let res = await fetch("data:application/octet-binary;base64," + value);
-						let data = await res.arrayBuffer();
-						ar!.compressedData = new Uint8Array(data);
+						ar!.compressedData = new Uint8Array(fastAtob(value));
 						break;
 					}
 					case "file": {
