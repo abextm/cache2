@@ -7,3 +7,4 @@ export * from "./Obj";
 export * from "./Param";
 export * from "./Sprite";
 export * from "./Struct";
+export * from "./Underlay";

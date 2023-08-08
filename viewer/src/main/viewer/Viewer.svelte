@@ -35,6 +35,7 @@
 	<div slot=1>
 		<ViewType name="index" bind:key={$key} index={255}>All Indexes</ViewType>
 		<Section name="Config" index={2}>
+			<ViewType name="underlay" bind:key={$key} index={1}/>
 			<ViewType name="obj" bind:key={$key} index={6}/>
 			<ViewType name="enum" bind:key={$key} index={8}/>
 			<ViewType name="item" bind:key={$key} index={10}/>

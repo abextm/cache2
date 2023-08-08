@@ -17,6 +17,7 @@ export const lookupTypes = {
 	ParamID: "param",
 	SpriteID: "sprite",
 	StructID: "struct",
+	UnderlayID: "underlay",
 } as const;
 export type LookupType =
 	| "dbrow"
@@ -29,7 +30,8 @@ export type LookupType =
 	| "obj"
 	| "param"
 	| "sprite"
-	| "struct";
+	| "struct"
+	| "underlay";
 
 const uiNameOverride = {
 	dbrow: "DBRow",

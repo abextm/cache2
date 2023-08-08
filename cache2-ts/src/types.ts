@@ -57,6 +57,7 @@ export type SoundEffectID = NewType<number, "SoundEffectID">;
 export type SpriteID = NewType<number, "SpriteID">;
 export type StructID = NewType<number, "StructID">;
 export type TextureID = NewType<number, "TextureID">;
+export type UnderlayID = NewType<number, "UnderlayID">;
 export type VarbitID = NewType<number, "VarbitID">;
 export type VarPID = NewType<number, "VarPID">;
 
