@@ -1,5 +1,4 @@
 import type { ErrorMessage, Request, Response } from "./reqres";
-import "./status";
 
 class Return {
 	constructor(readonly v: any, readonly transfer: Transferable[]) {

@@ -433,5 +433,3 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		return ServiceServer.return(...await serialize(tabs, false, ctx.cache));
 	},
 });
-
-postMessage({ type: "ready" });

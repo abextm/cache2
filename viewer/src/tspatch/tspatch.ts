@@ -1,6 +1,7 @@
 import type * as monaco from "monaco-editor";
 import type * as ts from "typescript";
 import { addTypeInfo } from "../../../cache2-ts/reflect";
+import "monaco-editor/esm/vs/language/typescript/ts.worker";
 
 type TypeScriptWorker_ = monaco.languages.typescript.TypeScriptWorker & ts.LanguageServiceHost;
 (self as any).customTSWorkerFactory = (

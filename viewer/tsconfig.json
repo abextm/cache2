@@ -5,7 +5,8 @@
 		"src/worker/**/*.ts",
 		"src/runner/**/*.ts",
 		"src/context/**/*.ts",
-		"src/tspatch/**/*.ts"
+		"src/tspatch/**/*.ts",
+		"src/status/**/*.ts"
 	],
 	"compilerOptions": {
 		"lib": ["ES2022", "WebWorker"]

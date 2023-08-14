@@ -18,37 +18,23 @@ import { files as viewerContextDTS } from "../../context?dts";
 import { files as fshDTS } from "@types/wicg-file-system-access/index.d.ts?dts";
 // @ts-ignore
 import { files as lodashDTS } from "@types/lodash/index.d.ts?dts";
-import { StatusWorkerMessageHandler } from "../../common/status";
+import { Worker2, WorkerType } from "../../status";
 
 const env: monaco_t.Environment = {
-	getWorkerUrl(id, label) {
-		return `mw/${label}.js`;
-	},
 	getWorker(id, label) {
-		let path: string;
-		let name: string = label;
+		let type: WorkerType;
 		switch (label) {
 			case "typescript":
 			case "javascript":
-				path = "ts";
+				type = "mw_ts";
 				break;
 			case "editorWorkerService":
-				path = name = "editor";
+				type = "mw_editor";
 				break;
 			default:
 				throw new Error(`Unsupported worker ${label}`);
 		}
-		let worker = new class extends Worker {
-			override terminate(): void {
-				super.terminate();
-				handler.stop();
-			}
-		}(`mw/${path}.js`, {
-			name: label,
-		});
-		let handler = new StatusWorkerMessageHandler(name + " worker");
-		worker.addEventListener("message", ev => handler.onMessage(ev));
-		return worker;
+		return new Worker2(type).ready;
 	},
 };
 (<any> self).MonacoEnvironment = env;

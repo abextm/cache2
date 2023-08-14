@@ -29,40 +29,15 @@ let config: webpack.Configuration = {
 	mode: dev ? "development" : "production",
 	devtool: "source-map",
 	entry: {
-		...(((workers: any) => {
-			for (let key in workers) {
-				let worker = workers[key];
-				if (typeof worker === "string") {
-					worker = {
-						import: worker,
-					};
-				}
-				if (typeof worker.import === "string") {
-					worker.import = [worker.import];
-				}
-				worker.import.push("./src/common/status.ts");
-				workers[key] = {
-					chunkLoading: "import-scripts",
-					...worker,
-				};
-			}
-			return workers;
-		})({
-			Runner: "./src/runner/Runner.ts",
-			"mw/editor": "monaco-editor/esm/vs/editor/editor.worker.js",
-			"mw/json": "monaco-editor/esm/vs/language/json/json.worker",
-			"mw/ts": {
-				import: [
-					"monaco-editor/esm/vs/language/typescript/ts.worker",
-					"./src/tspatch/tspatch.ts",
-				],
-			},
-		})),
 		main: {
 			import: [
 				"./src/main/main.ts",
 				"./src/main/main.scss",
 			],
+		},
+		worker: {
+			chunkLoading: "import-scripts",
+			import: "./src/status/worker.ts",
 		},
 	},
 	output: {

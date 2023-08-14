@@ -1,7 +1,10 @@
 import { IndexedDBCacheID, IndexedDBXTEAID } from "../common/CacheDirectory";
 import { CacheDirectory, setCacheShare } from "../common/CacheShare";
+import { installWebpackHook } from "../status";
 import { getKeyHandle } from "./IDBCache";
 import Main from "./Main.svelte";
+
+installWebpackHook();
 
 async function loadKey<const IsFile extends "file" | "dir">(
 	key: IndexedDBXTEAID | IndexedDBCacheID,

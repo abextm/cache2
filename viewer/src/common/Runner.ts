@@ -1,9 +1,9 @@
 import { Sprites } from "cache2";
 import { capitalize } from "lodash";
+import { Worker2, wrapWithStatus } from "../status/";
 import { getCacheSharePort } from "./CacheShare";
 import { altCache, defaultCache } from "./db";
 import { ServiceClient } from "./ServiceClient";
-import { wrapWithStatus } from "./status";
 import { UIData } from "./uiobject";
 
 export const lookupTypes = {
@@ -63,7 +63,7 @@ export let scriptRunner: Runner | undefined;
 function proxy<K extends keyof T, T = IRunner>(name: K, status?: string): T[K] {
 	return function(...args: any[]) {
 		// @ts-ignore
-		let p = this.client.then(v => v[name](...args));
+		let p = this.client[name](...args);
 		if (status) {
 			wrapWithStatus(status, p);
 		}
@@ -72,30 +72,20 @@ function proxy<K extends keyof T, T = IRunner>(name: K, status?: string): T[K] {
 }
 
 export class Runner implements IRunner {
-	private worker: Worker;
-	private client: Promise<ServiceClient & IRunnerPrivate>;
+	private worker: Worker2;
+	private client: ServiceClient & IRunnerPrivate;
 
 	constructor() {
-		this.worker = new Worker("Runner.js", { name: "runner" });
-		this.client = new Promise(resolve => {
-			let onMsg = (ev: MessageEvent<Ready>) => {
-				if (ev.data.type === "ready") {
-					this.worker.removeEventListener("message", onMsg);
-					let port = getCacheSharePort();
-					let client = ServiceClient.create<IRunnerPrivate>(this.worker, "runner");
-					client.prepare(port);
-					resolve(client);
-				}
-			};
-			this.worker.addEventListener("message", onMsg);
-		});
+		this.worker = new Worker2("runner");
+		this.client = ServiceClient.create<IRunnerPrivate>(this.worker);
+		this.client.prepare(getCacheSharePort());
 	}
 
 	terminate() {
 		if (runner === this) {
 			runner = undefined;
 		}
-		this.client.then(c => c.close());
+		this.client.close();
 	}
 
 	async executeScript(text: string, listener: (ev: ScriptResponse) => void): Promise<void> {
@@ -107,7 +97,7 @@ export class Runner implements IRunner {
 		let poolRunner = runner === this;
 		runner = undefined;
 
-		let c = await this.client;
+		let c = this.client;
 		let chan = new MessageChannel();
 		chan.port1.onmessage = (ev: MessageEvent<ScriptResponse>) => listener(ev.data);
 

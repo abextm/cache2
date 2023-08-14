@@ -1,9 +1,9 @@
 import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider, XTEAKeyManager } from "cache2";
 import { isEqual } from "lodash";
+import { wrapWithStatus } from "../status/";
 import { cacheShare } from "./CacheShare";
 import { altCache as altCacheID, dbAllEntries, defaultCache as defaultCacheID } from "./db";
 import { LazyPromise } from "./LazyPromise";
-import { wrapWithStatus } from "./status";
 
 export interface IndexedDBCacheID {
 	type: "idb";
