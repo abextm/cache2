@@ -1,14 +1,19 @@
 {
 	"extends": "./tsconfig.base.json",
 	"include": [
-		"src/common/**/*.ts",
-		"src/worker/**/*.ts",
-		"src/runner/**/*.ts",
-		"src/context/**/*.ts",
-		"src/tspatch/**/*.ts",
-		"src/status/**/*.ts"
+		"src/**/*"
 	],
 	"compilerOptions": {
-		"lib": ["ES2022", "WebWorker"]
+		"importHelpers": true,
+		"lib": ["ES2022", "WebWorker", "DOM"],
+		"types": [
+			"svelte",
+			"svelte/store",
+			"svelte/motion",
+			"svelte/transition",
+			"svelte/animate",
+			"svelte/easing",
+			"wicg-file-system-access"
+		]
 	}
 }

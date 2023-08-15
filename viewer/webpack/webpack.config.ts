@@ -67,7 +67,7 @@ let config: webpack.Configuration = {
 					emitCss: true,
 					preprocess: sveltePreprocess({
 						typescript: {
-							tsconfigFile: path.resolve(__dirname, "../src/main/tsconfig.json"),
+							tsconfigFile: path.resolve(__dirname, "../tsconfig.json"),
 							compilerOptions: {
 								// should match tsconfig.base.json
 								target: "ES2022",
@@ -106,22 +106,12 @@ let config: webpack.Configuration = {
 			{
 				test: /\.[jt]sx?/,
 				oneOf: [{
-					test: /src\/main\/.*\.tsx?$/,
-					loader: tsLoader,
 					exclude: /node_modules/,
-					options: {
-						...tsOpts,
-						configFile: path.resolve(__dirname, "../src/main/tsconfig.json"),
-						instance: "main",
-					},
-				}, {
-					// test: /src\/(common|runner|tspatch)\/.*\.tsx?$/,
 					loader: tsLoader,
-					exclude: /node_modules/,
 					options: {
 						...tsOpts,
 						configFile: path.resolve(__dirname, "../tsconfig.json"),
-						instance: "worker",
+						instance: "main",
 					},
 				}, {
 					resourceQuery: /dts/,
@@ -129,7 +119,7 @@ let config: webpack.Configuration = {
 					options: {
 						...tsOpts,
 						configFile: path.resolve(__dirname, "../tsconfig.json"),
-						instance: "worker",
+						instance: "main",
 					},
 				}],
 			},
