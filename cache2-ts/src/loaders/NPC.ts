@@ -152,7 +152,7 @@ export class NPC extends PerFileLoadable {
 					v.contrast = r.i8();
 					break;
 				case 102:
-					if (r.isAfter({ era: "osrs", indexRevision: 3642 })) {
+					if (!r.isAfter({ era: "osrs", indexRevision: 3642 })) {
 						v.headIconArchive = [-1 as SpriteID];
 						v.headIconSpriteIndex = [r.u16()];
 					} else {

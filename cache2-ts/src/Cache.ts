@@ -186,7 +186,7 @@ export namespace CacheVersion {
 			return true;
 		}
 		if (prev.era == after.era) {
-			return prev.indexRevision <= after.indexRevision;
+			return prev.indexRevision > after.indexRevision;
 		}
 		return false;
 	}
