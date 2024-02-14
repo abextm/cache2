@@ -66,6 +66,7 @@ export class Obj extends PerFileLoadable {
 	public ambientSoundID = <SoundEffectID> -1;
 	public multiAmbientSoundIDs = <SoundEffectID[]> [];
 	public ambientSoundDistance = 0;
+	public ambientSoundRetain = 0;
 	public ambientSoundChangeTicksMin = 0;
 	public ambientSoundChangeTicksMax = 0;
 	public randomizeAnimationStart = true;
@@ -213,11 +214,17 @@ export class Obj extends PerFileLoadable {
 				case 78:
 					v.ambientSoundID = <SoundEffectID> r.u16();
 					v.ambientSoundDistance = r.u8();
+					if (r.isAfter({ era: "osrs", indexRevision: 4106 })) {
+						v.ambientSoundRetain = r.u8();
+					}
 					break;
 				case 79: {
 					v.ambientSoundChangeTicksMin = r.u16();
 					v.ambientSoundChangeTicksMax = r.u16();
 					v.ambientSoundDistance = r.u8();
+					if (r.isAfter({ era: "osrs", indexRevision: 4106 })) {
+						v.ambientSoundRetain = r.u8();
+					}
 					let len = r.u8();
 					v.multiAmbientSoundIDs = new Array(len);
 					for (let i = 0; i < len; i++) {
