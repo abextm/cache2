@@ -42,6 +42,37 @@ export namespace Typed {
 		v: T;
 	};
 
+	function mergeType(a: Any, b: Any): Any {
+		if (!a || !b) {
+			return a ?? b;
+		}
+		if (a.type !== b.type) {
+			return b;
+		}
+		if (a.type === "obj" && b.type == "obj") {
+			let entries: Typed.Object["entries"] = {
+				...a.entries,
+			};
+			for (let [k, v] of Object.entries(b.entries)) {
+				if (k in entries) {
+					entries[k] = mergeType(entries[k], v);
+				} else {
+					entries[k] = v;
+				}
+			}
+			return {
+				type: a.type,
+				entries,
+				defaultEntry: mergeType(a.defaultEntry, b.defaultEntry),
+				default: b.default ?? a.default,
+			};
+		}
+		return {
+			...a,
+			...b,
+		};
+	}
+
 	export function withType<T>(type: Any | (() => Any) | undefined, v: T): T | Typed.Value<T> {
 		if (!type) {
 			return v;
@@ -58,11 +89,22 @@ export namespace Typed {
 			} as any;
 		}
 		if (!Object.hasOwn(onto, Typed.type)) {
-			if (typeof type === "function") {
+			if (typeof type === "function" || Typed.type in onto) {
+				let typefn = typeof type === "function" ? type : () => type;
 				let value: Any | undefined;
 				Object.defineProperty(onto, Typed.type, {
 					enumerable: false,
-					get: () => value ??= type(),
+					get() {
+						if (value) {
+							return value;
+						}
+						let superType = Object.getPrototypeOf(this)?.[Typed.type];
+						value = typefn();
+						if (superType) {
+							value = mergeType(superType, value);
+						}
+						return value;
+					},
 				});
 			} else {
 				Object.defineProperty(onto, Typed.type, {
