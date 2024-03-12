@@ -73,6 +73,7 @@ export const addTypeInfo =
 
 			see(entryValue);
 
+			let needLazy = false;
 			let vars: ts.Statement[] = [];
 			let circulars: ts.Statement[] = [];
 
@@ -121,6 +122,8 @@ export const addTypeInfo =
 								return ts.factory.createNull();
 							}
 							if (isNode(v)) {
+								// might be referencing class circularly
+								needLazy = true;
 								return cloneTransformer(v);
 							}
 							if (Array.isArray(v)) {
@@ -165,17 +168,22 @@ export const addTypeInfo =
 			}
 
 			let entryAST = serializeRoot(entryValue, true);
-			if (vars.length <= 0) {
+			if (!needLazy && vars.length <= 0) {
 				return entryAST;
 			}
 
-			let ret = ts.factory.createReturnStatement(entryAST);
-
-			return ts.factory.createImmediatelyInvokedFunctionExpression([
-				...vars,
-				...circulars,
-				ret,
-			]);
+			return ts.factory.createArrowFunction(
+				undefined,
+				undefined,
+				[],
+				undefined,
+				undefined,
+				ts.factory.createBlock([
+					...vars,
+					...circulars,
+					ts.factory.createReturnStatement(entryAST),
+				]),
+			);
 		}
 
 		function isType<T extends BT, BT extends ts.Type = ts.Type>(t: BT, flag: number): t is T {

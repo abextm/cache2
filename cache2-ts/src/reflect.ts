@@ -42,7 +42,7 @@ export namespace Typed {
 		v: T;
 	};
 
-	export function withType<T>(type: Any | undefined, v: T): T | Typed.Value<T> {
+	export function withType<T>(type: Any | (() => Any) | undefined, v: T): T | Typed.Value<T> {
 		if (!type) {
 			return v;
 		}
@@ -57,11 +57,19 @@ export namespace Typed {
 				v,
 			} as any;
 		}
-		if (!onto[Typed.type]) {
-			Object.defineProperty(onto, Typed.type, {
-				enumerable: false,
-				value: type,
-			});
+		if (!Object.hasOwn(onto, Typed.type)) {
+			if (typeof type === "function") {
+				let value: Any | undefined;
+				Object.defineProperty(onto, Typed.type, {
+					enumerable: false,
+					get: () => value ??= type(),
+				});
+			} else {
+				Object.defineProperty(onto, Typed.type, {
+					enumerable: false,
+					value: type,
+				});
+			}
 		}
 		return v;
 	}
