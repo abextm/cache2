@@ -22,6 +22,7 @@ function testCompile(
 		sys.getCurrentDirectory = () => __dirname;
 		let env = tvfs.createVirtualTypeScriptEnvironment(sys, [fileName], ts, {
 			module: ts.ModuleKind.Node16,
+			moduleResolution: ts.ModuleResolutionKind.Node16,
 			target: ts.ScriptTarget.ES2022,
 			strict: true,
 			importHelpers: false,
