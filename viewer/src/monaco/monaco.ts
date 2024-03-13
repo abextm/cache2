@@ -55,7 +55,7 @@ for (let lang of langs) {
 		allowUmdGlobalAccess: true,
 		moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
 
-		lib: ["webworker", "esnext", "genericconsole"],
+		lib: ["lib.webworker.d.ts", "lib.esnext.d.ts", "lib.genericconsole.d.ts"],
 		types: ["lodash"],
 		strict: true,
 		baseUrl: ".",
