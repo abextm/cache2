@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as ts from "typescript";
-import { libFileMap } from "../../libfs";
+import { libFileMap } from "../../libfs.macro";
 import {
 	Diagnostic,
 	DiagnosticRelatedInformation,

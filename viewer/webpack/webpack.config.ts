@@ -131,6 +131,10 @@ let config: webpack.Configuration = {
 					},
 				}],
 			},
+			{
+				test: /\.macro\.[tj]s/,
+				loader: path.resolve(__dirname, "macro-loader.ts"),
+			},
 		],
 	},
 	plugins: [

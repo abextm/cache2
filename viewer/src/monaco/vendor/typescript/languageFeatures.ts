@@ -11,7 +11,7 @@ import {
 } from './monaco.contribution';
 import type * as ts from "typescript";
 import type { TypeScriptWorker } from './tsWorker';
-import { libFileSet } from "../../libfsIndex";
+import { libFileSet } from "../../libfsIndex.macro";
 import {
 	editor,
 	languages,
