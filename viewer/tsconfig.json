@@ -13,6 +13,7 @@
 			"svelte/transition",
 			"svelte/animate",
 			"svelte/easing",
+			"webpack-env",
 			"wicg-file-system-access"
 		]
 	}

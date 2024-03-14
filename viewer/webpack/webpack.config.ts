@@ -26,6 +26,7 @@ let tsOpts = {
 };
 
 let config: webpack.Configuration = {
+	context: path.resolve(__dirname, "../"),
 	mode: dev ? "development" : "production",
 	devtool: "source-map",
 	entry: {
@@ -51,6 +52,9 @@ let config: webpack.Configuration = {
 		alias: {
 			svelte: path.resolve(__dirname, "../../node_modules/svelte"),
 			cache2: path.resolve(__dirname, "../../cache2-ts/src"),
+		},
+		fallback: {
+			perf_hooks: false,
 		},
 		extensions: [".ts", ".js", ".svelte"],
 		mainFields: ["svelte", "browser", "module", "main"],
@@ -104,6 +108,10 @@ let config: webpack.Configuration = {
 				type: "asset/resource",
 			},
 			{
+				test: /node_modules\/typescript\/.*\.d\.ts$/,
+				loader: "raw-loader",
+			},
+			{
 				test: /\.[jt]sx?/,
 				oneOf: [{
 					exclude: /node_modules/,
@@ -114,7 +122,7 @@ let config: webpack.Configuration = {
 						instance: "main",
 					},
 				}, {
-					resourceQuery: /dts/,
+					resourceQuery: /dts$/,
 					loader: tsLoader,
 					options: {
 						...tsOpts,
@@ -174,6 +182,9 @@ let config: webpack.Configuration = {
 	},
 	ignoreWarnings: [{
 		module: /Runner.ts/,
+		message: /dependency is an expression/,
+	}, {
+		module: /node_modules\/typescript/,
 		message: /dependency is an expression/,
 	}],
 	experiments: {

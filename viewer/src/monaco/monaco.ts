@@ -2,9 +2,14 @@
 // so we just pull in the ones we want here
 
 import "monaco-editor/esm/vs/language/json/monaco.contribution";
-import "monaco-editor/esm/vs/language/typescript/monaco.contribution";
 import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
 import "monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution";
+
+// we vendor the typescript worker & related stuff so that we can
+// 1) use a modern version of typescript
+// 2) not send all of our d.ts files to the worker for no reason
+// 3) avoid ugly hacks to install our custom transformers
+import "./vendor/typescript/monaco.contribution";
 
 import type * as monaco_t from "monaco-editor";
 
@@ -13,12 +18,12 @@ import * as monaco_v from "monaco-editor/esm/vs/editor/edcore.main";
 const monaco: typeof monaco_t = monaco_v;
 
 // @ts-ignore
-import { files as viewerContextDTS } from "../../context?dts";
+import { files as viewerContextDTS } from "../context?dts";
 // @ts-ignore
 import { files as fshDTS } from "@types/wicg-file-system-access/index.d.ts?dts";
 // @ts-ignore
 import { files as lodashDTS } from "@types/lodash/index.d.ts?dts";
-import { Worker2, WorkerType } from "../../status";
+import { Worker2, WorkerType } from "../status";
 
 const env: monaco_t.Environment = {
 	getWorker(id, label) {
@@ -92,10 +97,6 @@ for (let lang of langs) {
 		],
 	});
 }
-monaco.languages.typescript.typescriptDefaults.setWorkerOptions({
-	// webpack loads tspatch in with the worker, but we still need to set this
-	customWorkerPath: "data:application/javascript,0",
-});
 
 for (let [name, content] of Object.entries(extraLibs)) {
 	for (let lang of langs) {

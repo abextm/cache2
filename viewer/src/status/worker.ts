@@ -9,7 +9,7 @@ navigator.locks.request(workerLockName(type, workerIdentifier), () => new Promis
 const entryPoints = {
 	// @ts-ignore
 	mw_editor: () => import("monaco-editor/esm/vs/editor/editor.worker.js"),
-	mw_ts: () => import("../tspatch/tspatch"),
+	mw_ts: () => import("../monaco/tsworker"),
 	// @ts-ignore
 	mw_json: () => import("monaco-editor/esm/vs/language/json/json.worker.js"),
 	runner: () => import("../runner/Runner"),

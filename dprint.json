@@ -10,6 +10,7 @@
 	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
 	"excludes": [
 		"cache2-ts/src/generated",
+		"viewer/src/monaco/vendor",
 		"dist",
 		"build",
 		"**/node_modules",

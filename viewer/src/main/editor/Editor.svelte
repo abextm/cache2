@@ -24,7 +24,7 @@ console.log(await c2.Item.load(context.cache, 4151));
 	const EDITOR_CONTENTS = "editorContents";
 
 	onMount(async () => {
-		({monaco} = await import("./monaco"));
+		({monaco} = await import("../../monaco/monaco"));
 		darkMode.subscribe(dark => 
 			monaco.editor.setTheme(dark ? "vs-dark" : "vs"));
 

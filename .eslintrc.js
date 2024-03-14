@@ -4,6 +4,7 @@ module.exports = {
 		"dist",
 		"build",
 		"cache2-ts/src/generated",
+		"viewer/src/monaco/vendor",
 		"*.out.js",
 	],
 	env: {
