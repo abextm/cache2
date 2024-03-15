@@ -1,6 +1,3 @@
-// we use this instead of importing monaco-editor since we don't need support for 95% of languages
-// so we just pull in the ones we want here
-
 import "monaco-editor/esm/vs/language/json/monaco.contribution";
 import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
 import "monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution";
@@ -17,12 +14,6 @@ import type * as monaco_t from "monaco-editor";
 import * as monaco_v from "monaco-editor/esm/vs/editor/edcore.main";
 const monaco: typeof monaco_t = monaco_v;
 
-// @ts-ignore
-import { files as viewerContextDTS } from "../context?dts";
-// @ts-ignore
-import { files as fshDTS } from "@types/wicg-file-system-access/index.d.ts?dts";
-// @ts-ignore
-import { files as lodashDTS } from "@types/lodash/index.d.ts?dts";
 import { Worker2, WorkerType } from "../status";
 
 const env: monaco_t.Environment = {
@@ -49,27 +40,6 @@ const langs = [
 	monaco.languages.typescript.javascriptDefaults,
 ];
 
-// so typescript retains types data to console.log
-const genericConsole = `
-interface Console {
-	/* @TypedCall */ debug<T extends any[]>(...data: T): void;
-	/* @TypedCall */ error<T extends any[]>(...data: T): void;
-	/* @TypedCall */ info<T extends any[]>(...data: T): void;
-	/* @TypedCall */ log<T extends any[]>(...data: T): void;
-	/* @TypedCall */ trace<T extends any[]>(...data: T): void;
-	/* @TypedCall */ warn<T extends any[]>(...data: T): void;
-}
-
-declare var console: Console;
-`;
-
-let extraLibs = {
-	...fshDTS,
-	...viewerContextDTS,
-	...lodashDTS,
-	"lib.genericconsole.d.ts": genericConsole,
-};
-
 for (let lang of langs) {
 	lang.setCompilerOptions({
 		...lang.getCompilerOptions(),
@@ -86,6 +56,7 @@ for (let lang of langs) {
 		moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
 
 		lib: ["webworker", "esnext", "genericconsole"],
+		types: ["lodash"],
 		strict: true,
 		baseUrl: ".",
 	});
@@ -98,10 +69,4 @@ for (let lang of langs) {
 	});
 }
 
-for (let [name, content] of Object.entries(extraLibs)) {
-	for (let lang of langs) {
-		lang.addExtraLib(<string> content, name);
-	}
-}
-
-export { extraLibs, monaco };
+export { monaco };
