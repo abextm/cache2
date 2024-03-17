@@ -51,7 +51,7 @@ let config: webpack.Configuration = {
 	resolve: {
 		alias: {
 			svelte: path.resolve(__dirname, "../../node_modules/svelte"),
-			cache2: path.resolve(__dirname, "../../cache2-ts/src"),
+			"@abextm/cache2": path.resolve(__dirname, "../../cache2-ts/src"),
 		},
 		fallback: {
 			perf_hooks: false,

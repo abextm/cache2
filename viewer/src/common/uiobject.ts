@@ -11,7 +11,7 @@ import {
 	Reader,
 	ScriptVarType,
 	Typed,
-} from "cache2";
+} from "@abextm/cache2";
 import * as _ from "lodash";
 import { isEqual } from "lodash";
 import { AbstractTable } from "./Table";

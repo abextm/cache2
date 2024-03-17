@@ -15,7 +15,7 @@
 	let logs: (ScriptResponse&LogData)[] = [];
 	let fontFamily = "'Source Code Pro', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
 
-	const editorDefault = `import * as c2 from "cache2";
+	const editorDefault = `import * as c2 from "@abextm/cache2";
 import * as context from "viewer/context";
 
 console.log(await c2.Item.load(context.cache, 4151));

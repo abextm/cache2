@@ -1,4 +1,4 @@
-import { Sprites } from "cache2";
+import { Sprites } from "@abextm/cache2";
 import { capitalize } from "lodash";
 import { Worker2, wrapWithStatus } from "../status/";
 import { getCacheSharePort } from "./CacheShare";

@@ -35,7 +35,7 @@ const dtsjsLoader = async function(this: webpack.LoaderContext<any>, instance: T
 			[instance.compilerOptions.outDir],
 		]);
 		pathStr = root(pathStr, [
-			["cache2-ts/src", "cache2"],
+			["cache2-ts/src", "@abextm/cache2"],
 			["viewer/src", "viewer"],
 		]);
 

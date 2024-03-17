@@ -1,4 +1,4 @@
-import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider, XTEAKeyManager } from "cache2";
+import { CacheProvider, DiskCacheProvider, FileProvider, FlatCacheProvider, XTEAKeyManager } from "@abextm/cache2";
 import { isEqual } from "lodash";
 import { wrapWithStatus } from "../status/";
 import { cacheShare } from "./CacheShare";

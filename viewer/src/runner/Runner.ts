@@ -1,5 +1,5 @@
-import * as c2 from "cache2";
-import { CacheProvider } from "cache2";
+import * as c2 from "@abextm/cache2";
+import { CacheProvider } from "@abextm/cache2";
 import * as _ from "lodash";
 import { setCacheShare } from "../common/CacheShare";
 import { ClearConsole, IRunnerPrivate, Log, LogLevel, LookupType, ScriptResponse } from "../common/Runner";
@@ -105,7 +105,8 @@ class ScriptRunner {
 				let iport: System.ImportFn = name => {
 					switch (name) {
 						case "cache2":
-							return import("cache2");
+						case "@abextm/cache2":
+							return import("@abextm/cache2");
 						case "viewer/context":
 							return import("../context");
 						case "lodash":

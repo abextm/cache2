@@ -1,4 +1,4 @@
-import { Typed } from "cache2";
+import { Typed } from "@abextm/cache2";
 
 export namespace AbstractTable {
 	export type ColumnHeader = [value: any | number, columns: number];

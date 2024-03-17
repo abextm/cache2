@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 <script lang="ts">
-	import { Sprites } from "cache2";
+	import { Sprites } from "@abextm/cache2";
   import { onDestroy } from "svelte";
   import { Action } from "svelte/action";
   import { Runner } from "../../common/Runner";

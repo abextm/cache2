@@ -1,5 +1,5 @@
+import { ObjType, ScriptVarChar, ScriptVarID, ScriptVarType, WearPos } from "@abextm/cache2";
 import { mdiRepeatVariant } from "@mdi/js";
-import { ObjType, ScriptVarChar, ScriptVarID, ScriptVarType, WearPos } from "cache2";
 import { ComponentConstructorOptions, SvelteComponent } from "svelte";
 import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
 import {

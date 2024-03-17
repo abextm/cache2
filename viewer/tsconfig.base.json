@@ -11,7 +11,7 @@
 		"importsNotUsedAsValues": "remove",
 		"rootDir": "../",
 		"paths": {
-			"cache2": [
+			"@abextm/cache2": [
 				"../cache2-ts/src"
 			]
 		}
