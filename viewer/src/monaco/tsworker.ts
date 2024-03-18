@@ -45,6 +45,17 @@ class MyWorker extends TypeScriptWorker {
 			],
 		};
 	}
+
+	override getCurrentDirectory(): string {
+		return "/";
+	}
+
+	override async getLibFiles(): Promise<Record<string, string>> {
+		return Object.fromEntries(
+			Object.entries(await super.getLibFiles())
+				.map(([k, v]) => [k.startsWith("/") ? k.slice(1) : k, v]),
+		);
+	}
 }
 
 self.onmessage = () => {

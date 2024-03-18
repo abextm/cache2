@@ -58,7 +58,7 @@ for (let lang of langs) {
 		lib: ["lib.webworker.d.ts", "lib.esnext.d.ts", "lib.genericconsole.d.ts"],
 		types: ["lodash"],
 		strict: true,
-		baseUrl: ".",
+		baseUrl: "/",
 	});
 	lang.setDiagnosticsOptions({
 		...lang.getDiagnosticsOptions(),

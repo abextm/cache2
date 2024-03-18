@@ -107,9 +107,10 @@ export class LibFiles {
 		if (!uri) {
 			return false;
 		}
-		/*if (uri.path.indexOf('/lib.') === 0)*/ {
+		if (uri.path.indexOf('/lib.') === 0) {
 			return !!libFileSet[uri.path.slice(1)];
 		}
+		return !!libFileSet[uri.path];
 		return false;
 	}
 
