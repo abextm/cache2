@@ -9,11 +9,12 @@ export class EnumValueMap<K extends number = number, V extends string | number =
 	}
 }
 
-@Typed
 export class Enum<K extends number = number, V extends string | number = string | number> extends PerFileLoadable {
 	constructor(public id: EnumID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 8;

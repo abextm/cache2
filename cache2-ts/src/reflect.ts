@@ -120,7 +120,7 @@ export namespace Typed {
 		return v[type];
 	}
 
-	// injected decorator or value wrapper for c2.Typed(value) calls
+	// injected value wrapper for c2.Typed(value) calls
 	/** @internal */
 	export function d(type: Any): <T>(v: T, _ctx?: any) => T | Typed.Value<T> {
 		return (v: any) => withType(type, v);

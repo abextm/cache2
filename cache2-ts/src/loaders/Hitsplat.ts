@@ -3,11 +3,12 @@ import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import { FontID, HitsplatID, RGB, SpriteID, VarbitID, VarPID } from "../types";
 
-@Typed
 export class Hitsplat extends PerFileLoadable {
 	constructor(public id: HitsplatID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 32;

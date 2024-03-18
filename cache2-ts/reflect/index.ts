@@ -259,8 +259,14 @@ export const addTypeInfo =
 					if (
 						!isTypedDecleration
 						&& t2.symbol?.declarations?.some(decl =>
-							(ts.isClassDeclaration(decl) || ts.isClassExpression(decl))
-							&& ts.getDecorators(decl)?.some(deco => isTypedAccess(deco.expression))
+							(ts.isInterfaceDeclaration(decl) || ts.isClassDeclaration(decl))
+							&& decl.members.some(member =>
+								member.name
+								&& ts.isComputedPropertyName(member.name)
+								&& ts.isPropertyAccessExpression(member.name.expression)
+								&& member.name.expression.name.text === "type"
+								&& isTypedAccess(member.name.expression.expression)
+							)
 						)
 					) {
 						// will be handled with the runtime type info
@@ -335,7 +341,7 @@ export const addTypeInfo =
 
 			let pos = node.getSourceFile().getLineAndCharacterOfPosition(node.pos);
 			console.log(
-				"unknown type for @Typed",
+				"unknown type for Typed",
 				node.getSourceFile().fileName,
 				pos.line + ":" + pos.character,
 				(t as any).checker?.typeToString?.(t),
@@ -383,14 +389,51 @@ export const addTypeInfo =
 		}
 
 		let visitor: Transformer<ts.Node> = transformer<ts.Node>(node => {
-			if (ts.isDecorator(node) && isTypedAccess(node.expression)) {
-				let p = node.parent;
+			if (ts.isClassDeclaration(node)) {
+				let add: ts.ClassElement[] = [];
+				for (let i = 0; i < node.members.length; i++) {
+					let member = node.members[i];
+					if (
+						ts.isPropertyDeclaration(member)
+						&& member.initializer == null
+						&& ts.isComputedPropertyName(member.name)
+						&& ts.isPropertyAccessExpression(member.name.expression)
+						&& member.name.expression.name.text === "type"
+						&& isTypedAccess(member.name.expression.expression)
+					) {
+						let typed = member.name.expression.expression;
 
-				let type = typeToTyped(checker.getTypeAtLocation(p), node, true);
-				if (type) {
-					return ts.factory.updateDecorator(node, updateTypedExpr(node.expression, type));
+						if (!member.modifiers?.some(m => m.kind == ts.SyntaxKind.DeclareKeyword)) {
+							// no public diagnostic api
+							let pos = sf.getLineAndCharacterOfPosition(member.pos);
+							console.log(`${sf.fileName}:${pos.line}:${pos.character}: must use declare`);
+						}
+
+						add.push(ts.factory.createClassStaticBlockDeclaration(ts.factory.createBlock([
+							ts.factory.createExpressionStatement(ts.factory.createCallExpression(
+								ts.factory.createPropertyAccessExpression(typed, "v"),
+								undefined,
+								[
+									pojoToAST(typeToTyped(checker.getTypeAtLocation(node), node, true)),
+									ts.factory.createThis(),
+								],
+							)),
+						], true)));
+					}
+				}
+
+				if (add.length > 0) {
+					node = ts.factory.updateClassDeclaration(
+						node,
+						node.modifiers,
+						node.name,
+						node.typeParameters,
+						node.heritageClauses,
+						[...node.members, ...add],
+					);
 				}
 			}
+
 			if (ts.isCallExpression(node) && isTypedAccess(node.expression)) {
 				let type = typeToTyped(checker.getTypeAtLocation(node.arguments[0])!, node.arguments[0]);
 				if (type) {

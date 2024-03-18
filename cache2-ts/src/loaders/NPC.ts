@@ -3,11 +3,12 @@ import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import { AnimationID, CategoryID, HSL, ModelID, NPCID, Params, SpriteID, TextureID, VarbitID, VarPID } from "../types";
 
-@Typed
 export class NPC extends PerFileLoadable {
 	constructor(public id: NPCID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 9;

@@ -3,11 +3,12 @@ import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import { Params, StructID } from "../types";
 
-@Typed
 export class Struct extends PerFileLoadable {
 	constructor(public id: StructID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 34;

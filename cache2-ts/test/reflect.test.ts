@@ -6,7 +6,7 @@ import * as ts from "typescript";
 import { addTypeInfo } from "../reflect";
 import { ParamID, Params, Typed } from "../src";
 
-inspect.defaultOptions.depth = 5;
+inspect.defaultOptions.depth = 1;
 
 function testCompile(
 	name: string,
@@ -65,14 +65,16 @@ describe("reflect", () => {
 		`
 import * as c2 from "../src";
 
-@c2.Typed
 export class Foo {
+	declare [c2.Typed.type]: c2.Typed.Any;
+
 	someItem!: c2.ItemID;
 	someNumber = 123;
 };
 `,
 		e => {
-			let typ = e.Foo.prototype[Typed.type];
+			let v = new e.Foo();
+			let typ = v[Typed.type];
 			assert.equal(typ.type, "obj");
 			assert.equal(typ.entries.someNumber.default, 123);
 			assert.equal(typ.entries.someItem.name, "ItemID");
@@ -151,8 +153,9 @@ export const v2 = c2.Typed(v);
 		`
 import * as c2 from "../src";
 
-@c2.Typed
 export class Px {
+	declare public [c2.Typed.type]: c2.Typed.Any;
+
 	p!: c2.PrimitiveArray<c2.RGB, Uint32Array>;
 }
 `,

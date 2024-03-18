@@ -3,11 +3,12 @@ import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import { RGB, UnderlayID } from "../types";
 
-@Typed
 export class Underlay extends PerFileLoadable {
 	constructor(public id: UnderlayID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 1;
@@ -33,8 +34,9 @@ export class Underlay extends PerFileLoadable {
 	}
 }
 
-@Typed
 export class UnderlayHSL {
+	declare public [Typed.type]: Typed.Any;
+
 	hue: number;
 	sat: number;
 	lum: number;

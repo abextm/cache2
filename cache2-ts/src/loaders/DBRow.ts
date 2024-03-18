@@ -45,11 +45,12 @@ function readValues(r: Reader, types: ScriptVarID[]): (string | number | bigint)
 	return values;
 }
 
-@Typed
 export class DBRow extends PerFileLoadable {
 	constructor(public id: DBRowID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 38;
@@ -89,11 +90,12 @@ export class DBRow extends PerFileLoadable {
 	}
 }
 
-@Typed
 export class DBTable extends PerFileLoadable {
 	constructor(public id: DBTableID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 39;
@@ -154,11 +156,12 @@ export class DBTable extends PerFileLoadable {
 	}
 }
 
-@Typed
 export class DBTableIndex extends Loadable {
 	constructor(public id: DBTableID, public column: number) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 21;
 	public static readonly MASTER_COLUMN = -1;

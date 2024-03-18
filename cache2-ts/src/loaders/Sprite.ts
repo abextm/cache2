@@ -3,10 +3,11 @@ import { Reader } from "../Reader";
 import { Typed } from "../reflect";
 import * as types from "../types";
 
-@Typed
 export class Sprite {
 	constructor(public readonly sprites: Sprites, public readonly index: number) {
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	offsetX = 0;
 	offsetY = 0;
@@ -53,7 +54,6 @@ export class Sprite {
 	}
 }
 
-@Typed
 export class Sprites extends NamedPerArchiveLoadable {
 	constructor(public id: types.SpriteID, count: number) {
 		super();
@@ -62,6 +62,8 @@ export class Sprites extends NamedPerArchiveLoadable {
 			this.sprites[i] = new Sprite(this, i);
 		}
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	static readonly index = 8;
 

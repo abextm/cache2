@@ -17,11 +17,12 @@ import {
 	VarPID,
 } from "../types";
 
-@Typed
 export class Obj extends PerFileLoadable {
 	constructor(public id: ObjID) {
 		super();
 	}
+
+	declare public [Typed.type]: Typed.Any;
 
 	public static readonly index = 2;
 	public static readonly archive = 6;
