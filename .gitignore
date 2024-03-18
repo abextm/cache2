@@ -9,3 +9,4 @@ node_modules
 .DS_Store
 Thumbs.db
 **/test/**/*.out.js
+cache2-ts/abextm-cache2*.tgz

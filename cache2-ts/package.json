@@ -1,19 +1,45 @@
 {
 	"name": "@abextm/cache2",
-	"version": "1.0.0",
-	"description": "",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"version": "0.1.0",
+	"description": "Utilities for reading OSRS \"caches\"",
+	"keywords": [
+		"osrs",
+		"runescape",
+		"oldschool",
+		"js5"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/abextm/cache2.git",
+		"directory": "cache2-ts"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./node": {
+			"types": "./dist/node/index.d.ts",
+			"default": "./dist/node/index.js"
+		}
+	},
 	"scripts": {
 		"test": "node ../tsenv node --test ./test/*.test.ts",
 		"prepare": "rm -rf dist tsconfig.tsbuildinfo && tsc"
 	},
+	"files": [
+		"dist/*",
+		"src/*"
+	],
 	"author": "Abex",
 	"license": "BSD-2-Clause",
 	"dependencies": {
 		"base64-arraybuffer-es6": "^3.0.1",
-		"fflate": "^0.8.0"
+		"fflate": "^0.8.0",
+		"tslib": "^2.6.1"
 	},
 	"devDependencies": {
 		"@typescript/vfs": "^1.4.0"

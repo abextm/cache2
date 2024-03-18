@@ -15,6 +15,7 @@ jobs:
         cache: npm
     - run: npm ci
     - run: npm run test-all
+    - run: npm -w cache2-ts pack
     - run: |
         npm run -w viewer build
         cp -r viewer/public/* viewer/dist/
