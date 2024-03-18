@@ -3,12 +3,15 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import * as path from "path";
 import sveltePreprocess from "svelte-preprocess";
 import TerserPlugin from "terser-webpack-plugin";
-import * as webpack from "webpack";
-import StartupChunkDependenciesPlugin from "webpack/lib/runtime/StartupChunkDependenciesPlugin";
+import webpack from "webpack";
+import StartupChunkDependenciesPlugin from "webpack/lib/runtime/StartupChunkDependenciesPlugin.js";
 import "webpack-dev-server";
-import * as ts from "typescript";
-import { addTypeInfo } from "../../cache2-ts/reflect";
-import { StatusPlugin } from "./status";
+import * as url from "node:url";
+import ts from "typescript";
+import { addTypeInfo } from "../../cache2-ts/reflect/index.js";
+import { StatusPlugin } from "./status.js";
+
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 const tsLoader = path.resolve(__dirname, "dts-loader.ts");
 let dist = path.resolve(__dirname, "../dist");
@@ -55,6 +58,9 @@ let config: webpack.Configuration = {
 		},
 		fallback: {
 			perf_hooks: false,
+		},
+		extensionAlias: {
+			".js": [".js", ".ts"],
 		},
 		extensions: [".ts", ".js", ".svelte"],
 		mainFields: ["svelte", "browser", "module", "main"],

@@ -1,2 +1,2 @@
-export * from "../";
-export * from "./loadCache";
+export * from "../index.js";
+export * from "./loadCache.js";

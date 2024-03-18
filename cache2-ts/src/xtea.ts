@@ -1,6 +1,6 @@
-import { ArchiveData } from "./Cache";
-import { Reader } from "./Reader";
-import { CompressionType, XTEAKey } from "./types";
+import { ArchiveData } from "./Cache.js";
+import { Reader } from "./Reader.js";
+import { CompressionType, XTEAKey } from "./types.js";
 
 const ROUNDS = 32;
 const GOLDEN = 0x9E3779B9;

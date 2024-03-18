@@ -1,7 +1,7 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { FontID, HitsplatID, RGB, SpriteID, VarbitID, VarPID } from "../types";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import { FontID, HitsplatID, RGB, SpriteID, VarbitID, VarPID } from "../types.js";
 
 export class Hitsplat extends PerFileLoadable {
 	constructor(public id: HitsplatID) {

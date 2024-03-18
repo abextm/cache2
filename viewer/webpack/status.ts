@@ -1,13 +1,13 @@
-import { Compiler, RuntimeGlobals, RuntimeModule } from "webpack";
+import webpack from "webpack";
 
-class StatusRuntimeModule extends RuntimeModule {
+class StatusRuntimeModule extends webpack.RuntimeModule {
 	constructor() {
 		super("ensure chunk status hook");
 	}
 
 	override generate() {
-		return `${RuntimeGlobals.ensureChunk} = (ensureChunk => {
-			let status = ${RuntimeGlobals.require}.status = {
+		return `${webpack.RuntimeGlobals.ensureChunk} = (ensureChunk => {
+			let status = ${webpack.RuntimeGlobals.require}.status = {
 				loading: 0,
 				onChange: () => {},
 			};
@@ -16,15 +16,15 @@ class StatusRuntimeModule extends RuntimeModule {
 				return ensureChunk(...args).finally(() =>
 					status.onChange(--status.loading, true));
 			};
-		})(${RuntimeGlobals.ensureChunk})`;
+		})(${webpack.RuntimeGlobals.ensureChunk})`;
 	}
 }
 
 export class StatusPlugin {
-	apply(compiler: Compiler) {
+	apply(compiler: webpack.Compiler) {
 		compiler.hooks.compilation.tap("StatusPlugin", compilation => {
 			compilation.hooks.runtimeRequirementInTree
-				.for(RuntimeGlobals.ensureChunk)
+				.for(webpack.RuntimeGlobals.ensureChunk)
 				.tap("StatusPlugin", chunk => {
 					compilation.addRuntimeModule(chunk, new StatusRuntimeModule());
 				});

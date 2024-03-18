@@ -1,8 +1,8 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { CacheProvider, FileProvider } from "../Cache";
-import { DiskCacheProvider } from "../DiskCache";
-import { FlatCacheProvider } from "../FlatCache";
+import { CacheProvider, FileProvider } from "../Cache.js";
+import { DiskCacheProvider } from "../DiskCache.js";
+import { FlatCacheProvider } from "../FlatCache.js";
 
 export class NodeFSFileProvider implements FileProvider {
 	public constructor(private path: string) {

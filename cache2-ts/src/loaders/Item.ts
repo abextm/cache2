@@ -1,7 +1,7 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { CategoryID, HSL, ItemID, ModelID, Params, TextureID, WearPos } from "../types";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import { CategoryID, HSL, ItemID, ModelID, Params, TextureID, WearPos } from "../types.js";
 
 export class Item extends PerFileLoadable {
 	constructor(public id: ItemID) {

@@ -1,7 +1,18 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { AnimationID, CategoryID, HSL, ModelID, NPCID, Params, SpriteID, TextureID, VarbitID, VarPID } from "../types";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import {
+	AnimationID,
+	CategoryID,
+	HSL,
+	ModelID,
+	NPCID,
+	Params,
+	SpriteID,
+	TextureID,
+	VarbitID,
+	VarPID,
+} from "../types.js";
 
 export class NPC extends PerFileLoadable {
 	constructor(public id: NPCID) {

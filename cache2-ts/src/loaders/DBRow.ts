@@ -1,9 +1,9 @@
-import { CacheProvider } from "../Cache";
-import { Loadable, PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { BaseVarType, ScriptVarType } from "../ScriptVarType";
-import { DBColumnID, DBRowID, DBTableID, ScriptVarID } from "../types";
+import { CacheProvider } from "../Cache.js";
+import { Loadable, PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import { BaseVarType, ScriptVarType } from "../ScriptVarType.js";
+import { DBColumnID, DBRowID, DBTableID, ScriptVarID } from "../types.js";
 
 function readTypes(r: Reader): ScriptVarID[] {
 	let size = r.u8();

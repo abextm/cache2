@@ -4,6 +4,7 @@
 		"cache2-ts",
 		"viewer"
 	],
+	"type": "module",
 	"scripts": {
 		"serve": "npm -w viewer run serve",
 		"format": "dprint fmt",
@@ -12,7 +13,6 @@
 	},
 	"devDependencies": {
 		"@types/chai": "^4.3.5",
-		"@types/mocha": "^10.0.1",
 		"@types/node": "^20.4.2",
 		"@types/webpack-env": "^1.18.4",
 		"@typescript-eslint/eslint-plugin": "^7.2.0",
@@ -21,8 +21,6 @@
 		"dprint": "^0.39.1",
 		"eslint": "^8.57.0",
 		"eslint-plugin-svelte": "^2.32.2",
-		"mocha": "^10.2.0",
-		"ts-mocha": "^10.0.0",
 		"ts-node": "^10.9.1",
 		"tsconfig-paths": "^4.0.0",
 		"typescript": "5.4.2"

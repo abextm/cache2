@@ -1,5 +1,6 @@
 import { expect } from "chai";
-import { BitReader, decompress, moveToFront } from "../src/bz2";
+import { describe, it } from "node:test";
+import { BitReader, decompress, moveToFront } from "../src/bz2.js";
 
 describe("bz2", () => {
 	describe("BitReader", () => {

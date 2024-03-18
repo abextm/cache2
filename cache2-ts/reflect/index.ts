@@ -1,5 +1,5 @@
 import type * as ts from "typescript";
-import { Typed } from "../src/reflect";
+import { Typed } from "../src/reflect.js";
 
 const UNDEFINED_SENTINAL: unique symbol = Symbol("undefined");
 

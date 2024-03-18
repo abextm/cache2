@@ -1,6 +1,6 @@
 import * as path from "path";
-import * as ts from "typescript";
-import * as webpack from "webpack";
+import ts from "typescript";
+import webpack from "webpack";
 
 import tsloader from "ts-loader";
 import { TSInstance } from "ts-loader/dist/interfaces";

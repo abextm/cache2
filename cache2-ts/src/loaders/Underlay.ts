@@ -1,7 +1,7 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { RGB, UnderlayID } from "../types";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import { RGB, UnderlayID } from "../types.js";
 
 export class Underlay extends PerFileLoadable {
 	constructor(public id: UnderlayID) {

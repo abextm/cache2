@@ -1,6 +1,6 @@
-import { cp1252CharMap } from "./Reader";
-import { Typed } from "./reflect";
-import { ScriptVarChar, ScriptVarID } from "./types";
+import { cp1252CharMap } from "./Reader.js";
+import { Typed } from "./reflect.js";
+import { ScriptVarChar, ScriptVarID } from "./types.js";
 
 const byChar = new Map<ScriptVarChar, ScriptVarType>();
 const byID = new Map<ScriptVarID, ScriptVarType>();

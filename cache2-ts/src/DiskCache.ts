@@ -1,5 +1,5 @@
-import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache";
-import { Reader } from "./Reader";
+import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache.js";
+import { Reader } from "./Reader.js";
 
 export class DiskIndexData implements IndexData {
 	public id!: number;

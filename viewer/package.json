@@ -3,8 +3,9 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "",
+	"type": "module",
 	"scripts": {
-		"webpack": "cross-env TS_NODE_PROJECT=\"webpack/tsconfig.json\" webpack",
+		"webpack": "node ../tsenv TS_NODE_PROJECT=\"webpack/tsconfig.json\" webpack",
 		"serve": "npm run-script webpack serve",
 		"build": "cross-env NODE_ENV=\"production\" npm run-script webpack build",
 		"svelte-check": "svelte-check"

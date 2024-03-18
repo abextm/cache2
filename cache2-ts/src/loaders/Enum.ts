@@ -1,7 +1,7 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import { EnumID, ScriptVarChar } from "../types";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import { EnumID, ScriptVarChar } from "../types.js";
 
 export class EnumValueMap<K extends number = number, V extends string | number = string | number> extends Map<K, V> {
 	constructor(readonly parent: Enum<K, V>) {

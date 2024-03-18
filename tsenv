@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+import process from 'node:process';
+import crossEnv from "cross-env";
+
+let ver = process.versions.node.split(".")
+
+let tsxArg = (ver[0] > 20 || (ver[0] == 20 && ver[1] >= 6))
+	? `--import ${new URL("./tsenvImport.js", import.meta.url)}`
+	: "--loader ts-node/esm";
+
+crossEnv([
+	`NODE_OPTIONS=${JSON.stringify(tsxArg)}`,
+	...process.argv.slice(2),
+]);

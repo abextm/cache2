@@ -1,12 +1,17 @@
 import * as tvfs from "@typescript/vfs";
 import { assert } from "chai";
 import * as fs from "node:fs";
+import * as path from "node:path";
+import { describe, it } from "node:test";
+import * as url from "node:url";
 import { inspect } from "node:util";
-import * as ts from "typescript";
-import { addTypeInfo } from "../reflect";
-import { ParamID, Params, Typed } from "../src";
+import ts from "typescript";
+import { addTypeInfo } from "../reflect/index.js";
+import { ParamID, Params, Typed } from "../src/index.js";
 
 inspect.defaultOptions.depth = 1;
+
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 function testCompile(
 	name: string,
@@ -14,9 +19,9 @@ function testCompile(
 	source: string,
 	validate: (exports: any) => void = () => void 0,
 ) {
-	it(name, () => {
+	it(name, async () => {
 		let map = new Map<string, string>();
-		const fileName = __dirname + "/" + name + ".ts";
+		const fileName = path.join(__dirname, name + ".ts");
 		map.set(fileName, source);
 		let sys = tvfs.createFSBackedSystem(map, __dirname, ts);
 		sys.getCurrentDirectory = () => __dirname;
@@ -50,10 +55,9 @@ function testCompile(
 			}));
 		}
 		let src = out.outputFiles[0].text;
-		fs.writeFileSync(__dirname + "/reflect test out " + name + ".out.js", src);
-		let exports = {};
-		let module = { exports };
-		new Function("module", "exports", "require", src)(module, exports, require);
+		let scriptName = "reflect test out " + name + ".out.js";
+		fs.writeFileSync(path.join(__dirname, scriptName), src);
+		let exports = await import("./" + scriptName);
 		validate(exports);
 	});
 }
@@ -63,7 +67,7 @@ describe("reflect", () => {
 		"typed class",
 		true,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 
 export class Foo {
 	declare [c2.Typed.type]: c2.Typed.Any;
@@ -85,7 +89,7 @@ export class Foo {
 		"typed interface",
 		true,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 
 let v: {
 	item: c2.ItemID;
@@ -103,7 +107,7 @@ export const v2 = c2.Typed(v);
 		"automagic",
 		true,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 
 interface Foo {
 	item: c2.ItemID,
@@ -126,7 +130,7 @@ export const v2 = c2.Typed(v);
 		"recursive",
 		false,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 
 interface A {
 	b?: B;
@@ -151,7 +155,7 @@ export const v2 = c2.Typed(v);
 		"primitive array",
 		false,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 
 export class Px {
 	declare public [c2.Typed.type]: c2.Typed.Any;
@@ -171,7 +175,7 @@ export class Px {
 		"TypedCall",
 		true,
 		`
-import * as c2 from "../src";
+import * as c2 from "../src/index.js";
 const $_typed_ = c2.Typed;
 
 interface Foo {

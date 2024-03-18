@@ -1,5 +1,5 @@
-import { CacheProvider } from "./Cache";
-import { Reader } from "./Reader";
+import { CacheProvider } from "./Cache.js";
+import { Reader } from "./Reader.js";
 
 type LoadableType<I extends Loadable, ARGS extends unknown[]> = {
 	decode(reader: Reader, ...args: ARGS): I;

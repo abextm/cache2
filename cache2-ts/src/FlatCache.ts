@@ -1,4 +1,4 @@
-import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache";
+import { ArchiveData, CacheProvider, CacheVersion, FileProvider, hash, IndexData } from "./Cache.js";
 
 import { decode as fastAtob } from "base64-arraybuffer-es6";
 

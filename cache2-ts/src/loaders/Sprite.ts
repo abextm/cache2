@@ -1,7 +1,7 @@
-import { NamedPerArchiveLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
-import * as types from "../types";
+import { NamedPerArchiveLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
+import * as types from "../types.js";
 
 export class Sprite {
 	constructor(public readonly sprites: Sprites, public readonly index: number) {

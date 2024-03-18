@@ -1,6 +1,6 @@
-import { PerFileLoadable } from "../Loadable";
-import { Reader } from "../Reader";
-import { Typed } from "../reflect";
+import { PerFileLoadable } from "../Loadable.js";
+import { Reader } from "../Reader.js";
+import { Typed } from "../reflect.js";
 import {
 	AnimationID,
 	CategoryID,
@@ -15,7 +15,7 @@ import {
 	TextureID,
 	VarbitID,
 	VarPID,
-} from "../types";
+} from "../types.js";
 
 export class Obj extends PerFileLoadable {
 	constructor(public id: ObjID) {

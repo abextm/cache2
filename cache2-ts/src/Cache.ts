@@ -1,8 +1,8 @@
 import { gunzipSync } from "fflate";
-import * as bz2 from "./bz2";
-import { Reader } from "./Reader";
-import { CompressionType, XTEAKey } from "./types";
-import { decryptXTEA, XTEAKeyManager } from "./xtea";
+import * as bz2 from "./bz2.js";
+import { Reader } from "./Reader.js";
+import { CompressionType, XTEAKey } from "./types.js";
+import { decryptXTEA, XTEAKeyManager } from "./xtea.js";
 
 export interface CacheProvider {
 	getIndex(index: number): Promise<IndexData | undefined>;

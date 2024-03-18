@@ -4,8 +4,9 @@
 	"description": "",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"type": "module",
 	"scripts": {
-		"test": "env TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha -require ts-node/register \"test/**/*.ts\"",
+		"test": "node ../tsenv node --test ./test/*.test.ts",
 		"prepare": "rm -rf dist tsconfig.tsbuildinfo && tsc"
 	},
 	"author": "Abex",

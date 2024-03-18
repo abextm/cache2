@@ -1,5 +1,5 @@
-import { CacheVersion } from "./Cache";
-import { ParamID, Params } from "./types";
+import { CacheVersion } from "./Cache.js";
+import { ParamID, Params } from "./types.js";
 
 export const cp1252CharMap: string[] = (() => {
 	const ext = "€?‚ƒ„…†‡ˆ‰Š‹Œ?Ž??‘’“”•–—˜™š›œ?žŸ";

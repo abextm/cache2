@@ -2,16 +2,21 @@
 	"include": [
 		"src/**/*"
 	],
+	"ts-node": {
+		"experimentalSpecifierResolution": "node",
+		"transpileOnly": true,
+		"esm": true
+	},
 	"compilerOptions": {
 		"importHelpers": true,
 		"outDir": "dist/",
 		"rootDir": "src/",
-		"module": "ES2015",
+		"module": "Node16",
 		"strict": true,
 		"target": "ES2022",
 		"declaration": true,
 		"declarationMap": true,
-		"moduleResolution": "node",
+		"moduleResolution": "Node16",
 		"composite": true,
 		"lib": ["ES2022", "DOM"]
 	}
