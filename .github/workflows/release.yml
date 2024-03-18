@@ -1,0 +1,21 @@
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: npm
+        registry-url: 'https://registry.npmjs.org'
+    - run: npm ci
+    - run: npm run test-all
+    - run: npm -w cache2-ts publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
