@@ -39,6 +39,7 @@
 			<ViewType name="obj" bind:key={$key} index={6}/>
 			<ViewType name="enum" bind:key={$key} index={8}/>
 			<ViewType name="item" bind:key={$key} index={10}/>
+			<ViewType name="healthbar" bind:key={$key} index={33}/>
 			<ViewType name="hitsplat" bind:key={$key} index={32}/>
 			<ViewType name="npc" bind:key={$key} index={9}/>
 			<ViewType name="param" bind:key={$key} index={11}/>

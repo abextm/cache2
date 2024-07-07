@@ -171,6 +171,13 @@ export class Reader {
 			return this.i32() & (-1 >>> 1);
 		}
 	}
+	public u32o16n(): number { // rl BigSmart2
+		if (this.view.getUint8(this.offset) & 0x80) {
+			return this.i32() & (-1 >>> 1);
+		} else {
+			return this.u16n();
+		}
+	}
 	public leVarInt(): number { // rl LEVarInt
 		let v = 0;
 		let shift = 0;

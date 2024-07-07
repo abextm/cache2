@@ -255,6 +255,7 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	dbtable: c2.DBTable,
 	enum: c2.Enum,
 	item: c2.Item,
+	healthbar: c2.HealthBar,
 	hitsplat: c2.Hitsplat,
 	npc: c2.NPC,
 	obj: c2.Obj,

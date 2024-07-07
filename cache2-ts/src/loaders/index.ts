@@ -1,5 +1,6 @@
 export * from "./DBRow.js";
 export * from "./Enum.js";
+export * from "./HealthBar.js";
 export * from "./Hitsplat.js";
 export * from "./Item.js";
 export * from "./NPC.js";

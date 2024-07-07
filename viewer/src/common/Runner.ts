@@ -11,6 +11,7 @@ export const lookupTypes = {
 	DBTableID: "dbtable",
 	EnumID: "enum",
 	ItemID: "item",
+	HealthBarID: "healthbar",
 	HitsplatID: "hitsplat",
 	NPCID: "npc",
 	ObjID: "obj",
@@ -25,6 +26,7 @@ export type LookupType =
 	| "enum"
 	| "index"
 	| "item"
+	| "healthbar"
 	| "hitsplat"
 	| "npc"
 	| "obj"
@@ -37,6 +39,7 @@ const uiNameOverride = {
 	dbrow: "DBRow",
 	dbtable: "DBTable",
 	npc: "NPC",
+	healthbar: "HealthBar",
 } satisfies Partial<Record<LookupType, string>>;
 export function uiType(t: LookupType): string {
 	return uiNameOverride[t as keyof typeof uiNameOverride] ?? capitalize(t);
