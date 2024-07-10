@@ -72,6 +72,7 @@ export class Obj extends PerFileLoadable {
 	public ambientSoundChangeTicksMax = 0;
 	public randomizeAnimationStart = true;
 	public blockingMask: undefined | number = undefined;
+	public deferAnimChange = false;
 	public params = new Params();
 
 	public static decode(r: Reader, id: ObjID): Obj {
@@ -241,6 +242,9 @@ export class Obj extends PerFileLoadable {
 					break;
 				case 89:
 					v.randomizeAnimationStart = false;
+					break;
+				case 90:
+					v.deferAnimChange = true;
 					break;
 				case 92: {
 					v.varbit = <VarbitID> r.u16n();
