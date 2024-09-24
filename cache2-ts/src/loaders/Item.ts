@@ -161,7 +161,7 @@ export class Item extends PerFileLoadable {
 					break;
 				}
 				case 42:
-					v.shiftClickIndex = r.u8();
+					v.shiftClickIndex = r.i8();
 					break;
 				case 65:
 					v.isGrandExchangable = true;
