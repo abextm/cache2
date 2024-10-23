@@ -48,12 +48,15 @@ export type FontID = NewType<number, "FontID">;
 export type HealthBarID = NewType<number, "HealthBaID">;
 export type HitsplatID = NewType<number, "HitsplatID">;
 export type ItemID = NewType<number, "ItemID">;
+export type KitID = NewType<number, "KitID">;
 export type MapElementID = NewType<number, "MapElementID">;
 export type MapSceneIconID = NewType<number, "MapSceneIconID">;
 export type ModelID = NewType<number, "ModelID">;
 export type NPCID = NewType<number, "NPCID">;
 export type ObjID = NewType<number, "ObjID">;
 export type ParamID = NewType<number, "ParamID">;
+export type PoseID = NewType<number, "PoseID">;
+export type SkeletonID = NewType<number, "SkeletonID">;
 export type SoundEffectID = NewType<number, "SoundEffectID">;
 export type SpriteID = NewType<number, "SpriteID">;
 export type StructID = NewType<number, "StructID">;
@@ -68,8 +71,14 @@ export type RGB = AliasType<number, "RGB">;
 export type WorldPoint = NewType<number, "WorldPoint">;
 export type ObjType = NewType<number, "ObjType">;
 
+export type AnimMoveMode = NewType<number, "AnimMoveMode">;
+export type AnimRestartMode = NewType<number, "AnimRestartMode">;
+export type AnimMayaID = NewType<number, "AnimMayaID">;
+
 export class Params extends Map<ParamID, string | number> {
 }
+
+export type KitOrItem = { kit: KitID; } | { item: ItemID; } | undefined;
 
 function makeByID<T extends number>(): (this: object, id: T) => string | undefined {
 	let byID: string[] | undefined;
@@ -131,6 +140,18 @@ export namespace ObjType {
 	export const GroundDecor = <ObjType> 22;
 
 	export const byID = makeByID<ObjType>();
+}
+
+export namespace AnimMoveMode {
+	export const byID = makeByID<AnimMoveMode>();
+}
+
+export namespace AnimRestartMode {
+	export const Continue = 0 as AnimRestartMode;
+	export const Restart = 1 as AnimRestartMode;
+	export const ResetLoops = 2 as AnimRestartMode;
+
+	export const byID = makeByID<AnimRestartMode>();
 }
 
 export namespace DBColumnID {

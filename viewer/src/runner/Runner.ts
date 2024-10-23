@@ -251,6 +251,7 @@ interface Filterable<T> {
 
 let types: Record<LookupType, Filterable<unknown>> = {
 	index,
+	animation: c2.Animation,
 	dbrow: c2.DBRow,
 	dbtable: c2.DBTable,
 	enum: c2.Enum,

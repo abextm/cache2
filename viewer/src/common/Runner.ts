@@ -7,6 +7,7 @@ import { ServiceClient } from "./ServiceClient";
 import { UIData } from "./uiobject";
 
 export const lookupTypes = {
+	AnimationID: "animation",
 	DBRowID: "dbrow",
 	DBTableID: "dbtable",
 	EnumID: "enum",
@@ -21,6 +22,7 @@ export const lookupTypes = {
 	UnderlayID: "underlay",
 } as const;
 export type LookupType =
+	| "animation"
 	| "dbrow"
 	| "dbtable"
 	| "enum"
