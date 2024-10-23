@@ -1,4 +1,13 @@
-import { ObjType, ScriptVarChar, ScriptVarID, ScriptVarType, WearPos } from "@abextm/cache2";
+import {
+	AnimRestartMode,
+	ObjType,
+	PostAnimMoveMode,
+	PreAnimMoveMode,
+	ScriptVarChar,
+	ScriptVarID,
+	ScriptVarType,
+	WearPos,
+} from "@abextm/cache2";
 import { mdiRepeatVariant } from "@mdi/js";
 import { ComponentConstructorOptions, SvelteComponent } from "svelte";
 import { getRunner, LookupType, lookupTypes, Runner } from "../../common/Runner";
@@ -44,6 +53,14 @@ function patchProps<A extends object, B extends object>(
 		});
 	};
 }
+
+const enums: Record<string, { byID(v: number): string | undefined; }> = {
+	WearPos: WearPos,
+	ObjType: ObjType,
+	PreAnimMoveMode: PreAnimMoveMode,
+	PostAnimMoveMode: PostAnimMoveMode,
+	AnimRestartMode: AnimRestartMode,
+};
 
 export async function lookupUI<T extends LookupType>(
 	runner: Runner,
@@ -765,16 +782,13 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 					return createEl(tag, [svt.name], "type");
 				}
 			}
-			if (typeof val === "number" && type === "WearPos") {
-				let name = WearPos.byID(val as WearPos);
+			if (typeof val === "number" && type in enums) {
+				let name = enums[type].byID(val);
 				if (name) {
-					return createEl(tag, [name], "type");
-				}
-			}
-			if (typeof val === "number" && type === "ObjType") {
-				let name = ObjType.byID(val as ObjType);
-				if (name) {
-					return createEl(tag, [name], "type");
+					return createEl(tag, [
+						sp(name, "type"),
+						sp(`(${val})`, "length"),
+					], "enum");
 				}
 			}
 			if (typeof val === "number" && type === "WorldPoint") {

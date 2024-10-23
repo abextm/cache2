@@ -4,10 +4,11 @@ import { Typed } from "../reflect.js";
 import {
 	AnimationID,
 	AnimMayaID,
-	AnimMoveMode,
 	AnimRestartMode,
 	KitOrItem,
 	PoseID,
+	PostAnimMoveMode,
+	PreAnimMoveMode,
 	SkeletonID,
 	SoundEffectID,
 } from "../types.js";
@@ -58,8 +59,8 @@ export class Animation extends PerFileLoadable {
 	public leftHandItem?: KitOrItem = undefined;
 	public rightHandItem?: KitOrItem = undefined;
 	public maxLoops?: number = undefined;
-	public preAnimMove!: AnimMoveMode;
-	public postAnimMove!: AnimMoveMode;
+	public preAnimMove!: PreAnimMoveMode;
+	public postAnimMove!: PostAnimMoveMode;
 	public restartMode = AnimRestartMode.ResetLoops;
 	public sounds: Map<number, FrameSound[]> = new Map();
 
@@ -113,10 +114,10 @@ export class Animation extends PerFileLoadable {
 					v.maxLoops = r.u8();
 					break;
 				case 9:
-					v.preAnimMove = r.u8() as AnimMoveMode;
+					v.preAnimMove = r.u8() as PreAnimMoveMode;
 					break;
 				case 10:
-					v.postAnimMove = r.u8() as AnimMoveMode;
+					v.postAnimMove = r.u8() as PostAnimMoveMode;
 					break;
 				case 11:
 					v.restartMode = r.u8() as AnimRestartMode;
@@ -169,11 +170,11 @@ export class Animation extends PerFileLoadable {
 		}
 
 		let defaultAnimMode = v.interleaveLeave === undefined && v.masks == undefined
-			? 0 as AnimMoveMode
-			: 2 as AnimMoveMode;
+			? PreAnimMoveMode.DelayMove
+			: PreAnimMoveMode.Merge;
 
 		v.preAnimMove ??= defaultAnimMode;
-		v.postAnimMove ??= defaultAnimMode;
+		v.postAnimMove ??= defaultAnimMode as any as PostAnimMoveMode;
 
 		return v;
 	}

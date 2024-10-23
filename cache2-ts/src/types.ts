@@ -71,7 +71,8 @@ export type RGB = AliasType<number, "RGB">;
 export type WorldPoint = NewType<number, "WorldPoint">;
 export type ObjType = NewType<number, "ObjType">;
 
-export type AnimMoveMode = NewType<number, "AnimMoveMode">;
+export type PreAnimMoveMode = NewType<number, "PreAnimMoveMode">;
+export type PostAnimMoveMode = NewType<number, "PostAnimMoveMode">;
 export type AnimRestartMode = NewType<number, "AnimRestartMode">;
 export type AnimMayaID = NewType<number, "AnimMayaID">;
 
@@ -142,8 +143,20 @@ export namespace ObjType {
 	export const byID = makeByID<ObjType>();
 }
 
-export namespace AnimMoveMode {
-	export const byID = makeByID<AnimMoveMode>();
+export namespace PreAnimMoveMode {
+	export const DelayMove = 0 as PreAnimMoveMode;
+	export const DelayAnim = 1 as PreAnimMoveMode;
+	export const Merge = 2 as PreAnimMoveMode;
+
+	export const byID = makeByID<PreAnimMoveMode>();
+}
+
+export namespace PostAnimMoveMode {
+	export const DelayMove = 0 as PostAnimMoveMode;
+	export const AbortAnim = 1 as PostAnimMoveMode;
+	export const Merge = 2 as PostAnimMoveMode;
+
+	export const byID = makeByID<PostAnimMoveMode>();
 }
 
 export namespace AnimRestartMode {
