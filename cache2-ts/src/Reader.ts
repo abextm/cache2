@@ -178,9 +178,9 @@ export class Reader {
 	}
 	public u32o16(): number { // rl BigSmart
 		if (this.view.getUint8(this.offset) & 0x80) {
-			return this.u16();
-		} else {
 			return this.i32() & (-1 >>> 1);
+		} else {
+			return this.u16();
 		}
 	}
 	public u32o16n(): number { // rl BigSmart2
