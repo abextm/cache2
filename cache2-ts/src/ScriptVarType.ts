@@ -129,6 +129,7 @@ export class ScriptVarType {
 	static readonly hitsplat = this.t({ id: 62, char: "×", jag: "hitmark", type: "HitsplatID" });
 	static readonly struct = this.t({ id: 73, char: "J", jag: "struct", type: "StructID" });
 	static readonly dbRow = this.t({ id: 74, char: "Ð", jag: "dbrow", type: "DBRowID" });
+	static readonly varp = this.t({ id: 209, char: "7", jag: "varp", type: "VarPID" });
 
 	// 49, 56, 71, 110, 115, 116 are base long
 }
