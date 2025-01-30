@@ -36,6 +36,7 @@ export class Item extends PerFileLoadable {
 	public femaleModel1 = <ModelID> -1;
 	public groundActions: (string | null)[] = [null, null, "Take", null, null];
 	public inventoryActions: (string | null)[] = [null, null, null, null, "Drop"];
+	public subops: string[][] = [];
 	public recolorFrom: HSL[] = <HSL[]> [];
 	public recolorTo: HSL[] = <HSL[]> [];
 	public retextureFrom: TextureID[] = <TextureID[]> [];
@@ -163,6 +164,18 @@ export class Item extends PerFileLoadable {
 				case 42:
 					v.shiftClickIndex = r.i8();
 					break;
+				case 43: {
+					let index = r.u8();
+					let subop = v.subops[index] ??= [];
+					for (;;) {
+						let subindex = r.u8() - 1;
+						if (subindex < 0) {
+							break;
+						}
+						subop[subindex] = r.string();
+					}
+					break;
+				}
 				case 65:
 					v.isGrandExchangable = true;
 					break;
