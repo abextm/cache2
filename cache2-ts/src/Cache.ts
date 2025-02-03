@@ -47,6 +47,8 @@ export class ArchiveData {
 	public namehash!: number;
 	public revision!: number;
 	public crc!: number;
+	public decompressedSize?: number;
+	public compressedSize?: number;
 
 	/**@internal*/ files: Map<number, ArchiveFile> = new Map();
 
