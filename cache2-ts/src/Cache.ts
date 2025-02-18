@@ -99,8 +99,8 @@ export class ArchiveData {
 
 		this.decryptedData = data;
 
-		if (this.maxFile == 0) {
-			this.files.get(0)!.data = data;
+		if (this.files.size == 1) {
+			this.files.values().next().value!.data = data;
 		} else {
 			let fileCount = this.files.size;
 			let dv = Reader.makeViewOf(DataView, data);
