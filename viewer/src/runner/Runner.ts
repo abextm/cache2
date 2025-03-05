@@ -1,5 +1,5 @@
 import * as c2 from "@abextm/cache2";
-import { CacheProvider } from "@abextm/cache2";
+import { CacheProvider, DBTable } from "@abextm/cache2";
 import * as _ from "lodash";
 import { setCacheShare } from "../common/CacheShare";
 import { ClearConsole, IRunnerPrivate, Log, LogLevel, LookupType, ScriptResponse } from "../common/Runner";
@@ -266,14 +266,19 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	underlay: c2.Underlay,
 };
 
-async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Promise<T[]> {
-	let v: T[];
+async function loadAndFilter<T>(
+	typ: Filterable<T>,
+	filter: string | number,
+): Promise<{ result: T[]; numeric: boolean; }> {
 	if (typeof filter === "number") {
-		return [await typ.load(ctx.cache, filter)]
-			.filter(v => v !== undefined);
+		return {
+			result: [await typ.load(ctx.cache, filter)]
+				.filter(v => v !== undefined),
+			numeric: true,
+		};
 	}
 	if (/^[0-9, -]+$/.test(filter)) {
-		v = await Promise.all(
+		let v = await Promise.all(
 			filter.split(",")
 				.map(v => v.trim())
 				.filter(v => v)
@@ -289,12 +294,19 @@ async function loadAndFilter<T>(typ: Filterable<T>, filter: string | number): Pr
 				})
 				.map(id => typ.load(ctx.cache, id)),
 		);
+		return {
+			result: v.filter(v => v !== undefined),
+			numeric: true,
+		};
 	} else {
 		let re = new RegExp(filter, "iu");
-		v = (await typ.all(ctx.cache))
+		let v = (await typ.all(ctx.cache))
 			.filter(v => re.test((v as any)?.name));
+		return {
+			result: v.filter(v => v !== undefined),
+			numeric: false,
+		};
 	}
-	return v.filter(v => v !== undefined);
 }
 
 new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
@@ -327,7 +339,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 			});
 	},
 	async lookup(type, filter) {
-		let v = await loadAndFilter(types[type], filter);
+		let { result: v } = await loadAndFilter(types[type], filter);
 
 		if (v.length == 1) {
 			return ServiceServer.return(...await serialize(v[0], true, ctx.cache));
@@ -336,7 +348,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		return ServiceServer.return(...await serialize(v, true, ctx.cache));
 	},
 	async spriteMetadata(filter) {
-		let sprites = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);
+		let { result: sprites } = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);
 		return <c2.Sprites[]> <any> sprites.filter(s => {
 			return filter || !(s.sprites.length == 1 && s.sprites[0].pixelsWidth === 0 && s.sprites[0].pixelsHeight === 0);
 		}).map(s => ({
@@ -360,79 +372,92 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 		return sprites?.sprites?.[index]?.asImageData();
 	},
 	async dbTables(filter) {
-		let v = <c2.DBTable[]> await loadAndFilter(c2.DBTable, filter);
-		let tabs = new Map<c2.DBTableID, any>(
-			await Promise.all(v.map(async (tab) => {
-				let rows = await c2.DBTable.loadRows(ctx.cache, tab.id);
-				if (!rows) {
-					return [tab.id, `Broken table ${tab.id}`] as const;
-				}
-				let at = new class extends ctx.AbstractTable {
-					undefinedAsBlank = true;
-					override getHeader() {
-						let header: AbstractTable.ColumnHeader[][] = [
-							[[undefined, 1]], // col id
-							[[c2.Typed(c2.ScriptVarType.dbRow.id), 1]], // col type
-							[[undefined, 1]], // col default value
-						];
-						for (let i = 0; i < tab.types.length; i++) {
-							let types = tab.types[i];
-							let dvs = tab.defaultValues[i];
-							if (types === undefined) {
-								continue;
-							}
-							header[0].push([i, types.length]);
-							for (let ti = 0; ti < types.length; ti++) {
-								let type = types[ti];
-								header[1].push([c2.Typed(type), 1]);
-								header[2].push([c2.ScriptVarType.withType(dvs?.[ti], type), 1]);
-							}
-						}
-						if (tab.defaultValues.every(v => v === undefined)) {
-							header.pop();
-						}
-						return header;
-					}
-					override getNumRows() {
-						return rows!.length;
-					}
-					override getRow(i: number) {
-						let row = rows![i];
-						let vals = row.values.flatMap((col, i) => {
-							let types = tab.types[i];
-							if (!types) {
-								return [];
-							}
-							if (!col) {
-								return types.map(_v => undefined);
-							}
-							let out = types.map(_v => [] as any[]);
-							for (let i = 0; i < col.length;) {
-								for (let tup = 0; tup < types.length; tup++, i++) {
-									let v = col[i];
-									out[tup].push(
-										v === undefined
-											? undefined
-											: c2.ScriptVarType.withType(v, types[tup]),
-									);
-								}
-							}
-							return out.map(v => v.length == 1 ? v[0] : v);
-						});
-
-						return [
-							c2.ScriptVarType.dbRow.withType(row.id),
-							...vals,
-						];
-					}
-				}();
-				return [tab.id, at] as const;
-			})),
-		);
-
-		if (tabs.size === 1) {
-			return ServiceServer.return(...await serialize(tabs.values().next().value, false, ctx.cache));
+		let { result: v, numeric } = await loadAndFilter<c2.DBTable>(c2.DBTable, filter);
+		let contentFilter = undefined;
+		if (v.length <= 0 && !numeric) {
+			v = await c2.DBTable.all(ctx.cache);
+			contentFilter = new RegExp(("" + filter).trim(), "iu");
 		}
-		return ServiceServer.return(...await serialize(tabs, false, ctx.cache));
+		let tabs = await Promise.all(v.map(async (tab) => {
+			let rows = await c2.DBTable.loadRows(ctx.cache, tab.id);
+			if (!rows) {
+				return [tab.id, `Broken table ${tab.id}`] as const;
+			}
+			if (contentFilter) {
+				rows = rows!.filter(r => r.values.some(v => v?.some(c => v !== undefined && contentFilter.test("" + c))));
+				if (rows.length <= 0) {
+					return [tab.id, undefined] as const;
+				}
+			}
+			let at = new class extends ctx.AbstractTable {
+				undefinedAsBlank = true;
+				override getHeader() {
+					let header: AbstractTable.ColumnHeader[][] = [
+						[[undefined, 1]], // col id
+						[[c2.Typed(c2.ScriptVarType.dbRow.id), 1]], // col type
+						[[undefined, 1]], // col default value
+					];
+					for (let i = 0; i < tab.types.length; i++) {
+						let types = tab.types[i];
+						let dvs = tab.defaultValues[i];
+						if (types === undefined) {
+							continue;
+						}
+						header[0].push([i, types.length]);
+						for (let ti = 0; ti < types.length; ti++) {
+							let type = types[ti];
+							header[1].push([c2.Typed(type), 1]);
+							header[2].push([c2.ScriptVarType.withType(dvs?.[ti], type), 1]);
+						}
+					}
+					if (tab.defaultValues.every(v => v === undefined)) {
+						header.pop();
+					}
+					return header;
+				}
+				override getNumRows() {
+					return rows!.length;
+				}
+				override getRow(i: number) {
+					let row = rows![i];
+					let vals = row.values.flatMap((col, i) => {
+						let types = tab.types[i];
+						if (!types) {
+							return [];
+						}
+						if (!col) {
+							return types.map(_v => undefined);
+						}
+						let out = types.map(_v => [] as any[]);
+						for (let i = 0; i < col.length;) {
+							for (let tup = 0; tup < types.length; tup++, i++) {
+								let v = col[i];
+								out[tup].push(
+									v === undefined
+										? undefined
+										: c2.ScriptVarType.withType(v, types[tup]),
+								);
+							}
+						}
+						return out.map(v => v.length == 1 ? v[0] : v);
+					});
+
+					return [
+						c2.ScriptVarType.dbRow.withType(row.id),
+						...vals,
+					];
+				}
+			}();
+			return [tab.id, at] as const;
+		}));
+
+		if (contentFilter) {
+			tabs = tabs.filter(v => v[1]);
+		}
+
+		if (tabs.length === 1 && !contentFilter) {
+			return ServiceServer.return(...await serialize(tabs[0][1], false, ctx.cache));
+		}
+		return ServiceServer.return(...await serialize(new Map<c2.DBTableID, any>(tabs), false, ctx.cache));
 	},
 });
