@@ -18,12 +18,8 @@ export const cp1252CharMap: string[] = (() => {
 })();
 
 export class Reader {
-	private readonly view: DataView;
+	public readonly view: DataView;
 	public offset = 0;
-
-	get buffer(): ArrayBuffer {
-		return this.view.buffer;
-	}
 
 	get length(): number {
 		return this.view.byteLength;
