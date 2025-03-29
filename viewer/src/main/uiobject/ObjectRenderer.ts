@@ -240,7 +240,13 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 		}
 		let url = URL.createObjectURL(v);
 		activeBlob = url;
-		window.open(url, "_blank");
+		let a = document.createElement("a");
+		a.href = url;
+		a.download = "blob";
+		a.style.display = "none";
+		document.body.append(a);
+		a.click();
+		setTimeout(() => a.remove(), 100);
 	}
 
 	function constructEntries(
