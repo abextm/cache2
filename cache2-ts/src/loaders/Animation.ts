@@ -53,6 +53,8 @@ export class Animation extends PerFileLoadable {
 	public animMayaEnd = 0;
 	public masks?: boolean[] = undefined;
 
+	public debugName?: string;
+
 	public frameStep = -1;
 	public interleaveLeave?: number[] = undefined;
 	public stretches = true;
@@ -165,6 +167,9 @@ export class Animation extends PerFileLoadable {
 					}
 					break;
 				}
+				case 18:
+					v.debugName = r.string();
+					break;
 				default:
 					throw new Error(`unknown animation opcode ${opcode}`);
 			}
