@@ -23,6 +23,7 @@ export class NPC extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 9;
+	public static readonly gameval = 1;
 
 	public models: ModelID[] = <ModelID[]> [];
 	public name = "null";

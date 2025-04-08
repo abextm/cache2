@@ -54,6 +54,7 @@ export class DBRow extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 38;
+	public static readonly gameval = 9;
 
 	public table = <DBTableID> -1;
 	public values: (string | number | bigint | undefined)[][] = [];
@@ -99,6 +100,7 @@ export class DBTable extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 39;
+	public static readonly gameval = 10;
 
 	public types: (ScriptVarID | undefined)[][] = [];
 	public defaultValues: (string | number | bigint | undefined)[][] = [];

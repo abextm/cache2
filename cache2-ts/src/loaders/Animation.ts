@@ -42,6 +42,7 @@ export class Animation extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 12;
+	public static readonly gameval = 7;
 
 	public frameLengths?: number[] = undefined;
 	public frameIDs?: [SkeletonID, PoseID][] = undefined;

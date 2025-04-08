@@ -12,6 +12,7 @@ export class Item extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 10;
+	public static readonly gameval = 0;
 
 	public inventoryModel = <ModelID> -1;
 	public name: string | null = "null";

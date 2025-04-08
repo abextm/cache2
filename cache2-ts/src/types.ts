@@ -45,6 +45,7 @@ export type DBTableID = NewType<number, "DBTableID">;
 export type DBColumnID = NewType<number, "DBColumnID">;
 export type EnumID = NewType<number, "EnumID">;
 export type FontID = NewType<number, "FontID">;
+export type GameValID = NewType<number, "GameValID">;
 export type HealthBarID = NewType<number, "HealthBaID">;
 export type HitsplatID = NewType<number, "HitsplatID">;
 export type ItemID = NewType<number, "ItemID">;

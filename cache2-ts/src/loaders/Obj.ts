@@ -26,6 +26,7 @@ export class Obj extends PerFileLoadable {
 
 	public static readonly index = 2;
 	public static readonly archive = 6;
+	public static readonly gameval = 6;
 
 	public models: null | { type: ObjType; model: ModelID; }[] = null;
 	public name = "null";
