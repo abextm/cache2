@@ -1,3 +1,4 @@
+import { isEqual } from "lodash";
 import { IndexedDBCacheEntry, IndexedDBCacheID, IndexedDBNoPerms, IndexedDBXTEAID } from "../common/CacheDirectory";
 import { db } from "../common/db";
 
@@ -133,7 +134,15 @@ export async function refreshIDBEntry(key: number, file?: FileSystemHandle): Pro
 		console.log(`removing entry ${file.name} because it has no cache`);
 		deleteIDBEntry(key);
 	} else {
-		db.put("fileCache", e, key);
+		let tx = db.transaction(["fileCache"], "readwrite");
+		tx.done.catch(() => {}); // do not unhandledrejection for abort
+		let store = tx.objectStore("fileCache");
+		let prevVal = await store.get(key);
+		if (isEqual(prevVal, e)) {
+			tx.abort();
+		} else {
+			await store.put(e, key);
+		}
 	}
 	return e;
 }
