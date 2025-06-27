@@ -25,7 +25,7 @@ export class GameVal extends Loadable {
 	): Promise<Reader | undefined> {
 		let archive = await cache.getArchive(this.index, gameValID);
 		let version = await cache.getVersion(this.index);
-		let data = archive?.getFile(otherID + 1)?.data;
+		let data = archive?.getFile(otherID)?.data;
 		return data ? new Reader(data, version) : undefined;
 	}
 
@@ -55,7 +55,7 @@ export class GameVal extends Loadable {
 
 				for (let id = 0;; id++) {
 					let counter = r.u8();
-					if (counter == 0) {
+					if (counter == 0 && isEnd(r)) {
 						break;
 					}
 
@@ -67,14 +67,20 @@ export class GameVal extends Loadable {
 				// Widget
 				v.name = r.string();
 				let files = v.files = new Map();
+				let msb = 0;
+				let lastId = 0;
 
 				for (;;) {
 					let id = r.u8();
-					if (id == 255) {
+					if (id == 255 && isEnd(r)) {
 						break;
 					}
+					if (id < lastId) {
+						msb += 0x100;
+					}
+					lastId = id;
 
-					files.set(id, r.string());
+					files.set(msb + id, r.string());
 				}
 				break;
 			}
@@ -126,4 +132,16 @@ export class GameVal extends Loadable {
 				}),
 		);
 	}
+}
+
+function isEnd(r: Reader) {
+	let off = r.offset;
+	for (; r.offset < r.length;) {
+		if (r.u8() != 0) {
+			r.offset = off;
+			return false;
+		}
+	}
+
+	return true;
 }
