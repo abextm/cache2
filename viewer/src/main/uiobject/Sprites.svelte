@@ -60,7 +60,7 @@
 					data-index={index.index}
 					style:width={sprite.width + "px"}
 					style:height={sprite.height + "px"}
-					title={`index ${index.index}, pixels=${index.pixelsWidth}x${index.pixelsHeight}, offset=${index.offsetX},${index.offsetY}, mode=${index.encodingMode}`}
+					title={`index ${index.index}, pixels=${index.pixelsWidth}x${index.pixelsHeight}, offset=${index.offsetX},${index.offsetY}, encodingFlags=${index.encodingFlags}`}
 					on:click={toggle}
 					></canvas>
 			{/each}

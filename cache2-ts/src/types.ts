@@ -75,6 +75,7 @@ export type ObjType = NewType<number, "ObjType">;
 export type PreAnimMoveMode = NewType<number, "PreAnimMoveMode">;
 export type PostAnimMoveMode = NewType<number, "PostAnimMoveMode">;
 export type AnimRestartMode = NewType<number, "AnimRestartMode">;
+export type AmbientSoundCurve = NewType<number, "AmbientSoundCurve">;
 export type AnimMayaID = NewType<number, "AnimMayaID">;
 
 export class Params extends Map<ParamID, string | number> {
@@ -166,6 +167,39 @@ export namespace AnimRestartMode {
 	export const ResetLoops = 2 as AnimRestartMode;
 
 	export const byID = makeByID<AnimRestartMode>();
+}
+
+export namespace AmbientSoundCurve {
+	export const Linear = 0 as AmbientSoundCurve;
+	export const EaseInSine = 1 as AmbientSoundCurve;
+	export const EaseOutSine = 2 as AmbientSoundCurve;
+	export const EaseInOutSine = 3 as AmbientSoundCurve;
+	export const EaseInQuad = 4 as AmbientSoundCurve;
+	export const EaseOutQuad = 5 as AmbientSoundCurve;
+	export const EaseInOutQuad = 6 as AmbientSoundCurve;
+	export const EaseInCubic = 7 as AmbientSoundCurve;
+	export const EaseOutCubic = 8 as AmbientSoundCurve;
+	export const EaseInOutCubic = 9 as AmbientSoundCurve;
+	export const EaseInQuart = 10 as AmbientSoundCurve;
+	export const EaseOutQuart = 11 as AmbientSoundCurve;
+	export const EaseInOutQuart = 12 as AmbientSoundCurve;
+	export const EaseInQuint = 13 as AmbientSoundCurve;
+	export const EaseOutQuint = 14 as AmbientSoundCurve;
+	export const EaseInOutQuint = 15 as AmbientSoundCurve;
+	export const EaseInExpo = 16 as AmbientSoundCurve;
+	export const EaseOutExpo = 17 as AmbientSoundCurve;
+	export const EaseInOutExpo = 18 as AmbientSoundCurve;
+	export const EaseInCirc = 19 as AmbientSoundCurve;
+	export const EaseOutCirc = 20 as AmbientSoundCurve;
+	export const EaseInOutCirc = 21 as AmbientSoundCurve;
+	export const EaseInBack = 22 as AmbientSoundCurve;
+	export const EaseOutBack = 23 as AmbientSoundCurve;
+	export const EaseInOutBack = 24 as AmbientSoundCurve;
+	export const EaseInElastic = 25 as AmbientSoundCurve;
+	export const EaseOutElastic = 26 as AmbientSoundCurve;
+	export const EaseInOutElastic = 27 as AmbientSoundCurve;
+
+	export const byID = makeByID<AmbientSoundCurve>();
 }
 
 export namespace DBColumnID {

@@ -64,7 +64,7 @@ export class GameVal extends Loadable {
 				break;
 			}
 			case 13: {
-				// Widget
+				// legacy widget
 				v.name = r.string();
 				let files = v.files = new Map();
 				let msb = 0;
@@ -81,6 +81,21 @@ export class GameVal extends Loadable {
 					lastId = id;
 
 					files.set(msb + id, r.string());
+				}
+				break;
+			}
+			case 14: {
+				// widget
+				v.name = r.string();
+				let files = v.files = new Map();
+
+				for (;;) {
+					let id = r.u16();
+					if (id === 0xFFFF) {
+						break;
+					}
+
+					files.set(id, r.string());
 				}
 				break;
 			}

@@ -2,6 +2,7 @@ import { PerFileLoadable } from "../Loadable.js";
 import { Reader } from "../Reader.js";
 import { Typed } from "../reflect.js";
 import {
+	AmbientSoundCurve,
 	AnimationID,
 	CategoryID,
 	HSL,
@@ -69,6 +70,11 @@ export class Obj extends PerFileLoadable {
 	public multiAmbientSoundIDs = <SoundEffectID[]> [];
 	public ambientSoundDistance = 0;
 	public ambientSoundRetain = 0;
+	public ambientSoundDistanceFadeCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
+	public ambientSoundFadeInDuration = 300;
+	public ambientSoundFadeOutDuration = 300;
+	public ambientSoundFadeInCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
+	public ambientSoundFadeOutCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
 	public ambientSoundChangeTicksMin = 0;
 	public ambientSoundChangeTicksMax = 0;
 	public randomizeAnimationStart = true;
@@ -247,6 +253,9 @@ export class Obj extends PerFileLoadable {
 				case 90:
 					v.deferAnimChange = true;
 					break;
+				case 91:
+					v.ambientSoundDistanceFadeCurve = r.u8() as AmbientSoundCurve;
+					break;
 				case 92: {
 					v.varbit = <VarbitID> r.u16n();
 					v.varp = <VarPID> r.u16n();
@@ -258,6 +267,12 @@ export class Obj extends PerFileLoadable {
 					}
 					break;
 				}
+				case 93:
+					v.ambientSoundFadeInCurve = r.u8() as AmbientSoundCurve;
+					v.ambientSoundFadeInDuration = r.u16();
+					v.ambientSoundFadeOutCurve = r.u8() as AmbientSoundCurve;
+					v.ambientSoundFadeOutDuration = r.u16();
+					break;
 				case 249:
 					v.params = r.params();
 					break;

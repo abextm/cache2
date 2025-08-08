@@ -14,7 +14,7 @@ export class Sprite {
 	pixelsWidth = 0;
 	pixelsHeight = 0;
 
-	encodingMode!: number;
+	encodingFlags!: number;
 
 	pixels: Uint8Array = undefined!;
 
@@ -107,22 +107,31 @@ export class Sprites extends NamedPerArchiveLoadable {
 		r.offset = 0;
 		for (let i = 0; i < count; i++) {
 			let sprite = out.sprites[i];
-			let mode = sprite.encodingMode = r.u8();
-
-			if (mode == 0) {
-				sprite.pixels = r.array(sprite.pixelsWidth * sprite.pixelsHeight);
-			} else if (mode == 1) {
-				let px = sprite.pixels = new Uint8Array(sprite.pixelsWidth * sprite.pixelsHeight);
-				for (let x = 0; x < sprite.pixelsWidth; x++) {
-					for (let y = 0; y < sprite.pixelsHeight; y++) {
-						px[y * sprite.pixelsWidth + x] = r.u8();
-					}
-				}
-			} else {
-				throw new Error(`invalid mode ${mode}`);
+			let flags = sprite.encodingFlags = r.u8();
+			sprite.pixels = readArrayRotated(r, flags, sprite.pixelsWidth, sprite.pixelsHeight);
+			if (flags & 2) {
+				// this is supposed to be alpha, but is actually garbage. in this version, neither java or ehc reads it
+				r.offset += sprite.pixelsWidth + sprite.pixelsHeight;
+			}
+			if (flags & ~3) {
+				throw new Error(`invalid flags ${flags.toString(2)}`);
 			}
 		}
 
 		return out;
+	}
+}
+
+function readArrayRotated(r: Reader, flags: number, width: number, height: number): Uint8Array {
+	if (flags & 1) {
+		let px = new Uint8Array(width * height);
+		for (let x = 0; x < width; x++) {
+			for (let y = 0; y < height; y++) {
+				px[y * width + x] = r.u8();
+			}
+		}
+		return px;
+	} else {
+		return r.array(width * height);
 	}
 }
