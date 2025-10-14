@@ -104,6 +104,7 @@ export class ScriptVarType {
 	static readonly bool = this.t({ id: 1, char: "1", jag: "boolean" });
 	static readonly anim = this.t({ id: 6, char: "A", jag: "seq", type: "AnimationID" });
 	static readonly color = this.t({ id: 7, char: "C", jag: "colour", type: "RGB" });
+	static readonly objShape = this.t({ id: 8, char: "H", jag: "locshape", type: "ObjShape" });
 	static readonly widget = this.t({ id: 9, char: "I", jag: "component" });
 	static readonly kit = this.t({ id: 10, char: "K", jag: "idkit" });
 	static readonly midi = this.t({ id: 11, char: "M", jag: "midi" });
@@ -123,6 +124,7 @@ export class ScriptVarType {
 	static readonly spotAnim = this.t({ id: 37, char: "t", jag: "spotanim" });
 	static readonly inventory = this.t({ id: 39, char: "v", jag: "inv" });
 	static readonly texture = this.t({ id: 40, char: "x", jag: "texture", type: "TextureID" });
+	static readonly category = this.t({ id: 41, char: "y", jag: "category", type: "CategoryID" });
 	static readonly char = this.t({ id: 42, char: "z", jag: "char" });
 	static readonly mapSceneIcon = this.t({ id: 55, char: "£", jag: "mapsceneicon", type: "MapSceneIconID" });
 	static readonly mapElement = this.t({ id: 59, char: "µ", jag: "mapelement", type: "MapElementID" });

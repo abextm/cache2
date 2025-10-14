@@ -75,6 +75,8 @@ export class NPC extends PerFileLoadable {
 	public ranged = 1;
 	public magic = 1;
 	public height = -1;
+	public footprintSize = -1;
+	public unknown1 = false;
 	public params = new Params();
 
 	public static decode(r: Reader, id: NPCID): NPC {
@@ -270,6 +272,12 @@ export class NPC extends PerFileLoadable {
 					break;
 				case 124:
 					v.height = r.u16();
+					break;
+				case 126:
+					v.footprintSize = r.u16();
+					break;
+				case 129:
+					v.unknown1 = true;
 					break;
 				case 249:
 					v.params = r.params();

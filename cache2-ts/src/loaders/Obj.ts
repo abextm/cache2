@@ -10,7 +10,7 @@ import {
 	MapSceneIconID,
 	ModelID,
 	ObjID,
-	ObjType,
+	ObjShape,
 	Params,
 	SoundEffectID,
 	TextureID,
@@ -29,7 +29,7 @@ export class Obj extends PerFileLoadable {
 	public static readonly archive = 6;
 	public static readonly gameval = 6;
 
-	public models: null | { type: ObjType; model: ModelID; }[] = null;
+	public models: null | { shape: ObjShape; model: ModelID; }[] = null;
 	public name = "null";
 	public width = 1;
 	public length = 1;
@@ -80,6 +80,7 @@ export class Obj extends PerFileLoadable {
 	public randomizeAnimationStart = true;
 	public blockingMask: undefined | number = undefined;
 	public deferAnimChange = false;
+	public unknown1 = false;
 	public params = new Params();
 
 	public static decode(r: Reader, id: ObjID): Obj {
@@ -93,7 +94,7 @@ export class Obj extends PerFileLoadable {
 					for (let i = 0; i < len; i++) {
 						v.models[i] = {
 							model: <ModelID> r.u16(),
-							type: opcode == 5 ? ObjType.CentrepieceStraight : <ObjType> r.u8(),
+							shape: opcode == 5 ? ObjShape.CentrepieceStraight : <ObjShape> r.u8(),
 						};
 					}
 					break;
@@ -273,6 +274,9 @@ export class Obj extends PerFileLoadable {
 					v.ambientSoundFadeOutCurve = r.u8() as AmbientSoundCurve;
 					v.ambientSoundFadeOutDuration = r.u16();
 					break;
+				case 94:
+					v.unknown1 = true;
+					break;
 				case 249:
 					v.params = r.params();
 					break;
@@ -284,7 +288,7 @@ export class Obj extends PerFileLoadable {
 		if (v.isDoor === -1) {
 			v.isDoor = 0;
 			if (
-				v.models?.[0]?.type === ObjType.CentrepieceStraight
+				v.models?.[0]?.shape === ObjShape.CentrepieceStraight
 				|| v.actions.some(a => a !== null)
 			) {
 				v.isDoor = 1;

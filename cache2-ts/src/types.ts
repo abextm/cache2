@@ -70,7 +70,7 @@ export type HSL = AliasType<number, "HSL">;
 export type RGB = AliasType<number, "RGB">;
 
 export type WorldPoint = NewType<number, "WorldPoint">;
-export type ObjType = NewType<number, "ObjType">;
+export type ObjShape = NewType<number, "ObjType">;
 
 export type PreAnimMoveMode = NewType<number, "PreAnimMoveMode">;
 export type PostAnimMoveMode = NewType<number, "PostAnimMoveMode">;
@@ -117,32 +117,32 @@ export namespace WearPos {
 	export const byID = makeByID<WearPos>();
 }
 
-export namespace ObjType {
-	export const WallStraight = <ObjType> 0;
-	export const WallDiagonalCorner = <ObjType> 1;
-	export const WallCorner = <ObjType> 2;
-	export const WallSquareCorner = <ObjType> 3;
-	export const WallDecorStraightNoOffset = <ObjType> 4;
-	export const WallDecorStraightOffset = <ObjType> 5;
-	export const WallDecorDiagonalOffset = <ObjType> 6;
-	export const WallDecorDiagonalNoOffset = <ObjType> 7;
-	export const WallDecorDiagonalBoth = <ObjType> 8;
-	export const WallDiagonal = <ObjType> 9;
-	export const CentrepieceStraight = <ObjType> 10;
-	export const CentrepieceDiagonal = <ObjType> 11;
-	export const RoofStraight = <ObjType> 12;
-	export const RoofDiagonalWithRoofEdge = <ObjType> 13;
-	export const RoofDiagonal = <ObjType> 14;
-	export const RoofCornerConcave = <ObjType> 15;
-	export const RoofCornerConvex = <ObjType> 16;
-	export const RoofFlat = <ObjType> 17;
-	export const RoofEdgeStraight = <ObjType> 18;
-	export const RoofEdgeDiagonalCorner = <ObjType> 19;
-	export const RoofEdgeCorner = <ObjType> 20;
-	export const RoofEdgeSquarecorner = <ObjType> 21;
-	export const GroundDecor = <ObjType> 22;
+export namespace ObjShape {
+	export const WallStraight = <ObjShape> 0;
+	export const WallDiagonalCorner = <ObjShape> 1;
+	export const WallCorner = <ObjShape> 2;
+	export const WallSquareCorner = <ObjShape> 3;
+	export const WallDecorStraightNoOffset = <ObjShape> 4;
+	export const WallDecorStraightOffset = <ObjShape> 5;
+	export const WallDecorDiagonalOffset = <ObjShape> 6;
+	export const WallDecorDiagonalNoOffset = <ObjShape> 7;
+	export const WallDecorDiagonalBoth = <ObjShape> 8;
+	export const WallDiagonal = <ObjShape> 9;
+	export const CentrepieceStraight = <ObjShape> 10;
+	export const CentrepieceDiagonal = <ObjShape> 11;
+	export const RoofStraight = <ObjShape> 12;
+	export const RoofDiagonalWithRoofEdge = <ObjShape> 13;
+	export const RoofDiagonal = <ObjShape> 14;
+	export const RoofCornerConcave = <ObjShape> 15;
+	export const RoofCornerConvex = <ObjShape> 16;
+	export const RoofFlat = <ObjShape> 17;
+	export const RoofEdgeStraight = <ObjShape> 18;
+	export const RoofEdgeDiagonalCorner = <ObjShape> 19;
+	export const RoofEdgeCorner = <ObjShape> 20;
+	export const RoofEdgeSquarecorner = <ObjShape> 21;
+	export const GroundDecor = <ObjShape> 22;
 
-	export const byID = makeByID<ObjType>();
+	export const byID = makeByID<ObjShape>();
 }
 
 export namespace PreAnimMoveMode {

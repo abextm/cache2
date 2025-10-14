@@ -1,6 +1,6 @@
 import {
 	AnimRestartMode,
-	ObjType,
+	ObjShape,
 	PostAnimMoveMode,
 	PreAnimMoveMode,
 	ScriptVarChar,
@@ -56,7 +56,7 @@ function patchProps<A extends object, B extends object>(
 
 const enums: Record<string, { byID(v: number): string | undefined; }> = {
 	WearPos: WearPos,
-	ObjType: ObjType,
+	ObjShape: ObjShape,
 	PreAnimMoveMode: PreAnimMoveMode,
 	PostAnimMoveMode: PostAnimMoveMode,
 	AnimRestartMode: AnimRestartMode,

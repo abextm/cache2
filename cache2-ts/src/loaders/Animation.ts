@@ -68,6 +68,7 @@ export class Animation extends PerFileLoadable {
 	public postAnimMove!: PostAnimMoveMode;
 	public restartMode = AnimRestartMode.ResetLoops;
 	public sounds: Map<number, FrameSound[]> = new Map();
+	public soundsCrossWorldView = false;
 
 	public static decode(r: Reader, id: AnimationID): Animation {
 		const v = new Animation(id);
@@ -175,6 +176,9 @@ export class Animation extends PerFileLoadable {
 				}
 				case 18:
 					v.debugName = r.string();
+					break;
+				case 19:
+					v.soundsCrossWorldView = true;
 					break;
 				default:
 					throw new Error(`unknown animation opcode ${opcode}`);
