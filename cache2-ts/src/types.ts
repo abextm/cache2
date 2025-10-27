@@ -76,6 +76,7 @@ export type PreAnimMoveMode = NewType<number, "PreAnimMoveMode">;
 export type PostAnimMoveMode = NewType<number, "PostAnimMoveMode">;
 export type AnimRestartMode = NewType<number, "AnimRestartMode">;
 export type AmbientSoundCurve = NewType<number, "AmbientSoundCurve">;
+export type AmbientSoundVisibility = NewType<number, "AmbientSoundVisibility">;
 export type AnimMayaID = NewType<number, "AnimMayaID">;
 
 export class Params extends Map<ParamID, string | number> {
@@ -200,6 +201,14 @@ export namespace AmbientSoundCurve {
 	export const EaseInOutElastic = 27 as AmbientSoundCurve;
 
 	export const byID = makeByID<AmbientSoundCurve>();
+}
+
+export namespace AmbientSoundVisibility {
+	export const Always = 0 as AmbientSoundVisibility;
+	export const SameWorldEntity = 1 as AmbientSoundVisibility;
+	export const SameOrMainWorldEntity = 2 as AmbientSoundVisibility;
+
+	export const byID = makeByID<AmbientSoundVisibility>();
 }
 
 export namespace DBColumnID {

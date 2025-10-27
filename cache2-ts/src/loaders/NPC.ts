@@ -77,6 +77,8 @@ export class NPC extends PerFileLoadable {
 	public height = -1;
 	public footprintSize = -1;
 	public unknown1 = false;
+	public canHideForOverlap = false;
+	public overlapTint: HSL = 39188;
 	public params = new Params();
 
 	public static decode(r: Reader, id: NPCID): NPC {
@@ -278,6 +280,12 @@ export class NPC extends PerFileLoadable {
 					break;
 				case 129:
 					v.unknown1 = true;
+					break;
+				case 145:
+					v.canHideForOverlap = true;
+					break;
+				case 146:
+					v.overlapTint = r.u16();
 					break;
 				case 249:
 					v.params = r.params();

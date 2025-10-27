@@ -3,6 +3,7 @@ import { Reader } from "../Reader.js";
 import { Typed } from "../reflect.js";
 import {
 	AmbientSoundCurve,
+	AmbientSoundVisibility,
 	AnimationID,
 	CategoryID,
 	HSL,
@@ -75,6 +76,7 @@ export class Obj extends PerFileLoadable {
 	public ambientSoundFadeOutDuration = 300;
 	public ambientSoundFadeInCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
 	public ambientSoundFadeOutCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
+	public ambientSoundVisibility: AmbientSoundVisibility = AmbientSoundVisibility.SameOrMainWorldEntity;
 	public ambientSoundChangeTicksMin = 0;
 	public ambientSoundChangeTicksMax = 0;
 	public randomizeAnimationStart = true;
@@ -276,6 +278,9 @@ export class Obj extends PerFileLoadable {
 					break;
 				case 94:
 					v.unknown1 = true;
+					break;
+				case 95:
+					v.ambientSoundVisibility = r.u8() as AmbientSoundVisibility;
 					break;
 				case 249:
 					v.params = r.params();
