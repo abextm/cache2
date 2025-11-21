@@ -20,6 +20,7 @@ export const lookupTypes = {
 	SpriteID: "sprite",
 	StructID: "struct",
 	UnderlayID: "underlay",
+	WorldEntityID: "worldentity",
 } as const;
 export type LookupType =
 	| "animation"
@@ -35,13 +36,15 @@ export type LookupType =
 	| "param"
 	| "sprite"
 	| "struct"
-	| "underlay";
+	| "underlay"
+	| "worldentity";
 
 const uiNameOverride = {
 	dbrow: "DBRow",
 	dbtable: "DBTable",
 	npc: "NPC",
 	healthbar: "HealthBar",
+	worldentity: "WorldEntity",
 } satisfies Partial<Record<LookupType, string>>;
 export function uiType(t: LookupType): string {
 	return uiNameOverride[t as keyof typeof uiNameOverride] ?? capitalize(t);

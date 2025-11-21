@@ -52,6 +52,7 @@ export type ItemID = NewType<number, "ItemID">;
 export type KitID = NewType<number, "KitID">;
 export type MapElementID = NewType<number, "MapElementID">;
 export type MapSceneIconID = NewType<number, "MapSceneIconID">;
+export type MenuFilterMode = NewType<number, "MenuFilterMode">;
 export type ModelID = NewType<number, "ModelID">;
 export type NPCID = NewType<number, "NPCID">;
 export type ObjID = NewType<number, "ObjID">;
@@ -65,6 +66,7 @@ export type TextureID = NewType<number, "TextureID">;
 export type UnderlayID = NewType<number, "UnderlayID">;
 export type VarbitID = NewType<number, "VarbitID">;
 export type VarPID = NewType<number, "VarPID">;
+export type WorldEntityID = NewType<number, "WorldEntityID">;
 
 export type HSL = AliasType<number, "HSL">;
 export type RGB = AliasType<number, "RGB">;
@@ -209,6 +211,14 @@ export namespace AmbientSoundVisibility {
 	export const SameOrMainWorldEntity = 2 as AmbientSoundVisibility;
 
 	export const byID = makeByID<AmbientSoundVisibility>();
+}
+
+export namespace MenuFilterMode {
+	export const None = 0 as MenuFilterMode;
+	export const ExamineOnly = 1 as MenuFilterMode;
+	export const Everything = 2 as MenuFilterMode;
+
+	export const byID = makeByID<MenuFilterMode>();
 }
 
 export namespace DBColumnID {

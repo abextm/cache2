@@ -1,5 +1,8 @@
 import {
+	AmbientSoundCurve,
+	AmbientSoundVisibility,
 	AnimRestartMode,
+	MenuFilterMode,
 	ObjShape,
 	PostAnimMoveMode,
 	PreAnimMoveMode,
@@ -60,6 +63,9 @@ const enums: Record<string, { byID(v: number): string | undefined; }> = {
 	PreAnimMoveMode: PreAnimMoveMode,
 	PostAnimMoveMode: PostAnimMoveMode,
 	AnimRestartMode: AnimRestartMode,
+	AmbientSoundCurve: AmbientSoundCurve,
+	AmbientSoundVisibility: AmbientSoundVisibility,
+	MenuFilterMode: MenuFilterMode,
 };
 
 export async function lookupUI<T extends LookupType>(

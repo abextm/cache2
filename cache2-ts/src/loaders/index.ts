@@ -11,3 +11,4 @@ export * from "./Param.js";
 export * from "./Sprite.js";
 export * from "./Struct.js";
 export * from "./Underlay.js";
+export * from "./WorldEntity.js";

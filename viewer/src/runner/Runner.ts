@@ -264,6 +264,7 @@ let types: Record<LookupType, Filterable<unknown>> = {
 	sprite: c2.Sprites,
 	struct: c2.Struct,
 	underlay: c2.Underlay,
+	worldentity: c2.WorldEntity,
 };
 
 async function loadAndFilter<T>(

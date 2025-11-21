@@ -47,6 +47,7 @@
 			<ViewType name="param" bind:key={$key} index={11}/>
 			<ViewType name="struct" bind:key={$key} index={34}/>
 			<ViewType name="underlay" bind:key={$key} index={1}/>
+			<ViewType name="worldentity" bind:key={$key} index={72}/>
 		</Section>
 		<ViewType name="sprite" bind:key={$key} index={8}>Sprites</ViewType>
 	</div>
