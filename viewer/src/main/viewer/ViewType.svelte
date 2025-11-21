@@ -2,20 +2,22 @@
 	import { LookupType, uiType } from "../../common/Runner";
 
 	export let name: LookupType;
-	export let key: LookupType | undefined;
 	export let index: number;
 </script>
 
-<div on:click|preventDefault={() => key = name}>
+<a href="#/viewer/{name}/">
 	<slot>
 		{uiType(name)}
 	</slot>
 	<span class="viewer-id">{index}</span>
-</div>
+</a>
 
 <style>
-	div {
-		cursor: pointer;
+	a {
+		display: block;
+
+		text-decoration-line: none;
+		color: inherit;
 		padding-left: .25em;
 	}
 </style>
