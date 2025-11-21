@@ -217,12 +217,13 @@ let index = {
 				out.protocol = v.protocol;
 			}
 			return out;
-		} catch {
+		} catch (e) {
+			console.warn("failed to load index", id, e);
 			// ignored
 		}
 	},
 	async all(c: Promise<CacheProvider>): Promise<any[]> {
-		let lastIndex = 21;
+		let lastIndex = 25;
 		let indexes: c2.IndexData[] = await Promise.all(
 			_.range(0, lastIndex + 1)
 				.map(async i => this.load(c, i)),
