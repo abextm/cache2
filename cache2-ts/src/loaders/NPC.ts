@@ -25,23 +25,23 @@ export class NPC extends PerFileLoadable {
 	public static readonly archive = 9;
 	public static readonly gameval = 1;
 
-	public models: ModelID[] = <ModelID[]> [];
+	public models: ModelID[] = [] as ModelID[];
 	public name = "null";
 	public size = 1;
-	public standingAnimation = <AnimationID> -1;
-	public walkingAnimation = <AnimationID> -1;
-	public idleRotateLeftAnimation = <AnimationID> -1;
-	public idleRotateRightAnimation = <AnimationID> -1;
-	public rotate180Animation = <AnimationID> -1;
-	public rotateLeftAnimation = <AnimationID> -1;
-	public rotateRightAnimation = <AnimationID> -1;
-	public category = <CategoryID> -1;
+	public standingAnimation = -1 as AnimationID;
+	public walkingAnimation = -1 as AnimationID;
+	public idleRotateLeftAnimation = -1 as AnimationID;
+	public idleRotateRightAnimation = -1 as AnimationID;
+	public rotate180Animation = -1 as AnimationID;
+	public rotateLeftAnimation = -1 as AnimationID;
+	public rotateRightAnimation = -1 as AnimationID;
+	public category = -1 as CategoryID;
 	public actions: (string | null)[] = [null, null, null, null, null];
-	public recolorFrom: HSL[] = <HSL[]> [];
-	public recolorTo: HSL[] = <HSL[]> [];
-	public retextureFrom: TextureID[] = <TextureID[]> [];
-	public retextureTo: TextureID[] = <TextureID[]> [];
-	public chatheadModels: ModelID[] = <ModelID[]> [];
+	public recolorFrom: HSL[] = [] as HSL[];
+	public recolorTo: HSL[] = [] as HSL[];
+	public retextureFrom: TextureID[] = [] as TextureID[];
+	public retextureTo: TextureID[] = [] as TextureID[];
+	public chatheadModels: ModelID[] = [] as ModelID[];
 	public isMinimapVisible = true;
 	public combatLevel = -1;
 	public widthScale = 128;
@@ -52,22 +52,22 @@ export class NPC extends PerFileLoadable {
 	public headIconArchive: SpriteID[] = [];
 	public headIconSpriteIndex: number[] = [];
 	public rotationSpeed = 32;
-	public varbit = <VarbitID> -1;
-	public varp = <VarPID> -1;
-	public multiChildren: NPCID[] = <NPCID[]> [];
-	public oobChild = <NPCID> -1;
+	public varbit = -1 as VarbitID;
+	public varp = -1 as VarPID;
+	public multiChildren: NPCID[] = [] as NPCID[];
+	public oobChild = -1 as NPCID;
 	public isInteractible = true;
 	public isClickable = true;
 	public isFollower = false;
 	public lowPriorityOps = false;
-	public runAnimation = <AnimationID> -1;
-	public runRotate180Animation = <AnimationID> -1;
-	public runRotateLeftAnimation = <AnimationID> -1;
-	public runRotateRightAnimation = <AnimationID> -1;
-	public crawlAnimation = <AnimationID> -1;
-	public crawlRotate180Animation = <AnimationID> -1;
-	public crawlRotateLeftAnimation = <AnimationID> -1;
-	public crawlRotateRightAnimation = <AnimationID> -1;
+	public runAnimation = -1 as AnimationID;
+	public runRotate180Animation = -1 as AnimationID;
+	public runRotateLeftAnimation = -1 as AnimationID;
+	public runRotateRightAnimation = -1 as AnimationID;
+	public crawlAnimation = -1 as AnimationID;
+	public crawlRotate180Animation = -1 as AnimationID;
+	public crawlRotateLeftAnimation = -1 as AnimationID;
+	public crawlRotateRightAnimation = -1 as AnimationID;
 	public attack = 1;
 	public defence = 1;
 	public strength = 1;
@@ -89,7 +89,7 @@ export class NPC extends PerFileLoadable {
 					let len = r.u8();
 					v.models = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.models[i] = <ModelID> r.u16();
+						v.models[i] = r.u16() as ModelID;
 					}
 					break;
 				}
@@ -100,25 +100,25 @@ export class NPC extends PerFileLoadable {
 					v.size = r.u8();
 					break;
 				case 13:
-					v.standingAnimation = <AnimationID> r.u16();
+					v.standingAnimation = r.u16() as AnimationID;
 					break;
 				case 14:
-					v.walkingAnimation = <AnimationID> r.u16();
+					v.walkingAnimation = r.u16() as AnimationID;
 					break;
 				case 15:
-					v.idleRotateLeftAnimation = <AnimationID> r.u16();
+					v.idleRotateLeftAnimation = r.u16() as AnimationID;
 					break;
 				case 16:
-					v.idleRotateRightAnimation = <AnimationID> r.u16();
+					v.idleRotateRightAnimation = r.u16() as AnimationID;
 					break;
 				case 17:
-					v.walkingAnimation = <AnimationID> r.u16();
-					v.rotate180Animation = <AnimationID> r.u16();
-					v.rotateLeftAnimation = <AnimationID> r.u16();
-					v.rotateRightAnimation = <AnimationID> r.u16();
+					v.walkingAnimation = r.u16() as AnimationID;
+					v.rotate180Animation = r.u16() as AnimationID;
+					v.rotateLeftAnimation = r.u16() as AnimationID;
+					v.rotateRightAnimation = r.u16() as AnimationID;
 					break;
 				case 18:
-					v.category = <CategoryID> r.u16();
+					v.category = r.u16() as CategoryID;
 					break;
 				case 30:
 				case 31:
@@ -132,8 +132,8 @@ export class NPC extends PerFileLoadable {
 					v.recolorFrom = new Array(len);
 					v.recolorTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.recolorFrom[i] = <HSL> r.u16();
-						v.recolorTo[i] = <HSL> r.u16();
+						v.recolorFrom[i] = r.u16() as HSL;
+						v.recolorTo[i] = r.u16() as HSL;
 					}
 					break;
 				}
@@ -142,8 +142,8 @@ export class NPC extends PerFileLoadable {
 					v.retextureFrom = new Array(len);
 					v.retextureTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.retextureFrom[i] = <TextureID> r.u16();
-						v.retextureTo[i] = <TextureID> r.u16();
+						v.retextureFrom[i] = r.u16() as TextureID;
+						v.retextureTo[i] = r.u16() as TextureID;
 					}
 					break;
 				}
@@ -151,7 +151,7 @@ export class NPC extends PerFileLoadable {
 					let len = r.u8();
 					v.chatheadModels = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.chatheadModels[i] = <ModelID> r.u16();
+						v.chatheadModels[i] = r.u16() as ModelID;
 					}
 					break;
 				}
@@ -217,12 +217,12 @@ export class NPC extends PerFileLoadable {
 					v.rotationSpeed = r.u16();
 					break;
 				case 106: {
-					v.varbit = <VarbitID> r.u16n();
-					v.varp = <VarPID> r.u16n();
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = <NPCID> r.u16n();
+						v.multiChildren[i] = r.u16n() as NPCID;
 					}
 					break;
 				}
@@ -238,31 +238,31 @@ export class NPC extends PerFileLoadable {
 					v.lowPriorityOps = true;
 					break;
 				case 114:
-					v.runAnimation = <AnimationID> r.u16();
+					v.runAnimation = r.u16() as AnimationID;
 					break;
 				case 115:
-					v.runAnimation = <AnimationID> r.u16();
-					v.runRotate180Animation = <AnimationID> r.u16();
-					v.runRotateLeftAnimation = <AnimationID> r.u16();
-					v.runRotateRightAnimation = <AnimationID> r.u16();
+					v.runAnimation = r.u16() as AnimationID;
+					v.runRotate180Animation = r.u16() as AnimationID;
+					v.runRotateLeftAnimation = r.u16() as AnimationID;
+					v.runRotateRightAnimation = r.u16() as AnimationID;
 					break;
 				case 116:
-					v.crawlAnimation = <AnimationID> r.u16();
+					v.crawlAnimation = r.u16() as AnimationID;
 					break;
 				case 117:
-					v.crawlAnimation = <AnimationID> r.u16();
-					v.crawlRotate180Animation = <AnimationID> r.u16();
-					v.crawlRotateLeftAnimation = <AnimationID> r.u16();
-					v.crawlRotateRightAnimation = <AnimationID> r.u16();
+					v.crawlAnimation = r.u16() as AnimationID;
+					v.crawlRotate180Animation = r.u16() as AnimationID;
+					v.crawlRotateLeftAnimation = r.u16() as AnimationID;
+					v.crawlRotateRightAnimation = r.u16() as AnimationID;
 					break;
 				case 118: {
-					v.varbit = <VarbitID> r.u16n();
-					v.varp = <VarPID> r.u16n();
-					v.oobChild = <NPCID> r.u16n();
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
+					v.oobChild = r.u16n() as NPCID;
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = <NPCID> r.u16n();
+						v.multiChildren[i] = r.u16n() as NPCID;
 					}
 					break;
 				}

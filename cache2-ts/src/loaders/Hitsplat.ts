@@ -13,12 +13,12 @@ export class Hitsplat extends PerFileLoadable {
 	public static readonly index = 2;
 	public static readonly archive = 32;
 
-	public font = <FontID> -1;
-	public fontColor = <RGB> 16777215;
-	public leftSprite = <SpriteID> -1;
-	public leftSprite2 = <SpriteID> -1;
-	public backgroundSprite = <SpriteID> -1;
-	public rightSprite = <SpriteID> -1;
+	public font = -1 as FontID;
+	public fontColor = 16777215 as RGB;
+	public leftSprite = -1 as SpriteID;
+	public leftSprite2 = -1 as SpriteID;
+	public backgroundSprite = -1 as SpriteID;
+	public rightSprite = -1 as SpriteID;
 	public animX = 0;
 	public animY = 0;
 	public animStart = -1;
@@ -26,32 +26,32 @@ export class Hitsplat extends PerFileLoadable {
 	public animMode = 0;
 	public formatString: string | null = null;
 	public textY = 0;
-	public varbit = <VarbitID> -1;
-	public varp = <VarPID> -1;
-	public multiChildren: HitsplatID[] = <HitsplatID[]> [];
-	public oobChild = <HitsplatID> -1;
+	public varbit = -1 as VarbitID;
+	public varp = -1 as VarPID;
+	public multiChildren: HitsplatID[] = [] as HitsplatID[];
+	public oobChild = -1 as HitsplatID;
 
 	public static decode(r: Reader, id: HitsplatID): Hitsplat {
 		const v = new Hitsplat(id);
 		for (let opcode: number; (opcode = r.u8()) != 0;) {
 			switch (opcode) {
 				case 1:
-					v.font = <FontID> r.s2o4n();
+					v.font = r.s2o4n() as FontID;
 					break;
 				case 2:
-					v.fontColor = <RGB> r.u24();
+					v.fontColor = r.u24() as RGB;
 					break;
 				case 3:
-					v.leftSprite = <SpriteID> r.s2o4n();
+					v.leftSprite = r.s2o4n() as SpriteID;
 					break;
 				case 4:
-					v.leftSprite2 = <SpriteID> r.s2o4n();
+					v.leftSprite2 = r.s2o4n() as SpriteID;
 					break;
 				case 5:
-					v.backgroundSprite = <SpriteID> r.s2o4n();
+					v.backgroundSprite = r.s2o4n() as SpriteID;
 					break;
 				case 6:
-					v.rightSprite = <SpriteID> r.s2o4n();
+					v.rightSprite = r.s2o4n() as SpriteID;
 					break;
 				case 7:
 					v.animX = r.i16();
@@ -79,15 +79,15 @@ export class Hitsplat extends PerFileLoadable {
 					break;
 				case 17:
 				case 18: {
-					v.varbit = <VarbitID> r.u16n();
-					v.varp = <VarPID> r.u16n();
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
 					if (opcode == 18) {
-						v.oobChild = <HitsplatID> r.u16n();
+						v.oobChild = r.u16n() as HitsplatID;
 					}
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = <HitsplatID> r.u16n();
+						v.multiChildren[i] = r.u16n() as HitsplatID;
 					}
 					break;
 				}

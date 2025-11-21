@@ -102,48 +102,48 @@ function makeByID<T extends number>(): (this: object, id: T) => string | undefin
 }
 
 export namespace WearPos {
-	export const Head = <WearPos> 0;
-	export const Cape = <WearPos> 1;
-	export const Amulet = <WearPos> 2;
-	export const Weapon = <WearPos> 3;
-	export const Torso = <WearPos> 4;
-	export const Shield = <WearPos> 5;
-	export const Arms = <WearPos> 6;
-	export const Legs = <WearPos> 7;
-	export const Hair = <WearPos> 8;
-	export const Hands = <WearPos> 9;
-	export const Boots = <WearPos> 10;
-	export const Jaw = <WearPos> 11;
-	export const Ring = <WearPos> 12;
-	export const Ammo = <WearPos> 13;
+	export const Head = 0 as WearPos;
+	export const Cape = 1 as WearPos;
+	export const Amulet = 2 as WearPos;
+	export const Weapon = 3 as WearPos;
+	export const Torso = 4 as WearPos;
+	export const Shield = 5 as WearPos;
+	export const Arms = 6 as WearPos;
+	export const Legs = 7 as WearPos;
+	export const Hair = 8 as WearPos;
+	export const Hands = 9 as WearPos;
+	export const Boots = 10 as WearPos;
+	export const Jaw = 11 as WearPos;
+	export const Ring = 12 as WearPos;
+	export const Ammo = 13 as WearPos;
 
 	export const byID = makeByID<WearPos>();
 }
 
 export namespace ObjShape {
-	export const WallStraight = <ObjShape> 0;
-	export const WallDiagonalCorner = <ObjShape> 1;
-	export const WallCorner = <ObjShape> 2;
-	export const WallSquareCorner = <ObjShape> 3;
-	export const WallDecorStraightNoOffset = <ObjShape> 4;
-	export const WallDecorStraightOffset = <ObjShape> 5;
-	export const WallDecorDiagonalOffset = <ObjShape> 6;
-	export const WallDecorDiagonalNoOffset = <ObjShape> 7;
-	export const WallDecorDiagonalBoth = <ObjShape> 8;
-	export const WallDiagonal = <ObjShape> 9;
-	export const CentrepieceStraight = <ObjShape> 10;
-	export const CentrepieceDiagonal = <ObjShape> 11;
-	export const RoofStraight = <ObjShape> 12;
-	export const RoofDiagonalWithRoofEdge = <ObjShape> 13;
-	export const RoofDiagonal = <ObjShape> 14;
-	export const RoofCornerConcave = <ObjShape> 15;
-	export const RoofCornerConvex = <ObjShape> 16;
-	export const RoofFlat = <ObjShape> 17;
-	export const RoofEdgeStraight = <ObjShape> 18;
-	export const RoofEdgeDiagonalCorner = <ObjShape> 19;
-	export const RoofEdgeCorner = <ObjShape> 20;
-	export const RoofEdgeSquarecorner = <ObjShape> 21;
-	export const GroundDecor = <ObjShape> 22;
+	export const WallStraight = 0 as ObjShape;
+	export const WallDiagonalCorner = 1 as ObjShape;
+	export const WallCorner = 2 as ObjShape;
+	export const WallSquareCorner = 3 as ObjShape;
+	export const WallDecorStraightNoOffset = 4 as ObjShape;
+	export const WallDecorStraightOffset = 5 as ObjShape;
+	export const WallDecorDiagonalOffset = 6 as ObjShape;
+	export const WallDecorDiagonalNoOffset = 7 as ObjShape;
+	export const WallDecorDiagonalBoth = 8 as ObjShape;
+	export const WallDiagonal = 9 as ObjShape;
+	export const CentrepieceStraight = 10 as ObjShape;
+	export const CentrepieceDiagonal = 11 as ObjShape;
+	export const RoofStraight = 12 as ObjShape;
+	export const RoofDiagonalWithRoofEdge = 13 as ObjShape;
+	export const RoofDiagonal = 14 as ObjShape;
+	export const RoofCornerConcave = 15 as ObjShape;
+	export const RoofCornerConvex = 16 as ObjShape;
+	export const RoofFlat = 17 as ObjShape;
+	export const RoofEdgeStraight = 18 as ObjShape;
+	export const RoofEdgeDiagonalCorner = 19 as ObjShape;
+	export const RoofEdgeCorner = 20 as ObjShape;
+	export const RoofEdgeSquarecorner = 21 as ObjShape;
+	export const GroundDecor = 22 as ObjShape;
 
 	export const byID = makeByID<ObjShape>();
 }

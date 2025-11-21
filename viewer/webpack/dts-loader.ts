@@ -115,7 +115,7 @@ const dtsjsLoader = async function(this: webpack.LoaderContext<any>, instance: T
 		};
 
 		if (tsFi.isDeclarationFile) {
-			tsFi = <ts.SourceFile> ts.transform(tsFi, [declarationTransformer], instance.compilerOptions).transformed[0];
+			tsFi = ts.transform(tsFi, [declarationTransformer], instance.compilerOptions).transformed[0] as ts.SourceFile;
 			let tsPrinter = ts.createPrinter({
 				newLine: ts.NewLineKind.LineFeed,
 			});
@@ -145,13 +145,13 @@ export const files = ${JSON.stringify(files, undefined, "\t")};
 };
 
 const dtsLoader: webpack.LoaderDefinition = function(contents, map, meta) {
-	let opts = <Options> this.getOptions();
+	let opts = this.getOptions() as Options;
 	if (!opts.instance) {
 		throw new Error("all dtscs must have instance set");
 	}
 
 	if (this.resourcePath.endsWith(".d.ts")) {
-		let { instance } = instances.getTypeScriptInstance(<any> { instance: opts.instance }, <any> this);
+		let { instance } = instances.getTypeScriptInstance({ instance: opts.instance } as any, this as any);
 		return dtsjsLoader.call(this, instance, false);
 	}
 
@@ -165,7 +165,7 @@ const dtsLoader: webpack.LoaderDefinition = function(contents, map, meta) {
 				return;
 			}
 
-			let { instance } = instances.getTypeScriptInstance(<any> { instance: opts.instance }, <any> this);
+			let { instance } = instances.getTypeScriptInstance({ instance: opts.instance } as any, this as any);
 			dtsjsLoader.call(this, instance, gdts).then(t => cb(null, t), e => cb(e));
 		};
 	}

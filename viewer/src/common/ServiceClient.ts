@@ -48,12 +48,12 @@ export class ServiceClient {
 		let panic = () => {
 			throw new Error();
 		};
-		return new Proxy(<T & ServiceClient> sc, {
+		return new Proxy(sc as T & ServiceClient, {
 			defineProperty: panic,
 			deleteProperty: panic,
 			get: (self, type) => {
 				if (type in self) {
-					return (<any> self)[type];
+					return (self as any)[type];
 				}
 				if (typeof type === "string") {
 					return (...args: any[]) => sc._request(type, args);
@@ -104,7 +104,7 @@ export class ServiceClient {
 			console.log("bad message", ev);
 			return;
 		}
-		let v = <Response> ev.data;
+		let v = ev.data as Response;
 		let h = this._requests.get(v.id);
 		if (!h) {
 			console.log("duplicate response", v);
@@ -120,9 +120,9 @@ export class ServiceClient {
 
 	private _post(ev: Request, t?: Transferable[]) {
 		if (this._port instanceof Worker2 && !this._port.isRunning) {
-			this._port.ready.then(_ => this._port.postMessage(ev, <any> t));
+			this._port.ready.then(_ => this._port.postMessage(ev, t as any));
 		} else {
-			this._port.postMessage(ev, <any> t);
+			this._port.postMessage(ev, t as any);
 		}
 	}
 }

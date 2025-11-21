@@ -34,10 +34,10 @@ export class Enum<K extends number = number, V extends string | number = string 
 		for (let opcode: number; (opcode = reader.u8()) != 0;) {
 			switch (opcode) {
 				case 1:
-					v.keyTypeChar = <ScriptVarChar> reader.u8();
+					v.keyTypeChar = reader.u8() as ScriptVarChar;
 					break;
 				case 2:
-					v.valueTypeChar = <ScriptVarChar> reader.u8();
+					v.valueTypeChar = reader.u8() as ScriptVarChar;
 					break;
 				case 3:
 					v.defaultValue = reader.string();

@@ -19,17 +19,17 @@ export class ServiceServer<T extends object> {
 			console.log("bad message", ev);
 			return;
 		}
-		let v = <Request> ev.data;
+		let v = ev.data as Request;
 
 		if (v.type == "newPort") {
-			let p = <MessagePort> v.args[0];
+			let p = v.args[0] as MessagePort;
 			new ServiceServer<T>(p, this.handler);
 			return;
 		}
 
 		try {
 			if (v.type in this.handler) {
-				let value = await (<any> this.handler)[v.type](...v.args);
+				let value = await (this.handler as any)[v.type](...v.args);
 				this.post({
 					id: v.id,
 					value,

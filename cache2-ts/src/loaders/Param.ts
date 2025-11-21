@@ -13,7 +13,7 @@ export class Param extends PerFileLoadable {
 	public static readonly index = 2;
 	public static readonly archive = 11;
 
-	public type = <ScriptVarChar> 0;
+	public type = 0 as ScriptVarChar;
 	public isMembers = true;
 	public defaultInt = 0;
 	public defaultString: string | null = null;
@@ -23,7 +23,7 @@ export class Param extends PerFileLoadable {
 		for (let opcode: number; (opcode = r.u8()) != 0;) {
 			switch (opcode) {
 				case 1:
-					v.type = <ScriptVarChar> r.u8();
+					v.type = r.u8() as ScriptVarChar;
 					break;
 				case 2:
 					v.defaultInt = r.i32();

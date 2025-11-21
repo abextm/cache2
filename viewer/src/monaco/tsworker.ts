@@ -31,7 +31,7 @@ class MyWorker extends TypeScriptWorker {
 			};
 		}
 
-		let ls: ts.LanguageService = (<any> this).getLanguageService();
+		let ls: ts.LanguageService = (this as any).getLanguageService();
 
 		return {
 			before: [

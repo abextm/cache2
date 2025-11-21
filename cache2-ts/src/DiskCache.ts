@@ -95,7 +95,7 @@ export class DiskCacheProvider implements CacheProvider {
 					if (named) {
 						for (let am of ams) {
 							for (let file of am.files.values()) {
-								(<any> file).namehash = r.i32();
+								(file as any).namehash = r.i32();
 							}
 						}
 					}

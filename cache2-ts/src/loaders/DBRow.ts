@@ -56,7 +56,7 @@ export class DBRow extends PerFileLoadable {
 	public static readonly archive = 38;
 	public static readonly gameval = 9;
 
-	public table = <DBTableID> -1;
+	public table = -1 as DBTableID;
 	public values: (string | number | bigint | undefined)[][] = [];
 	public types: (ScriptVarID | undefined)[][] = [];
 
@@ -81,7 +81,7 @@ export class DBRow extends PerFileLoadable {
 					break;
 				}
 				case 4:
-					v.table = <DBTableID> r.leVarInt();
+					v.table = r.leVarInt() as DBTableID;
 					break;
 				default:
 					throw new Error(`unknown opcode ${opcode}`);

@@ -46,15 +46,15 @@ function patchProps<A extends object, B extends object>(
 	ctor: typeof SvelteComponent<A>,
 	props: Omit<A, keyof B>,
 ): typeof SvelteComponent<B> {
-	return <any> function(opts: ComponentConstructorOptions<B>) {
+	return function(opts: ComponentConstructorOptions<B>) {
 		return new ctor({
 			...opts,
-			props: <any> {
+			props: {
 				...opts.props!,
 				...props,
-			},
+			} as any,
 		});
-	};
+	} as any;
 }
 
 const enums: Record<string, { byID(v: number): string | undefined; }> = {
@@ -192,7 +192,7 @@ export function renderObject(parent: HTMLElement, data: UIData, unwrap: boolean)
 	port?.start();
 
 	let loadedPartials = new Map<PartialListID, number>();
-	(<any> window).ll = loadedPartials;
+	(window as any).ll = loadedPartials;
 
 	function expandable<T extends HTMLElement>(e: T, clickParent: HTMLElement = e, clazz: string = "expandable"): T {
 		e.classList.add(clazz, "collapsed");

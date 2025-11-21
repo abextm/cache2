@@ -100,7 +100,7 @@ class ScriptRunner {
 					// @ts-ignore
 					[, ...args] = args;
 				}
-				let [deps, declare] = <[string[], System.DeclareFn]> args;
+				let [deps, declare] = args as [string[], System.DeclareFn];
 
 				let iport: System.ImportFn = name => {
 					switch (name) {
@@ -351,7 +351,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 	},
 	async spriteMetadata(filter) {
 		let { result: sprites } = await loadAndFilter<c2.Sprites>(c2.Sprites, filter);
-		return <c2.Sprites[]> <any> sprites.filter(s => {
+		return sprites.filter(s => {
 			return filter || !(s.sprites.length == 1 && s.sprites[0].pixelsWidth === 0 && s.sprites[0].pixelsHeight === 0);
 		}).map(s => ({
 			...s,
@@ -360,7 +360,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 				...sp,
 				pixels: undefined!,
 			})),
-		}));
+		})) as any as c2.Sprites[];
 	},
 	async spriteImageData(id) {
 		let sprite = await c2.Sprites.load(ctx.cache, id);

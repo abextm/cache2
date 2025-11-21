@@ -14,7 +14,7 @@ export class Item extends PerFileLoadable {
 	public static readonly archive = 10;
 	public static readonly gameval = 0;
 
-	public inventoryModel = <ModelID> -1;
+	public inventoryModel = -1 as ModelID;
 	public name: string | null = "null";
 	public examine: string | null = null;
 	public zoom2d = 2000;
@@ -25,36 +25,36 @@ export class Item extends PerFileLoadable {
 	public isStackable = false;
 	public price = 1;
 	public isMembers = false;
-	public wearpos1 = <WearPos> -1;
-	public wearpos2 = <WearPos> -1;
-	public wearpos3 = <WearPos> -1;
+	public wearpos1 = -1 as WearPos;
+	public wearpos2 = -1 as WearPos;
+	public wearpos3 = -1 as WearPos;
 	public weight = 0;
-	public maleModel = <ModelID> -1;
+	public maleModel = -1 as ModelID;
 	public maleOffset = 0;
-	public maleModel1 = <ModelID> -1;
-	public femaleModel = <ModelID> -1;
+	public maleModel1 = -1 as ModelID;
+	public femaleModel = -1 as ModelID;
 	public femaleOffset = 0;
-	public femaleModel1 = <ModelID> -1;
+	public femaleModel1 = -1 as ModelID;
 	public groundActions: (string | null)[] = [null, null, "Take", null, null];
 	public inventoryActions: (string | null)[] = [null, null, null, null, "Drop"];
 	public subops: string[][] = [];
-	public recolorFrom: HSL[] = <HSL[]> [];
-	public recolorTo: HSL[] = <HSL[]> [];
-	public retextureFrom: TextureID[] = <TextureID[]> [];
-	public retextureTo: TextureID[] = <TextureID[]> [];
+	public recolorFrom: HSL[] = [] as HSL[];
+	public recolorTo: HSL[] = [] as HSL[];
+	public retextureFrom: TextureID[] = [] as TextureID[];
+	public retextureTo: TextureID[] = [] as TextureID[];
 	public shiftClickIndex = -2;
 	public isGrandExchangable = false;
-	public maleModel2 = <ModelID> -1;
-	public femaleModel2 = <ModelID> -1;
-	public maleChatheadModel = <ModelID> -1;
-	public femaleChatheadModel = <ModelID> -1;
-	public maleChatheadModel2 = <ModelID> -1;
-	public femaleChatheadModel2 = <ModelID> -1;
-	public category = <CategoryID> -1;
+	public maleModel2 = -1 as ModelID;
+	public femaleModel2 = -1 as ModelID;
+	public maleChatheadModel = -1 as ModelID;
+	public femaleChatheadModel = -1 as ModelID;
+	public maleChatheadModel2 = -1 as ModelID;
+	public femaleChatheadModel2 = -1 as ModelID;
+	public category = -1 as CategoryID;
 	public zan2d = 0;
-	public noteLinkedItem = <ItemID> -1;
-	public noteTemplate = <ItemID> -1;
-	public stackVariantItems: ItemID[] = <ItemID[]> [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	public noteLinkedItem = -1 as ItemID;
+	public noteTemplate = -1 as ItemID;
+	public stackVariantItems: ItemID[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as ItemID[];
 	public stackVariantQuantities: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	public resizeX = 128;
 	public resizeY = 128;
@@ -62,10 +62,10 @@ export class Item extends PerFileLoadable {
 	public ambient = 0;
 	public contrast = 0;
 	public team = 0;
-	public noted2 = <ItemID> -1;
-	public noted3 = <ItemID> -1;
-	public placeholderLinkedItem = <ItemID> -1;
-	public placeholderTemplate = <ItemID> -1;
+	public noted2 = -1 as ItemID;
+	public noted3 = -1 as ItemID;
+	public placeholderLinkedItem = -1 as ItemID;
+	public placeholderTemplate = -1 as ItemID;
 	public params = new Params();
 
 	public static decode(r: Reader, id: ItemID): Item {
@@ -73,7 +73,7 @@ export class Item extends PerFileLoadable {
 		for (let opcode: number; (opcode = r.u8()) != 0;) {
 			switch (opcode) {
 				case 1:
-					v.inventoryModel = <ModelID> r.u16();
+					v.inventoryModel = r.u16() as ModelID;
 					break;
 				case 2:
 					v.name = r.string();
@@ -103,30 +103,30 @@ export class Item extends PerFileLoadable {
 					v.price = r.i32();
 					break;
 				case 13:
-					v.wearpos1 = <WearPos> r.u8();
+					v.wearpos1 = r.u8() as WearPos;
 					break;
 				case 14:
-					v.wearpos2 = <WearPos> r.u8();
+					v.wearpos2 = r.u8() as WearPos;
 					break;
 				case 16:
 					v.isMembers = true;
 					break;
 				case 23:
-					v.maleModel = <ModelID> r.u16();
+					v.maleModel = r.u16() as ModelID;
 					v.maleOffset = r.u8();
 					break;
 				case 24:
-					v.maleModel1 = <ModelID> r.u16();
+					v.maleModel1 = r.u16() as ModelID;
 					break;
 				case 25:
-					v.femaleModel = <ModelID> r.u16();
+					v.femaleModel = r.u16() as ModelID;
 					v.femaleOffset = r.u8();
 					break;
 				case 26:
-					v.femaleModel1 = <ModelID> r.u16();
+					v.femaleModel1 = r.u16() as ModelID;
 					break;
 				case 27:
-					v.wearpos3 = <WearPos> r.u8();
+					v.wearpos3 = r.u8() as WearPos;
 					break;
 				case 30:
 				case 31:
@@ -147,8 +147,8 @@ export class Item extends PerFileLoadable {
 					v.recolorFrom = new Array(len);
 					v.recolorTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.recolorFrom[i] = <HSL> r.u16();
-						v.recolorTo[i] = <HSL> r.u16();
+						v.recolorFrom[i] = r.u16() as HSL;
+						v.recolorTo[i] = r.u16() as HSL;
 					}
 					break;
 				}
@@ -157,8 +157,8 @@ export class Item extends PerFileLoadable {
 					v.retextureFrom = new Array(len);
 					v.retextureTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.retextureFrom[i] = <TextureID> r.u16();
-						v.retextureTo[i] = <TextureID> r.u16();
+						v.retextureFrom[i] = r.u16() as TextureID;
+						v.retextureTo[i] = r.u16() as TextureID;
 					}
 					break;
 				}
@@ -184,34 +184,34 @@ export class Item extends PerFileLoadable {
 					v.weight = r.i16();
 					break;
 				case 78:
-					v.maleModel2 = <ModelID> r.u16();
+					v.maleModel2 = r.u16() as ModelID;
 					break;
 				case 79:
-					v.femaleModel2 = <ModelID> r.u16();
+					v.femaleModel2 = r.u16() as ModelID;
 					break;
 				case 90:
-					v.maleChatheadModel = <ModelID> r.u16();
+					v.maleChatheadModel = r.u16() as ModelID;
 					break;
 				case 91:
-					v.femaleChatheadModel = <ModelID> r.u16();
+					v.femaleChatheadModel = r.u16() as ModelID;
 					break;
 				case 92:
-					v.maleChatheadModel2 = <ModelID> r.u16();
+					v.maleChatheadModel2 = r.u16() as ModelID;
 					break;
 				case 93:
-					v.femaleChatheadModel2 = <ModelID> r.u16();
+					v.femaleChatheadModel2 = r.u16() as ModelID;
 					break;
 				case 94:
-					v.category = <CategoryID> r.u16();
+					v.category = r.u16() as CategoryID;
 					break;
 				case 95:
 					v.zan2d = r.u16();
 					break;
 				case 97:
-					v.noteLinkedItem = <ItemID> r.u16();
+					v.noteLinkedItem = r.u16() as ItemID;
 					break;
 				case 98:
-					v.noteTemplate = <ItemID> r.u16();
+					v.noteTemplate = r.u16() as ItemID;
 					break;
 				case 100:
 				case 101:
@@ -223,7 +223,7 @@ export class Item extends PerFileLoadable {
 				case 107:
 				case 108:
 				case 109:
-					v.stackVariantItems[opcode - 100] = <ItemID> r.u16();
+					v.stackVariantItems[opcode - 100] = r.u16() as ItemID;
 					v.stackVariantQuantities[opcode - 100] = r.u16();
 					break;
 				case 110:
@@ -245,16 +245,16 @@ export class Item extends PerFileLoadable {
 					v.team = r.i8();
 					break;
 				case 139:
-					v.noted2 = <ItemID> r.u16();
+					v.noted2 = r.u16() as ItemID;
 					break;
 				case 140:
-					v.noted3 = <ItemID> r.u16();
+					v.noted3 = r.u16() as ItemID;
 					break;
 				case 148:
-					v.placeholderLinkedItem = <ItemID> r.u16();
+					v.placeholderLinkedItem = r.u16() as ItemID;
 					break;
 				case 149:
-					v.placeholderTemplate = <ItemID> r.u16();
+					v.placeholderTemplate = r.u16() as ItemID;
 					break;
 				case 249:
 					v.params = r.params();

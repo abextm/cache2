@@ -143,7 +143,7 @@ export function config<NAME extends keyof ConfigTypes>(
 
 export const darkMode = await config(
 	"darkMode",
-	"matchMedia" in self && (<any> self).matchMedia("(prefers-color-scheme: dark)").matches,
+	"matchMedia" in self && (self as any).matchMedia("(prefers-color-scheme: dark)").matches,
 ).ready;
 
 export const GITHUB_MASTER: GithubCacheID = {

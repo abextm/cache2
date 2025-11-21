@@ -33,7 +33,7 @@ const env: monaco_t.Environment = {
 		return new Worker2(type).ready;
 	},
 };
-(<any> self).MonacoEnvironment = env;
+(self as any).MonacoEnvironment = env;
 
 const langs = [
 	monaco.languages.typescript.typescriptDefaults,

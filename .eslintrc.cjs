@@ -28,6 +28,7 @@ module.exports = {
 		"plugin:svelte/recommended",
 	],
 	rules: {
+		"@typescript-eslint/consistent-type-assertions": "error",
 		"@typescript-eslint/no-explicit-any": "off",
 		"prefer-const": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",

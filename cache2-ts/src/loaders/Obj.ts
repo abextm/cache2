@@ -40,18 +40,18 @@ export class Obj extends PerFileLoadable {
 	public contouredGround = -1;
 	public flatShading = false;
 	public modelClipped = false;
-	public animationId = <AnimationID> -1;
+	public animationId = -1 as AnimationID;
 	public decorDisplacement = 16;
 	public ambient = 0;
 	public contrast = 0;
-	public category = <CategoryID> -1;
+	public category = -1 as CategoryID;
 	public actions: (string | null)[] = [null, null, null, null, null];
-	public recolorFrom: HSL[] = <HSL[]> [];
-	public recolorTo: HSL[] = <HSL[]> [];
-	public retextureFrom: TextureID[] = <TextureID[]> [];
-	public retextureTo: TextureID[] = <TextureID[]> [];
-	public mapIconId = <MapElementID> -1;
-	public mapSceneId = <MapSceneIconID> -1;
+	public recolorFrom: HSL[] = [] as HSL[];
+	public recolorTo: HSL[] = [] as HSL[];
+	public retextureFrom: TextureID[] = [] as TextureID[];
+	public retextureTo: TextureID[] = [] as TextureID[];
+	public mapIconId = -1 as MapElementID;
+	public mapSceneId = -1 as MapSceneIconID;
 	public isRotated = false;
 	public shadow = true;
 	public modelSizeX = 128;
@@ -63,12 +63,12 @@ export class Obj extends PerFileLoadable {
 	public obstructsGround = false;
 	public isHollow = false;
 	public supportItems = -1;
-	public varbit = <VarbitID> -1;
-	public varp = <VarPID> -1;
-	public multiChildren: ObjID[] = <ObjID[]> [];
-	public oobChild = <ObjID> -1;
-	public ambientSoundID = <SoundEffectID> -1;
-	public multiAmbientSoundIDs = <SoundEffectID[]> [];
+	public varbit = -1 as VarbitID;
+	public varp = -1 as VarPID;
+	public multiChildren: ObjID[] = [] as ObjID[];
+	public oobChild = -1 as ObjID;
+	public ambientSoundID = -1 as SoundEffectID;
+	public multiAmbientSoundIDs = [] as SoundEffectID[];
 	public ambientSoundDistance = 0;
 	public ambientSoundRetain = 0;
 	public ambientSoundDistanceFadeCurve: AmbientSoundCurve = AmbientSoundCurve.Linear;
@@ -95,8 +95,8 @@ export class Obj extends PerFileLoadable {
 					v.models = new Array(len);
 					for (let i = 0; i < len; i++) {
 						v.models[i] = {
-							model: <ModelID> r.u16(),
-							shape: opcode == 5 ? ObjShape.CentrepieceStraight : <ObjShape> r.u8(),
+							model: r.u16() as ModelID,
+							shape: opcode == 5 ? ObjShape.CentrepieceStraight : r.u8() as ObjShape,
 						};
 					}
 					break;
@@ -130,7 +130,7 @@ export class Obj extends PerFileLoadable {
 					v.modelClipped = true;
 					break;
 				case 24:
-					v.animationId = <AnimationID> r.u16n();
+					v.animationId = r.u16n() as AnimationID;
 					break;
 				case 27:
 					v.clipType = 1;
@@ -156,8 +156,8 @@ export class Obj extends PerFileLoadable {
 					v.recolorFrom = new Array(len);
 					v.recolorTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.recolorFrom[i] = <HSL> r.u16();
-						v.recolorTo[i] = <HSL> r.u16();
+						v.recolorFrom[i] = r.u16() as HSL;
+						v.recolorTo[i] = r.u16() as HSL;
 					}
 					break;
 				}
@@ -166,13 +166,13 @@ export class Obj extends PerFileLoadable {
 					v.retextureFrom = new Array(len);
 					v.retextureTo = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.retextureFrom[i] = <TextureID> r.u16();
-						v.retextureTo[i] = <TextureID> r.u16();
+						v.retextureFrom[i] = r.u16() as TextureID;
+						v.retextureTo[i] = r.u16() as TextureID;
 					}
 					break;
 				}
 				case 61:
-					v.category = <CategoryID> r.u16();
+					v.category = r.u16() as CategoryID;
 					break;
 				case 62:
 					v.isRotated = true;
@@ -190,7 +190,7 @@ export class Obj extends PerFileLoadable {
 					v.modelSizeY = r.u16();
 					break;
 				case 68:
-					v.mapSceneId = <MapSceneIconID> r.u16();
+					v.mapSceneId = r.u16() as MapSceneIconID;
 					break;
 				case 69:
 					v.blockingMask = r.u8();
@@ -214,17 +214,17 @@ export class Obj extends PerFileLoadable {
 					v.supportItems = r.u8();
 					break;
 				case 77: {
-					v.varbit = <VarbitID> r.u16n();
-					v.varp = <VarPID> r.u16n();
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = <ObjID> r.u16n();
+						v.multiChildren[i] = r.u16n() as ObjID;
 					}
 					break;
 				}
 				case 78:
-					v.ambientSoundID = <SoundEffectID> r.u16();
+					v.ambientSoundID = r.u16() as SoundEffectID;
 					v.ambientSoundDistance = r.u8();
 					if (r.isAfter({ era: "osrs", indexRevision: 4106 })) {
 						v.ambientSoundRetain = r.u8();
@@ -240,7 +240,7 @@ export class Obj extends PerFileLoadable {
 					let len = r.u8();
 					v.multiAmbientSoundIDs = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiAmbientSoundIDs[i] = <SoundEffectID> r.u16();
+						v.multiAmbientSoundIDs[i] = r.u16() as SoundEffectID;
 					}
 					break;
 				}
@@ -248,7 +248,7 @@ export class Obj extends PerFileLoadable {
 					v.contouredGround = r.u8() * 256;
 					break;
 				case 82:
-					v.mapIconId = <MapElementID> r.u16();
+					v.mapIconId = r.u16() as MapElementID;
 					break;
 				case 89:
 					v.randomizeAnimationStart = false;
@@ -260,13 +260,13 @@ export class Obj extends PerFileLoadable {
 					v.ambientSoundDistanceFadeCurve = r.u8() as AmbientSoundCurve;
 					break;
 				case 92: {
-					v.varbit = <VarbitID> r.u16n();
-					v.varp = <VarPID> r.u16n();
-					v.oobChild = <ObjID> r.u16n();
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
+					v.oobChild = r.u16n() as ObjID;
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = <ObjID> r.u16n();
+						v.multiChildren[i] = r.u16n() as ObjID;
 					}
 					break;
 				}
