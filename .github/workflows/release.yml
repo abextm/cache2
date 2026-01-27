@@ -2,6 +2,9 @@ on:
   push:
     tags:
       - 'v*'
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -17,5 +20,3 @@ jobs:
     - run: npm ci
     - run: npm run test-all
     - run: npm -w cache2-ts publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
