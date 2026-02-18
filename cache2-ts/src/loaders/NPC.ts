@@ -68,6 +68,7 @@ export class NPC extends PerFileLoadable {
 	public crawlRotate180Animation = -1 as AnimationID;
 	public crawlRotateLeftAnimation = -1 as AnimationID;
 	public crawlRotateRightAnimation = -1 as AnimationID;
+	public idleAnimRestart = false;
 	public attack = 1;
 	public defence = 1;
 	public strength = 1;
@@ -79,6 +80,7 @@ export class NPC extends PerFileLoadable {
 	public unknown1 = false;
 	public canHideForOverlap = false;
 	public overlapTint: HSL = 39188;
+	public zbuf = true;
 	public params = new Params();
 
 	public static decode(r: Reader, id: NPCID): NPC {
@@ -281,11 +283,17 @@ export class NPC extends PerFileLoadable {
 				case 129:
 					v.unknown1 = true;
 					break;
+				case 130:
+					v.idleAnimRestart = true;
+					break;
 				case 145:
 					v.canHideForOverlap = true;
 					break;
 				case 146:
 					v.overlapTint = r.u16();
+					break;
+				case 147:
+					v.zbuf = false;
 					break;
 				case 249:
 					v.params = r.params();

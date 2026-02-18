@@ -63,6 +63,7 @@ export class Obj extends PerFileLoadable {
 	public obstructsGround = false;
 	public isHollow = false;
 	public supportItems = -1;
+	public raise = 0;
 	public varbit = -1 as VarbitID;
 	public varp = -1 as VarPID;
 	public multiChildren: ObjID[] = [] as ObjID[];
@@ -281,6 +282,9 @@ export class Obj extends PerFileLoadable {
 					break;
 				case 95:
 					v.ambientSoundVisibility = r.u8() as AmbientSoundVisibility;
+					break;
+				case 96:
+					v.raise = r.u8();
 					break;
 				case 249:
 					v.params = r.params();
