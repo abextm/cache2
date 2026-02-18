@@ -42,6 +42,6 @@
 		"tslib": "^2.6.1"
 	},
 	"devDependencies": {
-		"@typescript/vfs": "^1.4.0"
+		"@typescript/vfs": "^1.6.2"
 	}
 }
