@@ -81,7 +81,7 @@ export type AmbientSoundCurve = NewType<number, "AmbientSoundCurve">;
 export type AmbientSoundVisibility = NewType<number, "AmbientSoundVisibility">;
 export type AnimMayaID = NewType<number, "AnimMayaID">;
 
-export class Params extends Map<ParamID, string | number> {
+export class Params extends Map<ParamID, string | number | bigint> {
 }
 
 export type KitOrItem = { kit: KitID; } | { item: ItemID; } | undefined;

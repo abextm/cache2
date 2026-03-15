@@ -1,5 +1,6 @@
 export * from "./Animation.js";
 export * from "./DBRow.js";
+export * from "./EntityOps.js";
 export * from "./Enum.js";
 export * from "./GameVal.js";
 export * from "./HealthBar.js";

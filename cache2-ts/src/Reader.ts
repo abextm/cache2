@@ -1,5 +1,5 @@
 import { CacheVersion } from "./Cache.js";
-import { ItemID, KitID, KitOrItem, ParamID, Params } from "./types.js";
+import { ItemID, KitID, KitOrItem, ModelID, ParamID, Params } from "./types.js";
 
 export const cp1252CharMap: string[] = (() => {
 	const ext = "€?‚ƒ„…†‡ˆ‰Š‹Œ?Ž??‘’“”•–—˜™š›œ?žŸ";
@@ -153,6 +153,9 @@ export class Reader {
 				case 1:
 					out.set(param as ParamID, this.string());
 					break;
+				case 2:
+					out.set(param as ParamID, this.i64());
+					break;
 				default:
 					throw new Error(`invalid type in param table ${type}`);
 			}
@@ -171,6 +174,9 @@ export class Reader {
 		} else {
 			throw new Error(`invalid KitOrItem ${id}`);
 		}
+	}
+	public model(): ModelID {
+		return this.i32() as ModelID;
 	}
 	public u32o16(): number { // rl BigSmart
 		if (this.view.getUint8(this.offset) & 0x80) {

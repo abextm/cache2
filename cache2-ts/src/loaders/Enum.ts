@@ -3,13 +3,17 @@ import { Reader } from "../Reader.js";
 import { Typed } from "../reflect.js";
 import { EnumID, ScriptVarChar } from "../types.js";
 
-export class EnumValueMap<K extends number = number, V extends string | number = string | number> extends Map<K, V> {
+export class EnumValueMap<K extends number = number, V extends string | number | bigint = string | number | bigint>
+	extends Map<K, V>
+{
 	constructor(readonly parent: Enum<K, V>) {
 		super();
 	}
 }
 
-export class Enum<K extends number = number, V extends string | number = string | number> extends PerFileLoadable {
+export class Enum<K extends number = number, V extends string | number | bigint = string | number | bigint>
+	extends PerFileLoadable
+{
 	constructor(public id: EnumID) {
 		super();
 	}
@@ -31,6 +35,12 @@ export class Enum<K extends number = number, V extends string | number = string 
 
 	public static decode(reader: Reader, id: EnumID): Enum {
 		const v = new Enum(id);
+		function readTable(coder: "i32" | "i64" | "string") {
+			let size = reader.u16();
+			for (let i = 0; i < size; i++) {
+				v.map.set(reader.i32(), reader[coder]());
+			}
+		}
 		for (let opcode: number; (opcode = reader.u8()) != 0;) {
 			switch (opcode) {
 				case 1:
@@ -46,14 +56,17 @@ export class Enum<K extends number = number, V extends string | number = string 
 					v.defaultValue = reader.i32();
 					break;
 				case 5:
-				case 6: {
-					let coder = opcode === 5 ? "string" as const : "i32" as const;
-					let size = reader.u16();
-					for (let i = 0; i < size; i++) {
-						v.map.set(reader.i32(), reader[coder]());
-					}
+					readTable("string");
 					break;
-				}
+				case 6:
+					readTable("i32");
+					break;
+				case 7:
+					readTable("i64");
+					break;
+				case 8:
+					v.defaultValue = reader.i64();
+					break;
 				default:
 					throw new Error(`unknown enum opcode ${opcode}`);
 			}

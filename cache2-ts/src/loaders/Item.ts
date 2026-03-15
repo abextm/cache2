@@ -2,6 +2,7 @@ import { PerFileLoadable } from "../Loadable.js";
 import { Reader } from "../Reader.js";
 import { Typed } from "../reflect.js";
 import { CategoryID, HSL, ItemID, ModelID, Params, TextureID, WearPos } from "../types.js";
+import { EntityOps } from "./EntityOps.js";
 
 export class Item extends PerFileLoadable {
 	constructor(public id: ItemID) {
@@ -35,8 +36,8 @@ export class Item extends PerFileLoadable {
 	public femaleModel = -1 as ModelID;
 	public femaleOffset = 0;
 	public femaleModel1 = -1 as ModelID;
-	public groundActions: (string | null)[] = [null, null, "Take", null, null];
-	public inventoryActions: (string | null)[] = [null, null, null, null, "Drop"];
+	public groundOps = new EntityOps();
+	public inventoryOps: (string | null)[] = [null, null, null, null, "Drop"];
 	public subops: string[][] = [];
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
@@ -48,8 +49,8 @@ export class Item extends PerFileLoadable {
 	public femaleModel2 = -1 as ModelID;
 	public maleChatheadModel = -1 as ModelID;
 	public femaleChatheadModel = -1 as ModelID;
-	public maleChatheadModel2 = -1 as ModelID;
-	public femaleChatheadModel2 = -1 as ModelID;
+	public maleChatheadModel1 = -1 as ModelID;
+	public femaleChatheadModel1 = -1 as ModelID;
 	public category = -1 as CategoryID;
 	public zan2d = 0;
 	public noteLinkedItem = -1 as ItemID;
@@ -133,14 +134,14 @@ export class Item extends PerFileLoadable {
 				case 32:
 				case 33:
 				case 34:
-					v.groundActions[opcode - 30] = r.stringNullHidden();
+					v.groundOps.decodeOp(r, opcode - 30);
 					break;
 				case 35:
 				case 36:
 				case 37:
 				case 38:
 				case 39:
-					v.inventoryActions[opcode - 35] = r.string();
+					v.inventoryOps[opcode - 35] = r.string();
 					break;
 				case 40: {
 					let len = r.u8();
@@ -177,6 +178,41 @@ export class Item extends PerFileLoadable {
 					}
 					break;
 				}
+				case 44:
+					v.inventoryModel = r.model();
+					break;
+				case 45:
+					v.maleModel = r.model();
+					v.maleOffset = r.u8();
+					break;
+				case 46:
+					v.maleModel1 = r.model();
+					break;
+				case 47:
+					v.maleModel2 = r.model();
+					break;
+				case 48:
+					v.femaleModel = r.model();
+					v.femaleOffset = r.u8();
+					break;
+				case 49:
+					v.femaleModel1 = r.model();
+					break;
+				case 50:
+					v.femaleModel2 = r.model();
+					break;
+				case 51:
+					v.maleChatheadModel = r.model();
+					break;
+				case 52:
+					v.maleChatheadModel1 = r.model();
+					break;
+				case 53:
+					v.femaleChatheadModel = r.model();
+					break;
+				case 54:
+					v.femaleChatheadModel1 = r.model();
+					break;
 				case 65:
 					v.isGrandExchangable = true;
 					break;
@@ -196,10 +232,10 @@ export class Item extends PerFileLoadable {
 					v.femaleChatheadModel = r.u16() as ModelID;
 					break;
 				case 92:
-					v.maleChatheadModel2 = r.u16() as ModelID;
+					v.maleChatheadModel1 = r.u16() as ModelID;
 					break;
 				case 93:
-					v.femaleChatheadModel2 = r.u16() as ModelID;
+					v.femaleChatheadModel1 = r.u16() as ModelID;
 					break;
 				case 94:
 					v.category = r.u16() as CategoryID;
@@ -255,6 +291,15 @@ export class Item extends PerFileLoadable {
 					break;
 				case 149:
 					v.placeholderTemplate = r.u16() as ItemID;
+					break;
+				case 200:
+					v.groundOps.decodeSubOp(r);
+					break;
+				case 201:
+					v.groundOps.decodeConditionalOp(r);
+					break;
+				case 202:
+					v.groundOps.decodeConditionalSubOp(r);
 					break;
 				case 249:
 					v.params = r.params();

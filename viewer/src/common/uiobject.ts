@@ -105,7 +105,7 @@ interface Entries {
 type TypeOverride = (k: any, v: any, obj: any) => [Typed.Any | undefined, Typed.Any | undefined] | undefined;
 const paramTypeOverride: TypeOverride = (k: keyof Param, v, obj: Param) => {
 	if (k === "defaultInt" || k === "defaultString") {
-		return [undefined, ScriptVarType.forChar(obj.type)?.asTyped()];
+		return [undefined, obj.type?.asTyped()];
 	}
 };
 const enumValueMapOverride: TypeOverride = (k, v, obj: EnumValueMap) => {
@@ -151,7 +151,7 @@ let paramTypesPromise = PARAM_TYPES_EMPTY;
 async function loadParams(cache: Promise<CacheProvider>): Promise<Map<ParamID, Typed.Named>> {
 	let out = new Map<ParamID, Typed.Named>();
 	for (let param of await Param.all(cache)) {
-		let type = ScriptVarType.forChar(param.type)?.asTyped();
+		let type = param.type?.asTyped();
 		if (type) {
 			out.set(param.id, type);
 		}

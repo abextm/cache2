@@ -13,6 +13,7 @@ import {
 	VarbitID,
 	VarPID,
 } from "../types.js";
+import { EntityOps } from "./EntityOps.js";
 
 export class NPC extends PerFileLoadable {
 	constructor(public id: NPCID) {
@@ -36,7 +37,7 @@ export class NPC extends PerFileLoadable {
 	public rotateLeftAnimation = -1 as AnimationID;
 	public rotateRightAnimation = -1 as AnimationID;
 	public category = -1 as CategoryID;
-	public actions: (string | null)[] = [null, null, null, null, null];
+	public ops = new EntityOps();
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
 	public retextureFrom: TextureID[] = [] as TextureID[];
@@ -127,7 +128,7 @@ export class NPC extends PerFileLoadable {
 				case 32:
 				case 33:
 				case 34:
-					v.actions[opcode - 30] = r.stringNullHidden();
+					v.ops.decodeOp(r, opcode - 30);
 					break;
 				case 40: {
 					let len = r.u8();
@@ -154,6 +155,22 @@ export class NPC extends PerFileLoadable {
 					v.chatheadModels = new Array(len);
 					for (let i = 0; i < len; i++) {
 						v.chatheadModels[i] = r.u16() as ModelID;
+					}
+					break;
+				}
+				case 61: {
+					let len = r.u8();
+					v.models = new Array(len);
+					for (let i = 0; i < len; i++) {
+						v.models[i] = r.model();
+					}
+					break;
+				}
+				case 62: {
+					let len = r.u8();
+					v.chatheadModels = new Array(len);
+					for (let i = 0; i < len; i++) {
+						v.chatheadModels[i] = r.model();
 					}
 					break;
 				}
@@ -297,6 +314,15 @@ export class NPC extends PerFileLoadable {
 					break;
 				case 249:
 					v.params = r.params();
+					break;
+				case 251:
+					v.ops.decodeSubOp(r);
+					break;
+				case 252:
+					v.ops.decodeConditionalOp(r);
+					break;
+				case 253:
+					v.ops.decodeConditionalSubOp(r);
 					break;
 				default:
 					throw new Error(`unknown opcode ${opcode}`);

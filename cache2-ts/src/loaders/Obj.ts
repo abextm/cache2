@@ -18,6 +18,7 @@ import {
 	VarbitID,
 	VarPID,
 } from "../types.js";
+import { EntityOps } from "./EntityOps.js";
 
 export class Obj extends PerFileLoadable {
 	constructor(public id: ObjID) {
@@ -45,7 +46,7 @@ export class Obj extends PerFileLoadable {
 	public ambient = 0;
 	public contrast = 0;
 	public category = -1 as CategoryID;
-	public actions: (string | null)[] = [null, null, null, null, null];
+	public ops = new EntityOps();
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
 	public retextureFrom: TextureID[] = [] as TextureID[];
@@ -102,6 +103,18 @@ export class Obj extends PerFileLoadable {
 					}
 					break;
 				}
+				case 6:
+				case 7: {
+					let len = r.u8();
+					v.models = new Array(len);
+					for (let i = 0; i < len; i++) {
+						v.models[i] = {
+							model: r.model(),
+							shape: opcode == 7 ? ObjShape.CentrepieceStraight : r.u8() as ObjShape,
+						};
+					}
+					break;
+				}
 				case 2:
 					v.name = r.string();
 					break;
@@ -150,7 +163,7 @@ export class Obj extends PerFileLoadable {
 				case 32:
 				case 33:
 				case 34:
-					v.actions[opcode - 30] = r.stringNullHidden();
+					v.ops.decodeOp(r, opcode - 30);
 					break;
 				case 40: {
 					let len = r.u8();
@@ -286,6 +299,15 @@ export class Obj extends PerFileLoadable {
 				case 96:
 					v.raise = r.u8();
 					break;
+				case 100:
+					v.ops.decodeSubOp(r);
+					break;
+				case 101:
+					v.ops.decodeConditionalOp(r);
+					break;
+				case 102:
+					v.ops.decodeConditionalSubOp(r);
+					break;
 				case 249:
 					v.params = r.params();
 					break;
@@ -298,7 +320,7 @@ export class Obj extends PerFileLoadable {
 			v.isDoor = 0;
 			if (
 				v.models?.[0]?.shape === ObjShape.CentrepieceStraight
-				|| v.actions.some(a => a !== null)
+				|| [...v.ops.values()].some(a => a.text != null)
 			) {
 				v.isDoor = 1;
 			}
