@@ -44,6 +44,7 @@ export class Item extends PerFileLoadable {
 	public retextureFrom: TextureID[] = [] as TextureID[];
 	public retextureTo: TextureID[] = [] as TextureID[];
 	public shiftClickIndex = -2;
+	public isTradeable = true;
 	public isGrandExchangable = false;
 	public maleModel2 = -1 as ModelID;
 	public femaleModel2 = -1 as ModelID;
@@ -108,6 +109,9 @@ export class Item extends PerFileLoadable {
 					break;
 				case 14:
 					v.wearpos2 = r.u8() as WearPos;
+					break;
+				case 15:
+					v.isTradeable = false;
 					break;
 				case 16:
 					v.isMembers = true;
