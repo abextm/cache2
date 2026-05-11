@@ -114,7 +114,7 @@ let config: webpack.Configuration = {
 				type: "asset/resource",
 			},
 			{
-				test: /node_modules\/typescript\/.*\.d\.ts$/,
+				test: /node_modules[\\/]typescript[\\/].*\.d\.ts$/,
 				loader: "raw-loader",
 			},
 			{
