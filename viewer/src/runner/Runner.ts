@@ -381,6 +381,7 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 			contentFilter = new RegExp(("" + filter).trim(), "iu");
 		}
 		let tabs = await Promise.all(v.map(async (tab) => {
+      let gameVal = await c2.GameVal.load(ctx.cache, c2.DBTable.gameval as c2.GameValID, tab.id);
 			let rows = await c2.DBTable.loadRows(ctx.cache, tab.id);
 			if (!rows) {
 				return [tab.id, `Broken table ${tab.id}`] as const;
@@ -405,7 +406,8 @@ new ServiceServer<IRunnerPrivate>(self as DedicatedWorkerGlobalScope, {
 						if (types === undefined) {
 							continue;
 						}
-						header[0].push([i, types.length]);
+            let columnName = gameVal?.files?.get(i);
+						header[0].push([columnName === undefined ? i : `${columnName} (${i})`, types.length]);
 						for (let ti = 0; ti < types.length; ti++) {
 							let type = types[ti];
 							header[1].push([c2.Typed(type), 1]);
