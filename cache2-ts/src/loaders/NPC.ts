@@ -81,6 +81,7 @@ export class NPC extends PerFileLoadable {
 	public unknown1 = false;
 	public canHideForOverlap = false;
 	public overlapTint: HSL = 39188;
+	public hitbarSegments: number | undefined = undefined;
 	public zbuf = true;
 	public params = new Params();
 
@@ -255,6 +256,10 @@ export class NPC extends PerFileLoadable {
 					// removed in 220
 					v.isFollower = true;
 					v.lowPriorityOps = true;
+					break;
+				case 112:
+					// removed at some point
+					v.hitbarSegments = r.u8();
 					break;
 				case 114:
 					v.runAnimation = r.u16() as AnimationID;

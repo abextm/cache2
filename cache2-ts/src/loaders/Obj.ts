@@ -51,6 +51,7 @@ export class Obj extends PerFileLoadable {
 	public recolorTo: HSL[] = [] as HSL[];
 	public retextureFrom: TextureID[] = [] as TextureID[];
 	public retextureTo: TextureID[] = [] as TextureID[];
+	public mapFunction: number | undefined = undefined;
 	public mapIconId = -1 as MapElementID;
 	public mapSceneId = -1 as MapSceneIconID;
 	public isRotated = false;
@@ -185,6 +186,9 @@ export class Obj extends PerFileLoadable {
 					}
 					break;
 				}
+				case 60:
+					v.mapFunction = r.u16();
+					break;
 				case 61:
 					v.category = r.u16() as CategoryID;
 					break;

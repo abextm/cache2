@@ -1,5 +1,5 @@
 import * as c2 from "@abextm/cache2";
-import { CacheProvider, DBTable } from "@abextm/cache2";
+import { CacheProvider } from "@abextm/cache2";
 import * as _ from "lodash";
 import { setCacheShare } from "../common/CacheShare";
 import { ClearConsole, IRunnerPrivate, Log, LogLevel, LookupType, ScriptResponse } from "../common/Runner";
