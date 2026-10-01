@@ -49,6 +49,7 @@ export class Obj extends PerFileLoadable {
 	public ops = new EntityOps();
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
+	public fullRecolor = -1 as HSL;
 	public retextureFrom: TextureID[] = [] as TextureID[];
 	public retextureTo: TextureID[] = [] as TextureID[];
 	public mapFunction: number | undefined = undefined;
@@ -186,6 +187,9 @@ export class Obj extends PerFileLoadable {
 					}
 					break;
 				}
+				case 42:
+					v.fullRecolor = r.u16() as HSL;
+					break;
 				case 60:
 					v.mapFunction = r.u16();
 					break;

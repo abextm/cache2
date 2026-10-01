@@ -42,6 +42,7 @@ export class Item extends PerFileLoadable {
 	public subops: string[][] = [];
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
+	public fullRecolor = -1 as HSL;
 	public retextureFrom: TextureID[] = [] as TextureID[];
 	public retextureTo: TextureID[] = [] as TextureID[];
 	public shiftClickIndex = -2;
@@ -69,6 +70,8 @@ export class Item extends PerFileLoadable {
 	public noted3 = -1 as ItemID;
 	public placeholderLinkedItem = -1 as ItemID;
 	public placeholderTemplate = -1 as ItemID;
+	public holdingWhitelist: ItemID[] = [] as ItemID[];
+	public isBronzeman = false;
 	public params = new Params();
 
 	public static decode(r: Reader, id: ItemID): Item {
@@ -254,6 +257,9 @@ export class Item extends PerFileLoadable {
 				case 98:
 					v.noteTemplate = r.u16() as ItemID;
 					break;
+				case 99:
+					v.fullRecolor = r.u16() as HSL;
+					break;
 				case 100:
 				case 101:
 				case 102:
@@ -301,6 +307,14 @@ export class Item extends PerFileLoadable {
 					v.isStackable = false;
 					v.hasVar = true;
 					break;
+				case 161: {
+					let len = r.u16();
+					v.holdingWhitelist = new Array(len);
+					for (let i = 0; i < len; i++) {
+						v.holdingWhitelist[i] = r.u16() as ItemID;
+					}
+					break;
+				}
 				case 200:
 					v.groundOps.decodeSubOp(r);
 					break;
@@ -312,6 +326,9 @@ export class Item extends PerFileLoadable {
 					break;
 				case 249:
 					v.params = r.params();
+					break;
+				case 251:
+					v.isBronzeman = true;
 					break;
 				default:
 					throw new Error(`unknown opcode ${opcode}`);

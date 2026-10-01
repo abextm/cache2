@@ -40,6 +40,7 @@ export class NPC extends PerFileLoadable {
 	public ops = new EntityOps();
 	public recolorFrom: HSL[] = [] as HSL[];
 	public recolorTo: HSL[] = [] as HSL[];
+	public fullRecolor = -1 as HSL;
 	public retextureFrom: TextureID[] = [] as TextureID[];
 	public retextureTo: TextureID[] = [] as TextureID[];
 	public chatheadModels: ModelID[] = [] as ModelID[];
@@ -151,6 +152,9 @@ export class NPC extends PerFileLoadable {
 					}
 					break;
 				}
+				case 42:
+					v.fullRecolor = r.u16() as HSL;
+					break;
 				case 60: {
 					let len = r.u8();
 					v.chatheadModels = new Array(len);
