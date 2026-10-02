@@ -1,7 +1,7 @@
 import { PerFileLoadable } from "../Loadable.js";
 import { Reader } from "../Reader.js";
 import { Typed } from "../reflect.js";
-import { CategoryID, HSL, ItemID, ModelID, Params, TextureID, WearPos } from "../types.js";
+import { AnimationID, CategoryID, HSL, ItemID, ModelID, Params, TextureID, WearPos } from "../types.js";
 import { EntityOps } from "./EntityOps.js";
 
 export class Item extends PerFileLoadable {
@@ -70,7 +70,7 @@ export class Item extends PerFileLoadable {
 	public noted3 = -1 as ItemID;
 	public placeholderLinkedItem = -1 as ItemID;
 	public placeholderTemplate = -1 as ItemID;
-	public holdingWhitelist: ItemID[] = [] as ItemID[];
+	public holdingWhitelist: AnimationID[] = [] as AnimationID[];
 	public isBronzeman = false;
 	public params = new Params();
 
@@ -311,7 +311,7 @@ export class Item extends PerFileLoadable {
 					let len = r.u16();
 					v.holdingWhitelist = new Array(len);
 					for (let i = 0; i < len; i++) {
-						v.holdingWhitelist[i] = r.u16() as ItemID;
+						v.holdingWhitelist[i] = r.u16() as AnimationID;
 					}
 					break;
 				}
