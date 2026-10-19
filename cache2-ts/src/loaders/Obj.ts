@@ -38,8 +38,8 @@ export class Obj extends PerFileLoadable {
 	public clipType: 0 | 1 | 2 = 2;
 	public blocksProjectile = true;
 	public isDoor = -1;
-	public contouredGround = -1;
-	public flatShading = false;
+	public hillSkew = -1;
+	public shareLight = false;
 	public modelClipped = false;
 	public animationId = -1 as AnimationID;
 	public decorDisplacement = 16;
@@ -137,10 +137,10 @@ export class Obj extends PerFileLoadable {
 					v.isDoor = r.u8();
 					break;
 				case 21:
-					v.contouredGround = 0;
+					v.hillSkew = 0;
 					break;
 				case 22:
-					v.flatShading = true;
+					v.shareLight = true;
 					break;
 				case 23:
 					v.modelClipped = true;
@@ -267,7 +267,7 @@ export class Obj extends PerFileLoadable {
 					break;
 				}
 				case 81:
-					v.contouredGround = r.u8() * 256;
+					v.hillSkew = r.u8() * 256;
 					break;
 				case 82:
 					v.mapIconId = r.u16() as MapElementID;
