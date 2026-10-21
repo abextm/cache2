@@ -235,16 +235,6 @@ export class Obj extends PerFileLoadable {
 				case 75:
 					v.supportItems = r.u8();
 					break;
-				case 77: {
-					v.varbit = r.u16n() as VarbitID;
-					v.varp = r.u16n() as VarPID;
-					let len = r.u8p1();
-					v.multiChildren = new Array(len);
-					for (let i = 0; i < len; i++) {
-						v.multiChildren[i] = r.u16n() as ObjID;
-					}
-					break;
-				}
 				case 78:
 					v.ambientSoundID = r.u16() as SoundEffectID;
 					v.ambientSoundDistance = r.u8();
@@ -281,10 +271,13 @@ export class Obj extends PerFileLoadable {
 				case 91:
 					v.ambientSoundDistanceFadeCurve = r.u8() as AmbientSoundCurve;
 					break;
+				case 77:
 				case 92: {
 					v.varbit = r.u16n() as VarbitID;
 					v.varp = r.u16n() as VarPID;
-					v.oobChild = r.u16n() as ObjID;
+					if (opcode == 92) {
+						v.oobChild = r.u16n() as ObjID;
+					}
 					let len = r.u8p1();
 					v.multiChildren = new Array(len);
 					for (let i = 0; i < len; i++) {
@@ -307,6 +300,20 @@ export class Obj extends PerFileLoadable {
 				case 96:
 					v.raise = r.u8();
 					break;
+				case 97:
+				case 98: {
+					v.varbit = r.u16n() as VarbitID;
+					v.varp = r.u16n() as VarPID;
+					if (opcode == 98) {
+						v.oobChild = r.i24() as ObjID;
+					}
+					let len = r.u8p1();
+					v.multiChildren = new Array(len);
+					for (let i = 0; i < len; i++) {
+						v.multiChildren[i] = r.i24() as ObjID;
+					}
+					break;
+				}
 				case 100:
 					v.ops.decodeSubOp(r);
 					break;

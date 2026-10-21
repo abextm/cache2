@@ -106,6 +106,13 @@ export class Reader {
 		let off = this.bump(3);
 		return (this.view.getUint8(off) << 16) | this.view.getUint16(off + 1);
 	}
+	public i24(): number {
+		let v = this.u24();
+		if (v > 0x7f_ffff) {
+			v -= 0x100_0000;
+		}
+		return v;
+	}
 	public i32(): number {
 		return this.view.getInt32(this.bump(4));
 	}
